@@ -1,6 +1,6 @@
 # OpenClaw Multi-Agent Bootstrapper
 
-This repository contains a fully automated bootstrapping script (`oc-install-sonnet46.sh`) and associated prompt templates to deploy a **strictly isolated, multi-agent OpenClaw environment** on a bare-metal Linux host.
+This repository contains a fully automated bootstrapping script (`oc-bootstrap.sh`) and associated prompt templates to deploy a **strictly isolated, multi-agent OpenClaw environment** on a bare-metal Linux host.
 
 Designed for local privacy and efficiency, this setup completely bypasses traditional cloud inference and central orchestrators. Instead, it utilizes a local inference server, local vector memory, and distinct Telegram bots to enforce absolute context isolation between agents.
 
@@ -21,7 +21,7 @@ The bootstrapping script relies on a specific repository layout to automatically
 
 ```text
 .
-├── oc-install-sonnet46.sh    # The main installation script
+├── oc-bootstrap.sh    # The main installation script
 ├── assistant/                # Prompt files for the General Assistant
 │   ├── SOUL.md               # Core persona and behavioral rules
 │   └── USER.md               # User preferences
@@ -39,7 +39,7 @@ When executed, the script performs a robust, end-to-end installation of the Open
 1. **Credential Collection**: Prompts for your Lemonade API key, three separate Telegram Bot tokens, and optional Composio/Brave API keys.
 2. **Secure Storage**: Saves all collected credentials to a heavily restricted (`chmod 600`) `.env` file at `~/.openclaw/secrets.env`.
 3. **System Setup**: Updates `apt`, installs `curl` and `git`, runs the official OpenClaw installer, and automatically applies `openclaw doctor --fix` to repair permissions.
-4. **Local Inference Mapping**: Configures the OpenClaw gateway to route memory and inference calls to the local Lemonade server.
+4. **Local Inference Mapping**: Prompts for your Lemonade server IP address and configures the OpenClaw gateway to route memory and inference calls to the local Lemonade server.
 5. **Agent Provisioning**: Generates three isolated directories (`~/.openclaw/workspace-<agent>`) and assigns specific local LLMs to each agent.
 6. **Least-Privilege Secrets**: Injects external API keys securely. (e.g., The Developer agent gets Composio access, but the Assistant remains strictly sandboxed).
 7. **Plugin & Skill Configuration**: Installs the Composio MCP plugin and grants the Research agent access to built-in summarization and web search.
@@ -62,11 +62,11 @@ When executed, the script performs a robust, end-to-end installation of the Open
 1. Clone this repository to your target machine.
 2. Ensure the script is executable:
    ```bash
-   chmod +x oc-install-sonnet46.sh
+   chmod +x oc-bootstrap.sh
    ```
 3. Run the setup script:
    ```bash
-   ./oc-install-sonnet46.sh
+   ./oc-bootstrap.sh
    ```
 4. Follow the interactive prompts to supply your credentials and confirm prompt-file seeding.
 
