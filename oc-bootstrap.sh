@@ -263,10 +263,10 @@ if [[ -n "$X_API_KEY" ]]; then
 fi
 
 # ==============================================================================
-# 8. Install Plugins & Assign Skills
+# 8. Assign Native Skills & Hooks
 # ==============================================================================
 echo ""
-echo "=== Assigning Native Skills ==="
+echo "=== Assigning Native Skills & Hooks ==="
 
 echo "Enabling built-in data gathering skills for the Research Agent..."
 openclaw config set agents.list.research.skills.summarize    true || echo "Warning: Failed to enable summarize skill."
@@ -276,6 +276,14 @@ openclaw config set agents.list.research.skills.newsSearch   true || echo "Warni
 openclaw config set agents.list.research.skills.rssReader    true || echo "Warning: Failed to enable rssReader skill."
 openclaw config set agents.list.research.skills.trendsFinder true || echo "Warning: Failed to enable trendsFinder skill."
 openclaw config set agents.list.research.skills.xScraper     true || echo "Warning: Failed to enable xScraper skill."
+
+echo "Enabling operational hooks..."
+# Assistant: Automatically track evolving hardware/schedules
+openclaw config set agents.list.assistant.hooks.autoMemory true || echo "Warning: Failed to enable autoMemory hook for assistant."
+# Research: Summarize sessions to prevent context bloat
+openclaw config set agents.list.research.hooks.sessionSummarize true || echo "Warning: Failed to enable sessionSummarize hook for research."
+# Developer: Validate tool outputs for technical accuracy
+openclaw config set agents.list.developer.hooks.toolValidation true || echo "Warning: Failed to enable toolValidation hook for developer."
 
 # ==============================================================================
 # 9. Bind Isolated Telegram Channels
