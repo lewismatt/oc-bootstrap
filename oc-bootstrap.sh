@@ -115,8 +115,13 @@ read -r -s -p "Enter Brave Search API Key (for Research Agent, or press Enter to
 echo ""
 BRAVE_API_KEY="${BRAVE_API_KEY:-}"
 
+read -r -s -p "Enter X/Twitter API Key or Auth Cookie (for xScraper, or press Enter to skip): " X_API_KEY
+echo ""
+X_API_KEY="${X_API_KEY:-}"
+
 [[ -z "$GITLAB_PAT" ]]    && echo "Warning: No GitLab PAT provided. Git workflow features will be unavailable."
-[[ -z "$BRAVE_API_KEY" ]] && echo "Warning: No Brave Search API Key provided. Brave search will be unavailable."
+[[ -z "$BRAVE_API_KEY" ]] && echo "Warning: No Brave Search API Key provided. Web search will be unavailable."
+[[ -z "$X_API_KEY" ]]     && echo "Warning: No X/Twitter credentials provided. X scraping may be rate-limited or blocked."
 
 # ==============================================================================
 # 3. Save Credentials to Secure .env File
@@ -145,6 +150,7 @@ RESEARCH_TOKEN=$RESEARCH_TOKEN
 DEVELOPER_TOKEN=$DEVELOPER_TOKEN
 GITLAB_PAT=$GITLAB_PAT
 BRAVE_API_KEY=$BRAVE_API_KEY
+X_API_KEY=$X_API_KEY
 EOF
         chmod 600 "$SECRETS_FILE"
         echo "✓ Credentials updated at $SECRETS_FILE"
@@ -157,6 +163,7 @@ RESEARCH_TOKEN=$RESEARCH_TOKEN
 DEVELOPER_TOKEN=$DEVELOPER_TOKEN
 GITLAB_PAT=$GITLAB_PAT
 BRAVE_API_KEY=$BRAVE_API_KEY
+X_API_KEY=$X_API_KEY
 EOF
     chmod 600 "$SECRETS_FILE"
     echo "✓ Credentials saved to $SECRETS_FILE"
@@ -251,15 +258,24 @@ else
     echo "Skipping Brave search configuration (no key provided)."
 fi
 
+if [[ -n "$X_API_KEY" ]]; then
+    openclaw config set agents.list.research.env.X_API_KEY "$X_API_KEY" || { echo "Error: Failed to set X credentials for research agent."; exit 1; }
+fi
+
 # ==============================================================================
 # 8. Install Plugins & Assign Skills
 # ==============================================================================
 echo ""
 echo "=== Assigning Native Skills ==="
 
-echo "Enabling built-in skills for the Research Agent..."
-openclaw config set agents.list.research.skills.summarize true || echo "Warning: Failed to enable summarize skill."
-openclaw config set agents.list.research.skills.webSearch true || echo "Warning: Failed to enable webSearch skill."
+echo "Enabling built-in data gathering skills for the Research Agent..."
+openclaw config set agents.list.research.skills.summarize    true || echo "Warning: Failed to enable summarize skill."
+openclaw config set agents.list.research.skills.webSearch    true || echo "Warning: Failed to enable webSearch skill."
+openclaw config set agents.list.research.skills.webScrape    true || echo "Warning: Failed to enable webScrape skill."
+openclaw config set agents.list.research.skills.newsSearch   true || echo "Warning: Failed to enable newsSearch skill."
+openclaw config set agents.list.research.skills.rssReader    true || echo "Warning: Failed to enable rssReader skill."
+openclaw config set agents.list.research.skills.trendsFinder true || echo "Warning: Failed to enable trendsFinder skill."
+openclaw config set agents.list.research.skills.xScraper     true || echo "Warning: Failed to enable xScraper skill."
 
 # ==============================================================================
 # 9. Bind Isolated Telegram Channels
