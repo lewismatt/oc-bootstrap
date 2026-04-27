@@ -6,12 +6,13 @@ Designed for local privacy and efficiency, this setup completely bypasses tradit
 
 ## 🏗️ Architecture Overview
 
-- **Host Environment**: Ubuntu 24.04 (Bare-metal, native daemon execution)
-- **Inference Backend**: Local "Lemonade" server running GGUF models.
+- **Host Environment**: Ubuntu 24.04 (Bare-metal, native process execution)
+- **Inference Backend**: Local "Lemonade" server running GGUF models via AMD ROCm.
 - **Agent Topology**:
-  - **Assistant**: General-purpose aide (`Gemma-4-E4B-it-GGUF`)
-  - **Research**: Deep-dive web research agent (`Gemma-4-E4B-it-GGUF`)
-  - **Developer**: Code and Git workflow agent (`Qwen3.5-4B-GGUF`)
+  - **Assistant**: General-purpose aide (`lemonade/user.Qwen3.5-4B-GGUF`)
+  - **Research**: Deep-dive web research agent (`lemonade/user.Qwen3.5-4B-GGUF`)
+  - **Developer**: Code and Git workflow agent (`lemonade/user.Qwen3.5-4B-GGUF`)
+- **Shared Memory/Embedding Model**: `lemonade/user.nomic-embed-text-v1.5-GGUF`
 - **Interface**: 3x independent Telegram bots to prevent context bleeding.
 - **Memory**: Local SQLite-backed vector search with `sqlite-vec` acceleration.
 
@@ -21,7 +22,8 @@ The bootstrapping script relies on a specific repository layout to automatically
 
 ```text
 .
-├── oc-bootstrap.sh    # The main installation script
+├── oc-bootstrap.sh           # The main installation script
+├── secrets.env.template      # Boilerplate for required credentials
 ├── assistant/                # Prompt files for the General Assistant
 │   ├── SOUL.md               # Core persona and behavioral rules
 │   └── USER.md               # User preferences
@@ -32,53 +34,81 @@ The bootstrapping script relies on a specific repository layout to automatically
     └── AGENTS.md             # Multi-agent coordination instructions
 ```
 
-## ⚙️ What the Script Does
-
-When executed, the script performs a robust, end-to-end installation of the OpenClaw gateway:
-
-1. **Credential Collection**: Prompts for your Lemonade API key, three separate Telegram Bot tokens, and optional Composio/Brave API keys.
-2. **Secure Storage**: Saves all collected credentials to a heavily restricted (`chmod 600`) `.env` file at `~/.openclaw/secrets.env`.
-3. **System Setup**: Updates `apt`, installs `curl` and `git`, runs the official OpenClaw installer, and automatically applies `openclaw doctor --fix` to repair permissions.
-4. **Local Inference Mapping**: Prompts for your Lemonade server IP address and configures the OpenClaw gateway to route memory and inference calls to the local Lemonade server.
-5. **Agent Provisioning**: Generates three isolated directories (`~/.openclaw/workspace-<agent>`) and assigns specific local LLMs to each agent.
-6. **Least-Privilege Secrets**: Injects external API keys securely. (e.g., The Developer agent gets Composio access, but the Assistant remains strictly sandboxed).
-7. **Plugin & Skill Configuration**: Installs the Composio MCP plugin and grants the Research agent access to built-in summarization and web search.
-8. **Telegram Binding**: Maps each agent to its dedicated Telegram bot and strips all default channel bindings to guarantee strict input isolation.
-9. **Vector Memory Setup**: Provisions isolated `.sqlite` indexes for each agent. Enables `sqlite-vec` for accelerated hybrid search (Vector + BM25), embedding caching, and experimental session transcript indexing.
-10. **Prompt Seeding**: Detects `SOUL.md`, `USER.md`, and `AGENTS.md` files in the repository and interactively seeds them into the newly created workspaces, complete with diff-checks to prevent accidental overwrites.
-11. **Gateway Initialization**: Starts the OpenClaw background daemon, verifies its status, and checks background memory indexers.
-
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Ubuntu 24.04 with standard user `sudo` access.
 - A running Lemonade server on your local network.
 - **Three** distinct Telegram Bot tokens from @BotFather.
-- (Optional) A Composio API key for git/code MCP features.
+- (Optional) A Composio API key for Git/Code MCP features.
 - (Optional) A Brave Search API key for the research agent.
 
 ### Installation
 
-1. Clone this repository to your target machine.
-2. Ensure the script is executable:
+1. Clone this repository to your target machine:
+   ```bash
+   git clone [https://gitlab.com/mattlewis/oc-bootstrap.git](https://gitlab.com/mattlewis/oc-bootstrap.git)
+   cd oc-bootstrap
+   ```
+2. Set up your credentials:
+   ```bash
+   mkdir -p ~/.openclaw
+   cp secrets.env.template ~/.openclaw/secrets.env
+   nano ~/.openclaw/secrets.env # Add your keys and tokens here
+   chmod 600 ~/.openclaw/secrets.env
+   ```
+3. Ensure the script is executable:
    ```bash
    chmod +x oc-bootstrap.sh
    ```
-3. Run the setup script:
+4. Run the setup script:
    ```bash
    ./oc-bootstrap.sh
    ```
-4. Follow the interactive prompts to supply your credentials and confirm prompt-file seeding.
+
+## ⚙️ How the Installation Works (Step-by-Step)
+
+The `oc-bootstrap.sh` script executes a comprehensive, idempotent setup process. Here is exactly what happens under the hood during installation:
+
+### 1. Credential Collection & Secure Storage
+The script begins by looking for the `~/.openclaw/secrets.env` file. If it doesn't exist, it prompts you interactively for your Lemonade API key, Telegram Bot tokens, and optional external API keys (Composio, Brave). All credentials are saved with strict `chmod 600` permissions so only your user account can read them.
+
+### 2. System Preparation & Core Install
+The script requests `sudo` validation once upfront. It updates your package lists (`apt update`), installs required dependencies (`curl`, `git`), and executes the official OpenClaw installer. Finally, it runs `openclaw doctor --fix` to automatically repair any baseline permission or configuration drift.
+
+### 3. Local Inference Mapping
+You are prompted for your Lemonade server's IP address. The script configures the OpenClaw gateway to route all base generation requests to your local endpoint, and specifically assigns the `nomic-embed-text-v1.5-GGUF` model to handle background memory indexing and dreaming sequences.
+
+### 4. Agent Provisioning
+Three isolated workspace directories are created (`~/.openclaw/workspace-assistant`, `workspace-research`, and `workspace-developer`). The script standardizes the inference model across all three agents, strictly assigning `lemonade/user.Qwen3.5-4B-GGUF` to handle logic and generation.
+
+### 5. Least-Privilege Secret Injection
+External API keys are injected natively into the agents' environments. The Composio key is injected into all three agents to enable cross-agent Git workflows, while the Brave API key is strictly isolated to the Research agent's namespace.
+
+### 6. Plugins & Skills Assignment
+The Composio MCP plugin is installed globally via the CLI, and permissions are granted to the Assistant, Research, and Developer agents. Native `summarize` and `webSearch` skills are unlocked specifically for the Research agent.
+
+### 7. Telegram Channel Isolation
+Each agent is bound to its respective dedicated Telegram bot. Crucially, the script then strips all default fallback bindings from the agents. This guarantees strict input isolation—messages sent to the Assistant bot will never bleed into the Developer agent's context window.
+
+### 8. Local Vector Memory Configuration
+The script provisions isolated `.sqlite` indexes for each agent using `sqlite-vec` for accelerated hybrid search (Vector + BM25). It enables embedding caching to reduce load on the Lemonade server and turns on experimental session transcript indexing so past conversations remain searchable natively.
+
+### 9. Interactive Prompt Seeding
+The script scans the repository for `SOUL.md`, `USER.md`, and `AGENTS.md` files. If found, it offers to seed them into the newly created workspaces. If a file already exists in the destination workspace, it outputs a `diff` and asks for explicit confirmation before overwriting, protecting your existing agent personas.
+
+### 10. Gateway Initialization & Verification
+The OpenClaw background daemon is started for the first time. The script waits for the RPC endpoint to stabilize, verifies the systemd status, outputs the final agent routing matrix, and checks the status of the background memory indexers.
 
 ## 🛡️ Privacy & Security Notes
 
-- **No Docker Overhead**: Runs as a standard system process for maximum resource efficiency on constrained hardware.
-- **Zero Cloud Data**: Embeddings and inference are routed strictly to the local server. No conversation data leaves your network unless using the explicit Brave/Composio integrations on specific agents.
-- **Isolated State**: Each agent maintains its own `MEMORY.md` file and SQLite index. They cannot "see" each other's state unless explicitly shared.
+- **No Docker Overhead**: Runs as a standard system process for maximum resource efficiency on constrained local hardware.
+- **Zero Cloud Data**: Embeddings and inference are routed strictly to your local Lemonade server. No conversation data leaves your network unless utilizing the explicit Brave/Composio integrations.
+- **Isolated State**: Each agent maintains its own `MEMORY.md` file and SQLite index. They cannot "see" each other's state or memories unless explicitly shared via user prompts or MCP workflows.
 
 ## 📜 Logs & Troubleshooting
 
-Installation logs are automatically saved to `~/.openclaw/logs/openclaw-setup.log`. If the OpenClaw daemon fails to start, you can check its status using:
+Installation logs are automatically saved to `~/.openclaw/logs/openclaw-setup.log`. If the OpenClaw daemon fails to start, you can check its status manually using:
 
 ```bash
 openclaw gateway status
