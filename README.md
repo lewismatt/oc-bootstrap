@@ -39,6 +39,7 @@ The bootstrapping script relies on a specific repository layout to automatically
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Ubuntu 24.04 with standard user `sudo` access (Node.js/npm will be installed automatically).
 - A running Lemonade server on your local network.
 - **Three** distinct Telegram Bot tokens from @BotFather.
