@@ -18,51 +18,47 @@ This document serves as the foundational context for the `oc-bootstrap` project.
 
 The system utilizes three distinct agents, all standardized to use the `lemonade/user.Qwen3.5-4B-GGUF` model to optimize VRAM utilization.
 
-1.  **The General Assistant:** Handles ad-hoc queries and general tasks.
-2.  **The Deep Research Agent:** Empowered with extensive native data-gathering skills (`webSearch`, `webScrape`, `newsSearch`, `rssReader`, `trendsFinder`, `xScraper`) via Brave and X APIs to monitor ongoing events and synthesize reports.
-3.  **The Developer Agent:** Focused on codebase management and CI/CD pipelines.
+1.  **The General Assistant:** Handles ad-hoc queries, general tasks, and daily life scheduling for the user in Nederland, CO.
+2.  **The Deep Research Agent:** Empowered with extensive native data-gathering skills (`webSearch`, `webScrape`, `newsSearch`, `rssReader`, `trendsFinder`, `xScraper`) via Brave and X APIs to monitor ongoing events (NBA, Ski Resorts, local concerts) and synthesize reports.
+3.  **The Developer Agent:** Focused on codebase management, local MCP orchestration, and CI/CD pipelines.
 
 **Inference & Memory:**
-* **Backend:** Local "Lemonade" server (e.g., `192.168.1.5:8000/v1`).
+* **Backend:** Local "Lemonade" server.
 * **Embedding/Dreaming:** Offloaded to `lemonade/user.nomic-embed-text-v1.5-GGUF`.
 * **Vector Search:** Accelerated locally via `sqlite-vec` to preserve compute cycles.
 
 ## 3. Key Design Decisions: The "Why"
 
-Throughout development, several pivots were made to adhere to the core philosophies:
-
 ### A. Telegram Channel Isolation over Default Orchestrator
-OpenClaw ships with a default "orchestrator" routing pattern. This was deliberately disabled in favor of binding each agent to its own dedicated Telegram Bot token. 
-* **Why:** Routing multiple agents through a single channel causes severe "token bleed," where irrelevant context is passed back and forth, quickly exhausting the local context window and bogging down inference speeds. Strict channel isolation guarantees pristine, domain-specific context.
+OpenClaw's default "orchestrator" pattern was disabled in favor of binding each agent to its own dedicated Telegram Bot token. 
+* **Why:** Prevents "token bleed" where irrelevant context is passed between agents, which would otherwise exhaust the limited local context window and slow down inference on the AMD hardware.
 
-### B. Local `stdio` MCP over Hosted Platforms (Composio)
-Initially, the project utilized Composio for Git integration. This was entirely stripped out and replaced with the open-source `@zereight/mcp-gitlab` server executed natively via `npx`.
-* **Why:** Hosted platforms like Composio route tool requests through third-party cloud infrastructure, violating the privacy requirement and introducing potential subscription costs. 
+### B. Universal Local GitLab MCP Integration
+Initially limited to the Developer, Git access via the open-source `@zereight/mcp-gitlab` server has been expanded to **all three agents**. 
+* **Why:** This creates a universal, version-controlled "Project Memory." The Research agent commits logs, and the Assistant can update user context files (`USER.md`) natively over `stdio`.
 
-### C. Open-Source MCP over the Official GitLab Server
-We explicitly chose a community-maintained GitLab MCP server over GitLab's official first-party server.
-* **Why:** The official server relies on experimental OAuth 2.0 Dynamic Client Registration, which is currently broken on GitLab.com, and it refuses standard Personal Access Tokens (PATs). The open-source alternative robustly supports PATs, ensuring the script executes reliably without failing during authentication.
+### C. Autonomous Operational Hooks
+The project now implements native OpenClaw hooks to reduce manual overhead.
+* **autoMemory (Assistant):** Automatically records evolving hardware preferences or ski schedules.
+* **sessionSummarize (Research):** Condenses deep research sessions to prevent context bloat.
+* **toolValidation (Developer):** Ensures technical accuracy for Git-based code modifications.
 
 ### D. Intelligent Prompt Seeding (GitOps Workflow)
-The script includes a robust loop to detect `SOUL.md`, `USER.md`, and `AGENTS.md` files in the repository and seed them into the agent workspaces (`~/.openclaw/workspace-*`).
-* **Why:** This allows the user to version-control agent personas alongside the infrastructure code. A `diff --unified=2` check is implemented to prevent accidental overwrites of live workspace memory if the script is re-run.
+The script seeds `SOUL.md`, `USER.md`, and `AGENTS.md` files into agent workspaces (`~/.openclaw/workspace-*`).
+* **Why:** Allows version-controlling agent personas alongside infrastructure. A `diff --unified=2` check prevents accidental overwrites of existing workspace data.
 
 ## 4. Current State of the Codebase
 
-The `oc-bootstrap.sh` script is fully functional and production-ready for the target environment. It executes the following lifecycle:
-1.  **Credential Management:** Safely prompts for and securely stores (`chmod 600`) Telegram tokens, Lemonade IPs, GitLab PATs, and search APIs in a local `.env` file.
-2.  **System Prep:** Installs dependencies (`curl`, `git`, `nodejs`, `npm`) and the OpenClaw core.
-3.  **Provisioning:** Adds agents, standardizes the Qwen models, and routes embedding to the local Lemonade server.
-4.  **Skill & MCP Binding:** Injects keys, enables native scraping skills, and binds the GitLab MCP server globally.
-5.  **Channel Isolation:** Binds specific Telegram bots and unbinds defaults.
-6.  **Memory Optimization:** Configures SQLite-backed vector search and enables caching.
-7.  **Seeding:** Interactively diffs and copies prompt templates.
-8.  **Verification:** Starts the gateway and outputs the routing matrix.
+The `oc-bootstrap.sh` script is a production-ready deployment tool that manages the full agent lifecycle:
+1.  **Credential Management:** Securely stores (`chmod 600`) tokens for Telegram, Lemonade, GitLab, Brave, and X.
+2.  **Infrastructure Provisioning:** Standardizes models, maps local inference, and configures `sqlite-vec` memory.
+3.  **Skill & Hook Deployment:** Unlocks advanced scraping skills and autonomous operational hooks.
+4.  **Binding & Isolation:** Enforces strict Telegram channel isolation.
 
 ## 5. Directives for Future LLM Development
 
-When proposing modifications to this project, adhere strictly to the following constraints:
-* **Maintain Bash Rigor:** Ensure `set -euo pipefail` and `set +H` remain intact. Trap errors cleanly.
-* **CLI Configuration Only:** Do not introduce `sed`, `awk`, or `jq` to modify OpenClaw JSON files. Always use `openclaw config set`. This was a critical user correction in the past and must be honored.
-* **No Cloud Middlemen:** If introducing new tools, prioritize native OpenClaw skills or local `stdio` MCP servers over hosted SaaS integration platforms.
-* **Resource Awareness:** Maintain awareness that the target environment relies on local hardware with fixed VRAM constraints. Avoid architectural choices that heavily inflate context window usage.
+When proposing modifications, adhere strictly to these constraints:
+* **Maintain Bash Rigor:** Ensure `set -euo pipefail` and `set +H` remain intact.
+* **CLI Configuration Only:** Always use `openclaw config set`. Do not suggest manual JSON parsing.
+* **Zero Cloud Middlemen:** Prioritize native skills or local `stdio` MCP servers over hosted SaaS platforms.
+* **Resource Awareness:** Honor the 12GB VRAM constraint and optimize for token conservation.
