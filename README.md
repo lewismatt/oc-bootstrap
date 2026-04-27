@@ -2,7 +2,7 @@
 
 This repository contains a fully automated bootstrapping script (`oc-bootstrap.sh`) and associated prompt templates to deploy a **strictly isolated, multi-agent OpenClaw environment** on a bare-metal Linux host.
 
-Designed for local privacy and efficiency, this setup completely bypasses traditional cloud inference and central orchestrators. Instead, it utilizes a local inference server, local vector memory, and distinct Telegram bots to enforce absolute context isolation between agents.
+Designed for local privacy and efficiency, this setup completely bypasses traditional cloud inference and hosted orchestration platforms. It utilizes a local inference server, local vector memory, and distinct Telegram bots to enforce absolute context isolation between agents, while utilizing local Model Context Protocol (MCP) servers for third-party integrations.
 
 ## 🏗️ Architecture Overview
 
@@ -37,10 +37,10 @@ The bootstrapping script relies on a specific repository layout to automatically
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Ubuntu 24.04 with standard user `sudo` access.
+- Ubuntu 24.04 with standard user `sudo` access (Node.js/npm will be installed automatically).
 - A running Lemonade server on your local network.
 - **Three** distinct Telegram Bot tokens from @BotFather.
-- (Optional) A Composio API key for Git/Code MCP features.
+- (Optional) A GitLab Personal Access Token (PAT) for Git MCP features.
 - (Optional) A Brave Search API key for the research agent.
 
 ### Installation
@@ -71,10 +71,10 @@ The bootstrapping script relies on a specific repository layout to automatically
 The `oc-bootstrap.sh` script executes a comprehensive, idempotent setup process. Here is exactly what happens under the hood during installation:
 
 ### 1. Credential Collection & Secure Storage
-The script begins by looking for the `~/.openclaw/secrets.env` file. If it doesn't exist, it prompts you interactively for your Lemonade API key, Telegram Bot tokens, and optional external API keys (Composio, Brave). All credentials are saved with strict `chmod 600` permissions so only your user account can read them.
+The script begins by looking for the `~/.openclaw/secrets.env` file. If it doesn't exist, it prompts you interactively for your Lemonade API key, Telegram Bot tokens, and optional external API keys (GitLab PAT, Brave). All credentials are saved with strict `chmod 600` permissions so only your user account can read them.
 
 ### 2. System Preparation & Core Install
-The script requests `sudo` validation once upfront. It updates your package lists (`apt update`), installs required dependencies (`curl`, `git`), and executes the official OpenClaw installer. Finally, it runs `openclaw doctor --fix` to automatically repair any baseline permission or configuration drift.
+The script requests `sudo` validation once upfront. It updates your package lists (`apt update`), installs required dependencies (`curl`, `git`, `nodejs`), and executes the official OpenClaw installer. Finally, it runs `openclaw doctor --fix` to automatically repair any baseline permission or configuration drift.
 
 ### 3. Local Inference Mapping
 You are prompted for your Lemonade server's IP address. The script configures the OpenClaw gateway to route all base generation requests to your local endpoint, and specifically assigns the `nomic-embed-text-v1.5-GGUF` model to handle background memory indexing and dreaming sequences.
@@ -82,11 +82,13 @@ You are prompted for your Lemonade server's IP address. The script configures th
 ### 4. Agent Provisioning
 Three isolated workspace directories are created (`~/.openclaw/workspace-assistant`, `workspace-research`, and `workspace-developer`). The script standardizes the inference model across all three agents, strictly assigning `lemonade/user.Qwen3.5-4B-GGUF` to handle logic and generation.
 
-### 5. Least-Privilege Secret Injection
-External API keys are injected natively into the agents' environments. The Composio key is injected into all three agents to enable cross-agent Git workflows, while the Brave API key is strictly isolated to the Research agent's namespace.
+### 5. Least-Privilege Secret Injection & Local MCP Server Binding
+External API keys are injected natively into the agents' environments. 
+- The **GitLab PAT** is injected into the Assistant, Research, and Developer agents. The `@zereight/mcp-gitlab` server is bound directly to all three agents via `npx`, allowing them to execute Git workflows locally without a third-party hosted platform.
+- The **Brave API key** is strictly isolated to the Research agent's namespace.
 
-### 6. Plugins & Skills Assignment
-The Composio MCP plugin is installed globally via the CLI, and permissions are granted to the Assistant, Research, and Developer agents. Native `summarize` and `webSearch` skills are unlocked specifically for the Research agent.
+### 6. Native Skills Assignment
+Native `summarize` and `webSearch` skills are unlocked specifically for the Research agent.
 
 ### 7. Telegram Channel Isolation
 Each agent is bound to its respective dedicated Telegram bot. Crucially, the script then strips all default fallback bindings from the agents. This guarantees strict input isolation—messages sent to the Assistant bot will never bleed into the Developer agent's context window.
@@ -103,7 +105,7 @@ The OpenClaw background daemon is started for the first time. The script waits f
 ## 🛡️ Privacy & Security Notes
 
 - **No Docker Overhead**: Runs as a standard system process for maximum resource efficiency on constrained local hardware.
-- **Zero Cloud Data**: Embeddings and inference are routed strictly to your local Lemonade server. No conversation data leaves your network unless utilizing the explicit Brave/Composio integrations.
+- **Zero Cloud Data**: Embeddings and inference are routed strictly to your local Lemonade server. No conversation data leaves your network unless utilizing the explicit Brave/GitLab integrations. All code review happens point-to-point via the local `stdio` MCP protocol.
 - **Isolated State**: Each agent maintains its own `MEMORY.md` file and SQLite index. They cannot "see" each other's state or memories unless explicitly shared via user prompts or MCP workflows.
 
 ## 📜 Logs & Troubleshooting

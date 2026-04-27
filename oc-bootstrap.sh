@@ -107,15 +107,15 @@ done
 
 echo ""
 echo "=== Agent-Specific External Secrets (optional) ==="
-read -r -s -p "Enter Composio API Key (for Git workflows, or press Enter to skip): " COMPOSIO_KEY
+read -r -s -p "Enter GitLab Personal Access Token (for local MCP, or press Enter to skip): " GITLAB_PAT
 echo ""
-COMPOSIO_KEY="${COMPOSIO_KEY:-}"
+GITLAB_PAT="${GITLAB_PAT:-}"
 
 read -r -s -p "Enter Brave Search API Key (for Research Agent, or press Enter to skip): " BRAVE_API_KEY
 echo ""
 BRAVE_API_KEY="${BRAVE_API_KEY:-}"
 
-[[ -z "$COMPOSIO_KEY" ]]  && echo "Warning: No Composio API Key provided. Git workflow features will be unavailable."
+[[ -z "$GITLAB_PAT" ]]    && echo "Warning: No GitLab PAT provided. Git workflow features will be unavailable."
 [[ -z "$BRAVE_API_KEY" ]] && echo "Warning: No Brave Search API Key provided. Brave search will be unavailable."
 
 # ==============================================================================
@@ -143,7 +143,7 @@ LEMONADE_KEY=$LEMONADE_KEY
 ASSISTANT_TOKEN=$ASSISTANT_TOKEN
 RESEARCH_TOKEN=$RESEARCH_TOKEN
 DEVELOPER_TOKEN=$DEVELOPER_TOKEN
-COMPOSIO_KEY=$COMPOSIO_KEY
+GITLAB_PAT=$GITLAB_PAT
 BRAVE_API_KEY=$BRAVE_API_KEY
 EOF
         chmod 600 "$SECRETS_FILE"
@@ -155,7 +155,7 @@ LEMONADE_KEY=$LEMONADE_KEY
 ASSISTANT_TOKEN=$ASSISTANT_TOKEN
 RESEARCH_TOKEN=$RESEARCH_TOKEN
 DEVELOPER_TOKEN=$DEVELOPER_TOKEN
-COMPOSIO_KEY=$COMPOSIO_KEY
+GITLAB_PAT=$GITLAB_PAT
 BRAVE_API_KEY=$BRAVE_API_KEY
 EOF
     chmod 600 "$SECRETS_FILE"
@@ -172,7 +172,7 @@ sudo -v || { echo "Error: sudo access is required to install dependencies."; exi
 
 sudo apt update     || echo "Warning: apt update failed. Continuing."
 sudo apt upgrade -y || echo "Warning: apt upgrade failed. Continuing."
-sudo apt install -y curl git || { echo "Error: Failed to install curl/git. Cannot continue."; exit 1; }
+sudo apt install -y curl git nodejs npm || { echo "Error: Failed to install curl/git/node. Cannot continue."; exit 1; }
 
 echo "Running official OpenClaw installer..."
 if ! curl -fsSL https://openclaw.ai/install.sh | bash; then
@@ -191,7 +191,7 @@ echo "=== Linking Lemonade Server Backend ==="
 
 LEMONADE_IP=""
 while [[ -z "$LEMONADE_IP" ]]; do
-    read -r -p "Enter Lemonade server IP address (e.g., 192.168.1.100): " LEMONADE_IP
+    read -r -p "Enter Lemonade server IP address (e.g., 192.168.12.50): " LEMONADE_IP
     [[ -z "$LEMONADE_IP" ]] && echo "Error: Lemonade server IP address is required. Please try again."
 done
 
@@ -228,14 +228,20 @@ openclaw config set agents.list.developer.model "lemonade/user.Qwen3.5-4B-GGUF" 
 # 7. Inject Agent-Specific Secrets & Configure Providers
 # ==============================================================================
 echo ""
-echo "=== Injecting Isolated Agent Secrets ==="
+echo "=== Injecting Isolated Agent Secrets & MCPs ==="
 
-if [[ -n "$COMPOSIO_KEY" ]]; then
-    openclaw config set agents.list.developer.env.COMPOSIO_API_KEY "$COMPOSIO_KEY" || { echo "Error: Failed to set Composio key for developer agent."; exit 1; }
-    openclaw config set agents.list.research.env.COMPOSIO_API_KEY  "$COMPOSIO_KEY" || { echo "Error: Failed to set Composio key for research agent.";  exit 1; }
-    openclaw config set agents.list.assistant.env.COMPOSIO_API_KEY "$COMPOSIO_KEY" || { echo "Error: Failed to set Composio key for assistant agent.";  exit 1; }
+if [[ -n "$GITLAB_PAT" ]]; then
+    for agent in "assistant" "research" "developer"; do
+        openclaw config set agents.list.${agent}.env.GITLAB_PERSONAL_ACCESS_TOKEN "$GITLAB_PAT" || { echo "Error: Failed to set GitLab PAT for $agent."; exit 1; }
+        openclaw config set agents.list.${agent}.env.GITLAB_API_URL "https://gitlab.com"        || { echo "Error: Failed to set GitLab URL for $agent."; exit 1; }
+        
+        echo "Binding local GitLab MCP server to ${agent^^} Agent..."
+        openclaw config set agents.list.${agent}.mcp.servers.gitlab.command "npx"
+        openclaw config set agents.list.${agent}.mcp.servers.gitlab.args[0] "-y"
+        openclaw config set agents.list.${agent}.mcp.servers.gitlab.args[1] "@zereight/mcp-gitlab"
+    done
 else
-    echo "Skipping Composio secret injection (no key provided)."
+    echo "Skipping GitLab MCP configuration (no token provided)."
 fi
 
 if [[ -n "$BRAVE_API_KEY" ]]; then
@@ -249,14 +255,7 @@ fi
 # 8. Install Plugins & Assign Skills
 # ==============================================================================
 echo ""
-echo "=== Installing Plugins & Assigning Skills ==="
-
-openclaw plugins install @composio/openclaw-plugin || echo "Warning: Failed to install Composio plugin. Continuing."
-
-echo "Assigning plugin permissions per agent..."
-openclaw config set agents.list.research.plugins.composio  true  || { echo "Error: Failed to enable Composio for research agent.";  exit 1; }
-openclaw config set agents.list.developer.plugins.composio true  || { echo "Error: Failed to enable Composio for developer agent."; exit 1; }
-openclaw config set agents.list.assistant.plugins.composio true  || { echo "Error: Failed to enable Composio for assistant agent."; exit 1; }
+echo "=== Assigning Native Skills ==="
 
 echo "Enabling built-in skills for the Research Agent..."
 openclaw config set agents.list.research.skills.summarize true || echo "Warning: Failed to enable summarize skill."
@@ -475,7 +474,6 @@ echo "Log file:     $LOG_FILE"
 echo "Secrets file: $HOME/.openclaw/secrets.env"
 echo "Memory index: $HOME/.openclaw/memory/"
 echo ""
-echo "Note: If your agents require OAuth (e.g. GitHub/GitLab), run 'composio login' manually."
 echo "Note: Memory indexing runs asynchronously on first boot. Initial search results"
 echo "      may be incomplete until the background sync finishes."
 echo ""
