@@ -7,7 +7,7 @@ Designed for local privacy and efficiency, this setup completely bypasses tradit
 ## 🏗️ Architecture Overview
 
 - **Host Environment**: Ubuntu 24.04 (Bare-metal, native daemon execution)
-- **Inference Backend**: Local "Lemonade" server (`192.168.12.50`) running GGUF models.
+- **Inference Backend**: Local "Lemonade" server running GGUF models.
 - **Agent Topology**:
   - **Assistant**: General-purpose aide (`Gemma-4-E4B-it-GGUF`)
   - **Research**: Deep-dive web research agent (`Gemma-4-E4B-it-GGUF`)
@@ -73,7 +73,7 @@ When executed, the script performs a robust, end-to-end installation of the Open
 ## 🛡️ Privacy & Security Notes
 
 - **No Docker Overhead**: Runs as a standard system process for maximum resource efficiency on constrained hardware.
-- **Zero Cloud Data**: Embeddings and inference are routed strictly to the local `192.168.12.50` server. No conversation data leaves your network unless using the explicit Brave/Composio integrations on specific agents.
+- **Zero Cloud Data**: Embeddings and inference are routed strictly to the local server. No conversation data leaves your network unless using the explicit Brave/Composio integrations on specific agents.
 - **Isolated State**: Each agent maintains its own `MEMORY.md` file and SQLite index. They cannot "see" each other's state unless explicitly shared.
 
 ## 📜 Logs & Troubleshooting

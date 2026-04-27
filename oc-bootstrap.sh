@@ -11,7 +11,7 @@ set +H # Disable history expansion to prevent issues with '!' characters in secr
 #   - Storage: Standard home directories (~/.openclaw/workspace-*)
 #   - Execution: Native process daemon (no Docker overhead)
 #
-# INFERENCE BACKEND (Local Lemonade Server @ 192.168.12.50):
+# INFERENCE BACKEND (Local Lemonade Server):
 #   - Dreaming/Embedding: lemonade/user.nomic-embed-text-v1.5-GGUF
 #   - Assistant Model:    lemonade/Gemma-4-E4B-it-GGUF
 #   - Research Model:     lemonade/Gemma-4-E4B-it-GGUF
@@ -232,7 +232,13 @@ openclaw doctor --fix || echo "Warning: OpenClaw doctor reported issues. Continu
 echo ""
 echo "=== Linking Lemonade Server Backend ==="
 
-BASE_URL="http://192.168.12.50:8000/v1"
+LEMONADE_IP=""
+while [[ -z "$LEMONADE_IP" ]]; do
+    read -r -p "Enter Lemonade server IP address (e.g., 192.168.1.100): " LEMONADE_IP
+    [[ -z "$LEMONADE_IP" ]] && echo "Error: Lemonade server IP address is required. Please try again."
+done
+
+BASE_URL="http://${LEMONADE_IP}:8000/v1"
 read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL
 [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
 
