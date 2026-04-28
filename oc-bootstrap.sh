@@ -118,9 +118,9 @@ read -r -s -p "Enter X/Twitter API Key or Auth Cookie (for xScraper, or press En
 echo ""
 X_API_KEY="${X_API_KEY:-}"
 
-[[ -z "$GITLAB_PAT" ]]    && echo "Warning: No GitLab PAT provided. Git workflow features will be unavailable."
+[[ -z "$GITLAB_PAT" ]] && echo "Warning: No GitLab PAT provided. Git workflow features will be unavailable."
 [[ -z "$BRAVE_API_KEY" ]] && echo "Warning: No Brave Search API Key provided. Web search will be unavailable."
-[[ -z "$X_API_KEY" ]]     && echo "Warning: No X/Twitter credentials provided. X scraping may be rate-limited or blocked."
+[[ -z "$X_API_KEY" ]] && echo "Warning: No X/Twitter credentials provided. X scraping may be rate-limited or blocked."
 
 # ==============================================================================
 # 4. Save Credentials to Secure .env File
@@ -142,7 +142,7 @@ if [[ -f "$SECRETS_FILE" ]]; then
         # shellcheck disable=SC1090
         source "$SECRETS_FILE"
     else
-        cat > "$SECRETS_FILE" <<EOF
+        cat > "$SECRETS_FILE" << EOF
 LEMONADE_KEY="$LEMONADE_KEY"
 ASSISTANT_TOKEN="$ASSISTANT_TOKEN"
 RESEARCH_TOKEN="$RESEARCH_TOKEN"
@@ -155,7 +155,7 @@ EOF
         echo "✓ Credentials updated at $SECRETS_FILE"
     fi
 else
-    cat > "$SECRETS_FILE" <<EOF
+    cat > "$SECRETS_FILE" << EOF
 LEMONADE_KEY="$LEMONADE_KEY"
 ASSISTANT_TOKEN="$ASSISTANT_TOKEN"
 RESEARCH_TOKEN="$RESEARCH_TOKEN"
@@ -174,14 +174,20 @@ fi
 echo ""
 echo "=== System Preparation ==="
 
-sudo -v || { echo "Error: sudo access is required to install dependencies."; exit 1; }
+sudo -v || {
+    echo "Error: sudo access is required to install dependencies."
+    exit 1
+}
 
 echo "Configuring NodeSource PPA to ensure modern Node.js installation..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || echo "Warning: Failed to setup NodeSource. Using default repositories."
 
-sudo apt update     || echo "Warning: apt update failed. Continuing."
+sudo apt update || echo "Warning: apt update failed. Continuing."
 sudo apt upgrade -y || echo "Warning: apt upgrade failed. Continuing."
-sudo apt install -y curl git nodejs || { echo "Error: Failed to install curl/git/nodejs. Cannot continue."; exit 1; }
+sudo apt install -y curl git nodejs || {
+    echo "Error: Failed to install curl/git/nodejs. Cannot continue."
+    exit 1
+}
 
 echo "Running official OpenClaw installer..."
 if ! curl -fsSL https://openclaw.ai/install.sh | bash; then
@@ -189,7 +195,7 @@ if ! curl -fsSL https://openclaw.ai/install.sh | bash; then
     exit 1
 fi
 
-if ! command -v openclaw &> /dev/null; then 
+if ! command -v openclaw &> /dev/null; then
     echo "Error: OpenClaw binary not found in PATH after installation."
     exit 1
 fi
@@ -215,8 +221,14 @@ BASE_URL="http://${LEMONADE_IP}:8000/v1"
 read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL
 [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
 
-openclaw config set providers.lemonade.baseUrl "$BASE_URL"     || { echo "Error: Failed to set Lemonade base URL."; exit 1; }
-openclaw config set providers.lemonade.apiKey  "$LEMONADE_KEY" || { echo "Error: Failed to set Lemonade API key."; exit 1; }
+openclaw config set providers.lemonade.baseUrl "$BASE_URL" || {
+    echo "Error: Failed to set Lemonade base URL."
+    exit 1
+}
+openclaw config set providers.lemonade.apiKey "$LEMONADE_KEY" || {
+    echo "Error: Failed to set Lemonade API key."
+    exit 1
+}
 
 echo "Configuring shared embedding and dreaming models..."
 openclaw config set memory.dreaming.model "lemonade/user.nomic-embed-text-v1.5-GGUF" || echo "Warning: Failed to set dreaming model."
@@ -231,13 +243,13 @@ echo "=== Provisioning Agent Workspaces ==="
 for agent in "assistant" "research" "developer"; do
     WORKSPACE="$HOME/.openclaw/workspace-${agent}"
     echo "Provisioning agent: ${agent^^}..."
-    openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive \
-        || echo "Warning: Issue provisioning agent '$agent'. Continuing."
+    openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive ||
+        echo "Warning: Issue provisioning agent '$agent'. Continuing."
 done
 
 echo "Assigning Qwen3.5-4B inference model to all agents..."
 openclaw config set agents.list.assistant.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for assistant agent."
-openclaw config set agents.list.research.model  "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for research agent."
+openclaw config set agents.list.research.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for research agent."
 openclaw config set agents.list.developer.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for developer agent."
 
 # ==============================================================================
@@ -248,9 +260,15 @@ echo "=== Injecting Isolated Agent Secrets & MCPs ==="
 
 if [[ -n "$GITLAB_PAT" ]]; then
     for agent in "assistant" "research" "developer"; do
-        openclaw config set agents.list.${agent}.env.GITLAB_PERSONAL_ACCESS_TOKEN "$GITLAB_PAT" || { echo "Error: Failed to set GitLab PAT for $agent."; exit 1; }
-        openclaw config set agents.list.${agent}.env.GITLAB_API_URL "https://gitlab.com"        || { echo "Error: Failed to set GitLab URL for $agent."; exit 1; }
-        
+        openclaw config set agents.list.${agent}.env.GITLAB_PERSONAL_ACCESS_TOKEN "$GITLAB_PAT" || {
+            echo "Error: Failed to set GitLab PAT for $agent."
+            exit 1
+        }
+        openclaw config set agents.list.${agent}.env.GITLAB_API_URL "https://gitlab.com" || {
+            echo "Error: Failed to set GitLab URL for $agent."
+            exit 1
+        }
+
         echo "Binding local GitLab MCP server to ${agent^^} Agent..."
         openclaw config set agents.list.${agent}.mcp.servers.gitlab.command "npx"
         # Use space-separated args for better CLI compatibility
@@ -266,14 +284,23 @@ else
 fi
 
 if [[ -n "$BRAVE_API_KEY" ]]; then
-    openclaw config set agents.list.research.env.BRAVE_API_KEY "$BRAVE_API_KEY" || { echo "Error: Failed to set Brave API key for research agent."; exit 1; }
-    openclaw config set agents.list.research.search.provider   "brave"           || { echo "Error: Failed to set Brave as search provider.";         exit 1; }
+    openclaw config set agents.list.research.env.BRAVE_API_KEY "$BRAVE_API_KEY" || {
+        echo "Error: Failed to set Brave API key for research agent."
+        exit 1
+    }
+    openclaw config set agents.list.research.search.provider "brave" || {
+        echo "Error: Failed to set Brave as search provider."
+        exit 1
+    }
 else
     echo "Skipping Brave search configuration (no key provided)."
 fi
 
 if [[ -n "$X_API_KEY" ]]; then
-    openclaw config set agents.list.research.env.X_API_KEY "$X_API_KEY" || { echo "Error: Failed to set X credentials for research agent."; exit 1; }
+    openclaw config set agents.list.research.env.X_API_KEY "$X_API_KEY" || {
+        echo "Error: Failed to set X credentials for research agent."
+        exit 1
+    }
 fi
 
 # ==============================================================================
@@ -283,13 +310,13 @@ echo ""
 echo "=== Assigning Native Skills & Hooks ==="
 
 echo "Enabling built-in data gathering skills for the Research Agent..."
-openclaw config set agents.list.research.skills.summarize    true || echo "Warning: Failed to enable summarize skill."
-openclaw config set agents.list.research.skills.webSearch    true || echo "Warning: Failed to enable webSearch skill."
-openclaw config set agents.list.research.skills.webScrape    true || echo "Warning: Failed to enable webScrape skill."
-openclaw config set agents.list.research.skills.newsSearch   true || echo "Warning: Failed to enable newsSearch skill."
-openclaw config set agents.list.research.skills.rssReader    true || echo "Warning: Failed to enable rssReader skill."
+openclaw config set agents.list.research.skills.summarize true || echo "Warning: Failed to enable summarize skill."
+openclaw config set agents.list.research.skills.webSearch true || echo "Warning: Failed to enable webSearch skill."
+openclaw config set agents.list.research.skills.webScrape true || echo "Warning: Failed to enable webScrape skill."
+openclaw config set agents.list.research.skills.newsSearch true || echo "Warning: Failed to enable newsSearch skill."
+openclaw config set agents.list.research.skills.rssReader true || echo "Warning: Failed to enable rssReader skill."
 openclaw config set agents.list.research.skills.trendsFinder true || echo "Warning: Failed to enable trendsFinder skill."
-openclaw config set agents.list.research.skills.xScraper     true || echo "Warning: Failed to enable xScraper skill."
+openclaw config set agents.list.research.skills.xScraper true || echo "Warning: Failed to enable xScraper skill."
 
 echo "Enabling operational hooks..."
 # Assistant: Automatically track evolving hardware/schedules
@@ -309,7 +336,7 @@ for agent in "assistant" "research" "developer"; do
     TOKEN=""
     case "$agent" in
         "assistant") TOKEN="$ASSISTANT_TOKEN" ;;
-        "research")  TOKEN="$RESEARCH_TOKEN"  ;;
+        "research") TOKEN="$RESEARCH_TOKEN" ;;
         "developer") TOKEN="$DEVELOPER_TOKEN" ;;
     esac
 
@@ -319,8 +346,8 @@ for agent in "assistant" "research" "developer"; do
         exit 1
     fi
 
-    openclaw agents unbind --agent "$agent" --all \
-        || echo "Warning: Failed to unbind defaults for agent '$agent'. Continuing."
+    openclaw agents unbind --agent "$agent" --all ||
+        echo "Warning: Failed to unbind defaults for agent '$agent'. Continuing."
 done
 
 # ==============================================================================
@@ -330,10 +357,22 @@ echo ""
 echo "=== Configuring Local Memory & Vector Search ==="
 
 echo "Configuring memory search embedding provider..."
-openclaw config set agents.defaults.memorySearch.provider           "openai"                                   || { echo "Error: Failed to set memory search provider.";       exit 1; }
-openclaw config set agents.defaults.memorySearch.model              "lemonade/user.nomic-embed-text-v1.5-GGUF" || { echo "Error: Failed to set memory search model.";          exit 1; }
-openclaw config set agents.defaults.memorySearch.remote.baseUrl     "$BASE_URL"                                || { echo "Error: Failed to set memory search base URL.";       exit 1; }
-openclaw config set agents.defaults.memorySearch.remote.apiKey      "$LEMONADE_KEY"                            || { echo "Error: Failed to set memory search API key.";        exit 1; }
+openclaw config set agents.defaults.memorySearch.provider "openai" || {
+    echo "Error: Failed to set memory search provider."
+    exit 1
+}
+openclaw config set agents.defaults.memorySearch.model "lemonade/user.nomic-embed-text-v1.5-GGUF" || {
+    echo "Error: Failed to set memory search model."
+    exit 1
+}
+openclaw config set agents.defaults.memorySearch.remote.baseUrl "$BASE_URL" || {
+    echo "Error: Failed to set memory search base URL."
+    exit 1
+}
+openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" || {
+    echo "Error: Failed to set memory search API key."
+    exit 1
+}
 
 echo "Configuring per-agent SQLite index storage..."
 # Use static path with explicit file naming pattern to avoid expansion issues
@@ -348,12 +387,12 @@ echo "Enabling sqlite-vec vector search acceleration..."
 openclaw config set agents.defaults.memorySearch.store.vector.enabled true || echo "Warning: Failed to enable sqlite-vec. OpenClaw will use JS fallback."
 
 echo "Enabling embedding cache..."
-openclaw config set agents.defaults.memorySearch.cache.enabled       true || echo "Warning: Failed to enable embedding cache."
+openclaw config set agents.defaults.memorySearch.cache.enabled true || echo "Warning: Failed to enable embedding cache."
 
 echo "Enabling session transcript indexing (experimental)..."
-openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true                               || echo "Warning: Failed to enable session memory indexing."
-openclaw config set agents.defaults.memorySearch.sources[0]          "memory"                                  || echo "Warning: Failed to set memory source."
-openclaw config set agents.defaults.memorySearch.sources[1]          "sessions"                                || echo "Warning: Failed to set sessions source."
+openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true || echo "Warning: Failed to enable session memory indexing."
+openclaw config set agents.defaults.memorySearch.sources[0] "memory" || echo "Warning: Failed to set memory source."
+openclaw config set agents.defaults.memorySearch.sources[1] "sessions" || echo "Warning: Failed to set sessions source."
 
 echo "✓ Memory index directory created at $MEMORY_DIR"
 echo "✓ Local memory and vector search configured."
@@ -435,24 +474,24 @@ else
                             echo "  Diff (workspace → repository):"
                             echo "  ------------------------------------------------------------"
                             if [[ -f "$DEST" && -f "$SRC" ]]; then
-                                diff -u "$DEST" "$SRC" \
-                                    | sed 's/^/  /' \
-                                    || true 
+                                diff -u "$DEST" "$SRC" |
+                                    sed 's/^/  /' ||
+                                    true
                             fi
                             echo "  ------------------------------------------------------------"
                             echo ""
                             read -r -p "  Overwrite ~/.openclaw/workspace-${agent}/${file}? (y/N) " OVERWRITE_FILE
                             if [[ "${OVERWRITE_FILE^^}" == "Y" ]]; then
-                                cp "$SRC" "$DEST" \
-                                    && echo "  ✓ ${agent^^}: $file overwritten." \
-                                    || echo "  Warning: Failed to copy $file for $agent."
+                                cp "$SRC" "$DEST" &&
+                                    echo "  ✓ ${agent^^}: $file overwritten." ||
+                                    echo "  Warning: Failed to copy $file for $agent."
                             else
                                 echo "  Skipped ${agent^^}: $file — existing file kept."
                             fi
                         else
-                            cp "$SRC" "$DEST" \
-                                && echo "  ✓ ${agent^^}: $file" \
-                                || echo "  Warning: Failed to copy $file for $agent."
+                            cp "$SRC" "$DEST" &&
+                                echo "  ✓ ${agent^^}: $file" ||
+                                echo "  Warning: Failed to copy $file for $agent."
                         fi
                     done
                 done
