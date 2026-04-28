@@ -20,21 +20,20 @@ Designed for local privacy and efficiency, this setup completely bypasses tradit
 
 The bootstrapping script relies on a specific repository layout to automatically seed each agent's behavioral prompts on startup.
 
-```text
-.
-├── oc-bootstrap.sh           # The main installation script
-├── assistant/                # Prompt files for the General Assistant
-│   ├── SOUL.md               # Core persona and behavioral rules
-│   ├── AGENTS.md             # GitOps coordination instructions
-│   └── USER.md               # User preferences
-├── research/                 # Prompt files for the Research Agent
-│   ├── SOUL.md
-│   └── AGENTS.md
-└── developer/                # Prompt files for the Developer Agent
-    ├── SOUL.md
-    ├── AGENTS.md
-    └── USER.md
-```
+### Root Directory
+
+- **`oc-bootstrap.sh`**: The main automated, idempotent installer that provisions agents, binds MCP servers, and configures memory.
+
+- **`.gitlab-ci.yml`**: CI/CD pipeline that executes ShellCheck, MarkdownLint, and Yamllint alongside security tests (SAST and Secret Detection).
+- **`LLM.md`**: Foundational project context and directives used to ensure AI agents maintain architectural alignment during future development.
+- **`.secrets`**: Boilerplate template for infrastructure credentials (Lemonade IP) and API tokens (Telegram, GitLab, Brave, X).
+
+### Agent-Specific Directories (`assistant/`, `research/`, `developer/`)
+
+- **`SOUL.md`**: Defines an agent's core persona, behavioral rules, and communication tone (e.g., CLI-priority).
+
+- **`USER.md`**: Provides agent-specific user context, such as Nederland location data, hardware specs, or NBA monitoring targets.
+- **`AGENTS.md`**: Outlines multi-agent coordination protocols and GitOps procedures for local repository interaction.
 
 ## 🚀 Quick Start
 
@@ -50,7 +49,7 @@ The bootstrapping script relies on a specific repository layout to automatically
 ### Installation
 
 1. Clone this repository to your target machine.
-2. Set up your credentials in `~/.openclaw/secrets.env`.
+2. Set up your credentials in `~/.openclaw/secrets.env` based on the `.secrets` template.
 3. Ensure the script is executable: `chmod +x oc-bootstrap.sh`.
 4. Run the setup script: `./oc-bootstrap.sh`.
 
