@@ -12,32 +12,11 @@ set +o histexpand # Disable history expansion to prevent issues with '!' charact
 #   - Execution: Native process daemon (no Docker overhead)
 #
 # INFERENCE BACKEND (Local Lemonade Server):
+#   - Note: Models reverted to 4B-GGUF to respect 12GB VRAM hardware limits.
 #   - Dreaming/Embedding: lemonade/user.nomic-embed-text-v1.5-GGUF
 #   - Assistant Model:    lemonade/user.Qwen3.5-4B-GGUF
 #   - Research Model:     lemonade/user.Qwen3.5-4B-GGUF
 #   - Developer Model:    lemonade/user.Qwen3.5-4B-GGUF
-#
-# AGENT TOPOLOGY & ISOLATION STRATEGY:
-#   To strictly conserve context windows and token usage for local inference,
-#   this setup bypasses the default central "orchestrator" pattern. Instead,
-#   each agent is strictly bound to its own dedicated Telegram bot interface.
-#   This guarantees complete context isolation and zero "token bleed" between
-#   different functional domains.
-#
-# REPOSITORY STRUCTURE:
-#   This script is designed to live in a git repository alongside per-agent
-#   configuration directories. If present, these directories are used to seed
-#   each agent's workspace with core prompt files before the gateway starts.
-#
-#   Expected layout:
-#     ./assistant/          # Prompt files for the General Assistant agent
-#     ./research/           # Prompt files for the Deep Research agent
-#     ./developer/          # Prompt files for the Developer agent
-#
-#   Recognized prompt files (any subset may be present):
-#     SOUL.md               # Agent persona, values, and behavioral rules
-#     AGENTS.md             # Multi-agent coordination instructions
-#     USER.md               # User context and preferences
 #
 # ==============================================================================
 
@@ -239,10 +218,10 @@ for agent in "assistant" "research" "developer"; do
         || echo "Warning: Issue provisioning agent '$agent'. Continuing."
 done
 
-echo "Assigning Qwen3.5-9B inference model to all agents..."
-openclaw config set agents.list.assistant.model "lemonade/user.Qwen3.5-9B-GGUF" || echo "Warning: Failed to set model for assistant agent."
-openclaw config set agents.list.research.model  "lemonade/user.Qwen3.5-9B-GGUF" || echo "Warning: Failed to set model for research agent."
-openclaw config set agents.list.developer.model "lemonade/user.Qwen3.5-9B-GGUF" || echo "Warning: Failed to set model for developer agent."
+echo "Assigning Qwen3.5-4B inference model to all agents..."
+openclaw config set agents.list.assistant.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for assistant agent."
+openclaw config set agents.list.research.model  "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for research agent."
+openclaw config set agents.list.developer.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for developer agent."
 
 # ==============================================================================
 # 7. Inject Agent-Specific Secrets & Configure Providers
