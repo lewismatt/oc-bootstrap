@@ -12,7 +12,6 @@ set +o histexpand # Disable history expansion to prevent issues with '!' charact
 #   - Execution: Native process daemon (no Docker overhead)
 #
 # INFERENCE BACKEND (Local Lemonade Server):
-#   - Note: Models reverted to 4B-GGUF to respect 12GB VRAM hardware limits.
 #   - Dreaming/Embedding: lemonade/user.nomic-embed-text-v1.5-GGUF
 #   - Assistant Model:    lemonade/user.Qwen3.5-4B-GGUF
 #   - Research Model:     lemonade/user.Qwen3.5-4B-GGUF
@@ -20,10 +19,20 @@ set +o histexpand # Disable history expansion to prevent issues with '!' charact
 #
 # ==============================================================================
 
+# ------------------------------------------------------------------------------
+# 0. Sudo Trap Guardrail
+# ------------------------------------------------------------------------------
+if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+    echo "Error: Do not run this script directly as root or with sudo."
+    echo "This script installs workspaces to the current user's home directory (\$HOME)."
+    echo "It will automatically prompt for sudo access when installing system packages."
+    exit 1
+fi
+
 STABILITY_DELAY=5 # Configurable start-up wait time
 
 # ==============================================================================
-# 0. Logging & Trap Setup
+# 1. Logging & Trap Setup
 # ==============================================================================
 SCRIPT_NAME="openclaw-setup"
 LOG_FILE="$HOME/.openclaw/logs/${SCRIPT_NAME}.log"
@@ -47,7 +56,7 @@ trap cleanup EXIT INT TERM
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ==============================================================================
-# 1. User Confirmation
+# 2. User Confirmation
 # ==============================================================================
 echo ""
 echo "OpenClaw Multi-Agent Setup"
@@ -57,7 +66,7 @@ read -r -p "Proceed with installation? (Y/n) " CONFIRM
 [[ "$CONFIRM" == "y" || "$CONFIRM" == "Y" || -z "$CONFIRM" ]] || exit 0
 
 # ==============================================================================
-# 2. Credential Collection
+# 3. Credential Collection
 # ==============================================================================
 echo ""
 echo "=== Infrastructure Credentials ==="
@@ -66,7 +75,7 @@ LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
 
 echo ""
 echo "=== Telegram Bot Tokens ==="
-echo "You will need three separate Telegram Bot Tokens from @BotFather."
+echo "You will need three unique Telegram Bot Tokens from @BotFather."
 echo ""
 
 ASSISTANT_TOKEN=""
@@ -77,17 +86,22 @@ while [[ -z "$ASSISTANT_TOKEN" ]]; do
 done
 
 RESEARCH_TOKEN=""
-while [[ -z "$RESEARCH_TOKEN" ]]; do
+while [[ -z "$RESEARCH_TOKEN" || "$RESEARCH_TOKEN" == "$ASSISTANT_TOKEN" ]]; do
     read -r -s -p "Enter Telegram Bot Token for the Deep Research Agent: " RESEARCH_TOKEN
     echo ""
     [[ -z "$RESEARCH_TOKEN" ]] && echo "Error: Research token is required. Please try again."
+    [[ "$RESEARCH_TOKEN" == "$ASSISTANT_TOKEN" ]] && echo "Error: Token must be unique. Do not reuse the Assistant token."
 done
 
 DEVELOPER_TOKEN=""
-while [[ -z "$DEVELOPER_TOKEN" ]]; do
+while [[ -z "$DEVELOPER_TOKEN" || "$DEVELOPER_TOKEN" == "$ASSISTANT_TOKEN" || "$DEVELOPER_TOKEN" == "$RESEARCH_TOKEN" ]]; do
     read -r -s -p "Enter Telegram Bot Token for the Developer Agent: " DEVELOPER_TOKEN
     echo ""
     [[ -z "$DEVELOPER_TOKEN" ]] && echo "Error: Developer token is required. Please try again."
+    if [[ "$DEVELOPER_TOKEN" == "$ASSISTANT_TOKEN" || "$DEVELOPER_TOKEN" == "$RESEARCH_TOKEN" ]]; then
+        echo "Error: Token must be unique. Do not reuse existing tokens."
+        DEVELOPER_TOKEN=""
+    fi
 done
 
 echo ""
@@ -109,7 +123,7 @@ X_API_KEY="${X_API_KEY:-}"
 [[ -z "$X_API_KEY" ]]     && echo "Warning: No X/Twitter credentials provided. X scraping may be rate-limited or blocked."
 
 # ==============================================================================
-# 3. Save Credentials to Secure .env File
+# 4. Save Credentials to Secure .env File
 # ==============================================================================
 echo ""
 echo "Saving credentials to secure environment file..."
@@ -155,16 +169,19 @@ EOF
 fi
 
 # ==============================================================================
-# 4. System Preparation & Core Install
+# 5. System Preparation & Core Install
 # ==============================================================================
 echo ""
 echo "=== System Preparation ==="
 
 sudo -v || { echo "Error: sudo access is required to install dependencies."; exit 1; }
 
+echo "Configuring NodeSource PPA to ensure modern Node.js installation..."
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || echo "Warning: Failed to setup NodeSource. Using default repositories."
+
 sudo apt update     || echo "Warning: apt update failed. Continuing."
 sudo apt upgrade -y || echo "Warning: apt upgrade failed. Continuing."
-sudo apt install -y curl git nodejs npm || { echo "Error: Failed to install curl/git/node. Cannot continue."; exit 1; }
+sudo apt install -y curl git nodejs || { echo "Error: Failed to install curl/git/nodejs. Cannot continue."; exit 1; }
 
 echo "Running official OpenClaw installer..."
 if ! curl -fsSL https://openclaw.ai/install.sh | bash; then
@@ -181,7 +198,7 @@ echo "Running post-install health check and auto-repair..."
 openclaw doctor --fix || echo "Warning: OpenClaw doctor reported issues. Continuing."
 
 # ==============================================================================
-# 5. Configure Local Inference (Lemonade Server)
+# 6. Configure Local Inference (Lemonade Server)
 # ==============================================================================
 echo ""
 echo "=== Linking Lemonade Server Backend ==="
@@ -206,7 +223,7 @@ openclaw config set memory.dreaming.model "lemonade/user.nomic-embed-text-v1.5-G
 openclaw config set memory.embeddingModel "lemonade/user.nomic-embed-text-v1.5-GGUF" || echo "Warning: Failed to set embedding model."
 
 # ==============================================================================
-# 6. Provision Isolated Agent Workspaces
+# 7. Provision Isolated Agent Workspaces
 # ==============================================================================
 echo ""
 echo "=== Provisioning Agent Workspaces ==="
@@ -224,7 +241,7 @@ openclaw config set agents.list.research.model  "lemonade/user.Qwen3.5-4B-GGUF" 
 openclaw config set agents.list.developer.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for developer agent."
 
 # ==============================================================================
-# 7. Inject Agent-Specific Secrets & Configure Providers
+# 8. Inject Agent-Specific Secrets & Configure Providers
 # ==============================================================================
 echo ""
 echo "=== Injecting Isolated Agent Secrets & MCPs ==="
@@ -260,7 +277,7 @@ if [[ -n "$X_API_KEY" ]]; then
 fi
 
 # ==============================================================================
-# 8. Assign Native Skills & Hooks
+# 9. Assign Native Skills & Hooks
 # ==============================================================================
 echo ""
 echo "=== Assigning Native Skills & Hooks ==="
@@ -283,7 +300,7 @@ openclaw config set agents.list.research.hooks.sessionSummarize true || echo "Wa
 openclaw config set agents.list.developer.hooks.toolValidation true || echo "Warning: Failed to enable toolValidation hook for developer."
 
 # ==============================================================================
-# 9. Bind Isolated Telegram Channels
+# 10. Bind Isolated Telegram Channels
 # ==============================================================================
 echo ""
 echo "=== Binding Telegram Channels ==="
@@ -307,7 +324,7 @@ for agent in "assistant" "research" "developer"; do
 done
 
 # ==============================================================================
-# 10. Configure Local Memory & Vector Search
+# 11. Configure Local Memory & Vector Search
 # ==============================================================================
 echo ""
 echo "=== Configuring Local Memory & Vector Search ==="
@@ -342,7 +359,7 @@ echo "✓ Memory index directory created at $MEMORY_DIR"
 echo "✓ Local memory and vector search configured."
 
 # ==============================================================================
-# 11. Seed Agent Prompt Files from Repository
+# 12. Seed Agent Prompt Files from Repository
 # ==============================================================================
 echo ""
 echo "=== Agent Prompt File Seeding ==="
@@ -462,7 +479,7 @@ else
 fi
 
 # ==============================================================================
-# 12. Start & Verify Gateway
+# 13. Start & Verify Gateway
 # ==============================================================================
 echo ""
 echo "=== Starting OpenClaw Gateway ==="
@@ -482,7 +499,7 @@ fi
 echo "✓ Gateway started successfully."
 
 # ==============================================================================
-# 13. Final Verification
+# 14. Final Verification
 # ==============================================================================
 echo ""
 echo "=== Final Verification ==="

@@ -20,7 +20,7 @@ Designed for local privacy and efficiency, this setup bypasses traditional cloud
 To get the most out of this multi-agent setup, you will need to gather a few API keys before running the installer.
 
 - **Telegram (Required):** You need three distinct bots to keep agent contexts isolated. Message [@BotFather on Telegram](https://t.me/botfather), send the `/newbot` command three separate times, and copy the provided HTTP API Tokens.
-- **Lemonade Server (Required):** You must have a running instance of a Lemonade inference server on your network. Have your IP address and API key ready.
+- **Lemonade Server (Required):** You must have a running instance of a Lemonade inference server on your network. Have your IP address and API key ready. **CRITICAL:** Ensure that both the `Qwen3.5-4B-GGUF` and `nomic-embed-text-v1.5-GGUF` models are actively downloaded and staged on your server before starting the agents.
 - **GitLab PAT (Optional):** Required for the Developer agent to read/write code. Create a Personal Access Token with `api` and `read_repository` scopes in your [GitLab Access Tokens settings](https://gitlab.com/-/user_settings/personal_access_tokens).
 - **Brave Search (Optional):** Empowers the Research agent to search the live web. Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).
 - **X/Twitter (Optional):** Allows the Research agent to scrape real-time trends. Requires an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).
@@ -29,7 +29,7 @@ To get the most out of this multi-agent setup, you will need to gather a few API
 
 ### Prerequisites
 
-- Ubuntu 24.04 with standard user `sudo` access.
+- Ubuntu 24.04 with standard user access. **Do not run the script as root.** The script will prompt for `sudo` access only when required.
 - `git` installed (`sudo apt install git`).
 
 ### Setup Steps
@@ -57,11 +57,18 @@ To get the most out of this multi-agent setup, you will need to gather a few API
 
 Running `oc-setup.sh` automates the entire provisioning process:
 
-1. **Installs Dependencies:** Ensures Node.js, npm, curl, and the OpenClaw core daemon are installed.
-2. **Secures Credentials:** Safely stores your API keys in a restricted (`chmod 600`) local environment file.
+1. **Installs Dependencies:** Safely provisions Node.js 20.x, curl, and the OpenClaw core daemon.
+2. **Secures Credentials:** Safely stores your API keys in a restricted (`chmod 600`) local environment file and blocks duplicate Telegram tokens.
 3. **Provisions Agents:** Creates isolated workspaces (`~/.openclaw/workspace-*`) for the Assistant, Research, and Developer agents.
 4. **Binds Skills & Hooks:** Equips the Research agent with live scraping skills, sets up auto-memory summarization, and binds the open-source `@zereight/mcp-gitlab` server for local Git operations.
 5. **Seeds Context:** Interactively copies the prompt files (`SOUL.md`, `USER.md`, `AGENTS.md`) from this repository directly into the agents' operational memory.
+
+## 📜 Troubleshooting Edge Cases
+
+- **Agents are unresponsive via Telegram:** Check your Lemonade server logs. If the required models (`Qwen3.5-4B-GGUF` and `nomic-embed-text-v1.5-GGUF`) are not downloaded on the server, the gateway will start but inference requests will time out.
+- **"Conflict: terminated by other getUpdates request":** You assigned the same Telegram Bot token to multiple agents. Run the setup script again and provide three strictly unique tokens.
+- **Ghost Daemon States:** If the setup script was abruptly terminated in the past, a ghost PM2 daemon may be holding onto old configurations. You can wipe the slate clean by running `openclaw gateway stop` and `npx pm2 kill`, then restarting the setup script.
+- **MCP Server Failures:** The `@zereight/mcp-gitlab` module requires a modern version of Node.js. The script attempts to install Node 20.x automatically, but if you have conflicting repository configurations, ensure you have at least Node 18+ installed via `node -v`.
 
 ## 🛡️ Privacy & Security Notes
 
