@@ -11,14 +11,14 @@ bash-syntax:
   stage: lint
   image: bash:latest
   script:
-    - bash -n oc-setup.sh
+    - bash -n oc-boostrap.sh
 
 # 2. ShellCheck: Validates Bash rigor and catches bugs
 shellcheck:
   stage: lint
   image: koalaman/shellcheck-alpine:stable
   script:
-    - shellcheck oc-setup.sh
+    - shellcheck oc-boostrap.sh
 
 # 3. shfmt: Enforces strict styling and indentation
 shfmt:
@@ -28,7 +28,7 @@ shfmt:
     # The -d flag prints a diff and fails the job if formatting is incorrect
     # The -i 4 flag enforces 4-space indentation
     # The -ci flag indents switch cases
-    - shfmt -d -i 4 -ci oc-setup.sh
+    - shfmt -d -i 4 -ci oc-boostrap.sh
 
 # 4. MarkdownLint: Ensures prompt files are LLM-ready
 markdownlint:
