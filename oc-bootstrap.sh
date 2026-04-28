@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-set +H # Disable history expansion to prevent issues with '!' characters in secrets
+set +o histexpand # Disable history expansion to prevent issues with '!' characters in secrets
 
 # ==============================================================================
 # OPENCLAW MULTI-AGENT ARCHITECTURE SETUP
@@ -41,6 +41,7 @@ set +H # Disable history expansion to prevent issues with '!' characters in secr
 #
 # ==============================================================================
 
+STABILITY_DELAY=5 # Configurable start-up wait time
 
 # ==============================================================================
 # 0. Logging & Trap Setup
@@ -54,10 +55,15 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting OpenClaw Multi-Agent Setup"
 
 cleanup() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setup aborted or interrupted. Check log: $LOG_FILE"
-    exit 1
+    local exit_code=$?
+    if [[ $exit_code -ne 0 ]]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setup aborted or interrupted with code $exit_code. Check log: $LOG_FILE"
+    else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setup completed or intentionally halted."
+    fi
+    exit "$exit_code"
 }
-trap cleanup INT TERM
+trap cleanup EXIT INT TERM
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -144,28 +150,28 @@ if [[ -f "$SECRETS_FILE" ]]; then
         source "$SECRETS_FILE"
     else
         cat > "$SECRETS_FILE" <<EOF
-LEMONADE_KEY=$LEMONADE_KEY
-ASSISTANT_TOKEN=$ASSISTANT_TOKEN
-RESEARCH_TOKEN=$RESEARCH_TOKEN
-DEVELOPER_TOKEN=$DEVELOPER_TOKEN
-GITLAB_PAT=$GITLAB_PAT
-BRAVE_API_KEY=$BRAVE_API_KEY
-X_API_KEY=$X_API_KEY
+LEMONADE_KEY="$LEMONADE_KEY"
+ASSISTANT_TOKEN="$ASSISTANT_TOKEN"
+RESEARCH_TOKEN="$RESEARCH_TOKEN"
+DEVELOPER_TOKEN="$DEVELOPER_TOKEN"
+GITLAB_PAT="$GITLAB_PAT"
+BRAVE_API_KEY="$BRAVE_API_KEY"
+X_API_KEY="$X_API_KEY"
 EOF
-        chmod 600 "$SECRETS_FILE"
+        chmod 600 "$SECRETS_FILE" && chown "$USER":"$USER" "$SECRETS_FILE"
         echo "✓ Credentials updated at $SECRETS_FILE"
     fi
 else
     cat > "$SECRETS_FILE" <<EOF
-LEMONADE_KEY=$LEMONADE_KEY
-ASSISTANT_TOKEN=$ASSISTANT_TOKEN
-RESEARCH_TOKEN=$RESEARCH_TOKEN
-DEVELOPER_TOKEN=$DEVELOPER_TOKEN
-GITLAB_PAT=$GITLAB_PAT
-BRAVE_API_KEY=$BRAVE_API_KEY
-X_API_KEY=$X_API_KEY
+LEMONADE_KEY="$LEMONADE_KEY"
+ASSISTANT_TOKEN="$ASSISTANT_TOKEN"
+RESEARCH_TOKEN="$RESEARCH_TOKEN"
+DEVELOPER_TOKEN="$DEVELOPER_TOKEN"
+GITLAB_PAT="$GITLAB_PAT"
+BRAVE_API_KEY="$BRAVE_API_KEY"
+X_API_KEY="$X_API_KEY"
 EOF
-    chmod 600 "$SECRETS_FILE"
+    chmod 600 "$SECRETS_FILE" && chown "$USER":"$USER" "$SECRETS_FILE"
     echo "✓ Credentials saved to $SECRETS_FILE"
 fi
 
@@ -187,6 +193,11 @@ if ! curl -fsSL https://openclaw.ai/install.sh | bash; then
     exit 1
 fi
 
+if ! command -v openclaw &> /dev/null; then 
+    echo "Error: OpenClaw binary not found in PATH after installation."
+    exit 1
+fi
+
 echo "Running post-install health check and auto-repair..."
 openclaw doctor --fix || echo "Warning: OpenClaw doctor reported issues. Continuing."
 
@@ -197,9 +208,11 @@ echo ""
 echo "=== Linking Lemonade Server Backend ==="
 
 LEMONADE_IP=""
-while [[ -z "$LEMONADE_IP" ]]; do
+while [[ ! "$LEMONADE_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; do
     read -r -p "Enter Lemonade server IP address (e.g., 192.168.12.50): " LEMONADE_IP
-    [[ -z "$LEMONADE_IP" ]] && echo "Error: Lemonade server IP address is required. Please try again."
+    if [[ ! "$LEMONADE_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Error: Invalid IP address format. Please try again."
+    fi
 done
 
 BASE_URL="http://${LEMONADE_IP}:8000/v1"
@@ -244,8 +257,8 @@ if [[ -n "$GITLAB_PAT" ]]; then
         
         echo "Binding local GitLab MCP server to ${agent^^} Agent..."
         openclaw config set agents.list.${agent}.mcp.servers.gitlab.command "npx"
-        openclaw config set agents.list.${agent}.mcp.servers.gitlab.args[0] "-y"
-        openclaw config set agents.list.${agent}.mcp.servers.gitlab.args[1] "@zereight/mcp-gitlab"
+        # CLI tools generally prefer flat arguments array structure over indexed setting
+        openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "-y" "@zereight/mcp-gitlab" || echo "Warning: Array args syntax may be unsupported by config command."
     done
 else
     echo "Skipping GitLab MCP configuration (no token provided)."
@@ -322,6 +335,7 @@ openclaw config set agents.defaults.memorySearch.remote.baseUrl     "$BASE_URL" 
 openclaw config set agents.defaults.memorySearch.remote.apiKey      "$LEMONADE_KEY"                            || { echo "Error: Failed to set memory search API key.";        exit 1; }
 
 echo "Configuring per-agent SQLite index storage..."
+# Ensure path logic is handled natively by the OpenClaw daemon path expansion to avoid bash globbing issues
 openclaw config set agents.defaults.memorySearch.store.path         "$HOME/.openclaw/memory/{agentId}.sqlite"  || echo "Warning: Failed to set memory index path."
 
 echo "Enabling sqlite-vec vector search acceleration..."
@@ -416,9 +430,11 @@ else
                             echo "  ⚠️  ${agent^^}: $file already exists in workspace."
                             echo "  Diff (workspace → repository):"
                             echo "  ------------------------------------------------------------"
-                            diff --unified=2 "$DEST" "$SRC" \
-                                | sed 's/^/  /' \
-                                || true 
+                            if [[ -f "$DEST" && -f "$SRC" ]]; then
+                                diff -u "$DEST" "$SRC" \
+                                    | sed 's/^/  /' \
+                                    || true 
+                            fi
                             echo "  ------------------------------------------------------------"
                             echo ""
                             read -r -p "  Overwrite ~/.openclaw/workspace-${agent}/${file}? (y/N) " OVERWRITE_FILE
@@ -469,8 +485,8 @@ if ! openclaw gateway start; then
     exit 1
 fi
 
-echo "Waiting 5 seconds for gateway to stabilize..."
-sleep 5
+echo "Waiting $STABILITY_DELAY seconds for gateway to stabilize..."
+sleep "$STABILITY_DELAY"
 
 if ! openclaw gateway status; then
     echo "Error: Gateway status check failed after start."
