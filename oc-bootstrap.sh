@@ -257,8 +257,13 @@ if [[ -n "$GITLAB_PAT" ]]; then
         
         echo "Binding local GitLab MCP server to ${agent^^} Agent..."
         openclaw config set agents.list.${agent}.mcp.servers.gitlab.command "npx"
-        # CLI tools generally prefer flat arguments array structure over indexed setting
-        openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "-y" "@zereight/mcp-gitlab" || echo "Warning: Array args syntax may be unsupported by config command."
+        # Use space-separated args for better CLI compatibility
+        openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "-y" "@zereight/mcp-gitlab" || {
+            echo "Warning: Array args syntax may not be supported. Trying alternative method..."
+            # Fallback: try setting each arg separately
+            openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "-y" || echo "Warning: Failed to set first MCP arg."
+            openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "@zereight/mcp-gitlab" || echo "Warning: Failed to set second MCP arg."
+        }
     done
 else
     echo "Skipping GitLab MCP configuration (no token provided)."
@@ -335,8 +340,13 @@ openclaw config set agents.defaults.memorySearch.remote.baseUrl     "$BASE_URL" 
 openclaw config set agents.defaults.memorySearch.remote.apiKey      "$LEMONADE_KEY"                            || { echo "Error: Failed to set memory search API key.";        exit 1; }
 
 echo "Configuring per-agent SQLite index storage..."
-# Ensure path logic is handled natively by the OpenClaw daemon path expansion to avoid bash globbing issues
-openclaw config set agents.defaults.memorySearch.store.path         "$HOME/.openclaw/memory/{agentId}.sqlite"  || echo "Warning: Failed to set memory index path."
+# Use static path with explicit file naming pattern to avoid expansion issues
+MEMORY_DIR="$HOME/.openclaw/memory"
+mkdir -p "$MEMORY_DIR"
+openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentId}.sqlite" || {
+    echo "Warning: Failed to set memory index path with pattern. Attempting static path..."
+    openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agent}.sqlite" || echo "Warning: Alternative memory path also failed."
+}
 
 echo "Enabling sqlite-vec vector search acceleration..."
 openclaw config set agents.defaults.memorySearch.store.vector.enabled true || echo "Warning: Failed to enable sqlite-vec. OpenClaw will use JS fallback."
@@ -349,9 +359,7 @@ openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true
 openclaw config set agents.defaults.memorySearch.sources[0]          "memory"                                  || echo "Warning: Failed to set memory source."
 openclaw config set agents.defaults.memorySearch.sources[1]          "sessions"                                || echo "Warning: Failed to set sessions source."
 
-mkdir -p "$HOME/.openclaw/memory"
-echo "✓ Memory index directory created at $HOME/.openclaw/memory"
-
+echo "✓ Memory index directory created at $MEMORY_DIR"
 echo "✓ Local memory and vector search configured."
 
 # ==============================================================================
