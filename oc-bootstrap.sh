@@ -239,10 +239,10 @@ for agent in "assistant" "research" "developer"; do
         || echo "Warning: Issue provisioning agent '$agent'. Continuing."
 done
 
-echo "Assigning Qwen3.5-4B inference model to all agents..."
-openclaw config set agents.list.assistant.model "lemonade/user.Qwen3.5-4B-GGUF"  || echo "Warning: Failed to set model for assistant agent."
-openclaw config set agents.list.research.model  "lemonade/user.Qwen3.5-4B-GGUF"  || echo "Warning: Failed to set model for research agent."
-openclaw config set agents.list.developer.model "lemonade/user.Qwen3.5-4B-GGUF"  || echo "Warning: Failed to set model for developer agent."
+echo "Assigning Qwen3.5-9B inference model to all agents..."
+openclaw config set agents.list.assistant.model "lemonade/user.Qwen3.5-9B-GGUF" || echo "Warning: Failed to set model for assistant agent."
+openclaw config set agents.list.research.model  "lemonade/user.Qwen3.5-9B-GGUF" || echo "Warning: Failed to set model for research agent."
+openclaw config set agents.list.developer.model "lemonade/user.Qwen3.5-9B-GGUF" || echo "Warning: Failed to set model for developer agent."
 
 # ==============================================================================
 # 7. Inject Agent-Specific Secrets & Configure Providers
