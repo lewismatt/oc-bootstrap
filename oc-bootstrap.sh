@@ -142,7 +142,7 @@ if [[ -f "$SECRETS_FILE" ]]; then
         # shellcheck disable=SC1090
         source "$SECRETS_FILE"
     else
-        cat > "$SECRETS_FILE" << EOF
+        cat >"$SECRETS_FILE" <<EOF
 LEMONADE_KEY="$LEMONADE_KEY"
 ASSISTANT_TOKEN="$ASSISTANT_TOKEN"
 RESEARCH_TOKEN="$RESEARCH_TOKEN"
@@ -155,7 +155,7 @@ EOF
         echo "✓ Credentials updated at $SECRETS_FILE"
     fi
 else
-    cat > "$SECRETS_FILE" << EOF
+    cat >"$SECRETS_FILE" <<EOF
 LEMONADE_KEY="$LEMONADE_KEY"
 ASSISTANT_TOKEN="$ASSISTANT_TOKEN"
 RESEARCH_TOKEN="$RESEARCH_TOKEN"
@@ -195,7 +195,7 @@ if ! curl -fsSL https://openclaw.ai/install.sh | bash; then
     exit 1
 fi
 
-if ! command -v openclaw &> /dev/null; then
+if ! command -v openclaw &>/dev/null; then
     echo "Error: OpenClaw binary not found in PATH after installation."
     exit 1
 fi
