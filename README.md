@@ -25,7 +25,7 @@
 |:-----------------------------|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Telegram** (required)      | Three distinct bots keep each agent's context isolated.  | Message **@BotFather** -> `/newbot` three times -> copy the HTTP API tokens.                                                                                        |
 | **Lemonade Server** (required) | Provides local inference.                                | Run a Lemonade instance and note its IP and API key. **CRITICAL:** Ensure both `Qwen3.5-4B-GGUF` **and** `nomic-embed-text-v1.5-GGUF` are downloaded and staged. |
-| **GitLab PAT** (optional)    | Allows the Developer agent to read/write code.           | Create a Personal Access Token with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
+| **GitLab PAT** (optional)    | Allows all agents to read/write to a shared codebase.   | Create a Personal Access Token with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
 | **Brave Search** (optional)  | Powers live web searches for the Research agent.         | Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).                                                                         |
 | **X/Twitter** (optional)     | Enables real-time trend scraping for the Research agent. | Obtain an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).                                                                 |
 
@@ -59,8 +59,9 @@ chmod +x oc-bootstrap.sh
 
 ## What the Script Does
 
-1. **Installs Dependencies** - Safely provisions Node 20.x, `curl`, and the OpenClaw
-   core daemon.
+1. **Installs Dependencies & Runs Health Check** - Safely provisions Node 20.x, 
+   `curl`, the OpenClaw core daemon, and runs `openclaw doctor --fix` to 
+   auto-repair common issues.
 2. **Secures Credentials** - Stores API keys in a `chmod 600`-protected local env file
    and prevents duplicate Telegram tokens.
 3. **Provisions Agents** - Creates isolated workspaces (`~/.openclaw/workspace-*`) for
