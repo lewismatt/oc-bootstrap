@@ -25,7 +25,6 @@ E_DEPENDENCY=11
 E_OPENCLAW=12
 E_CONFIG=13
 E_GATEWAY=14
-E_CREDENTIALS=15
 
 STABILITY_DELAY=5 # Configurable start-up wait time
 
@@ -73,19 +72,19 @@ print_section_summary() {
 validate_telegram_token() {
     local token=$1
     local timeout=5
-    
+
     # Validate token format (basic check - Telegram bots start with '@BotToken:')
     if [[ ! "$token" =~ ^[a-zA-Z0-9_-]{14,}$ ]]; then
         echo "  ⚠️  Warning: Token format validation failed. May be invalid."
         return 1
     fi
-    
+
     # Try to validate with Telegram API (returns HTTP status code)
     # Use timeout to prevent hanging
     local http_code
     http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time "$timeout" \
         "https://api.telegram.org/bot$token/getMe" 2>/dev/null)
-    
+
     if [[ "$http_code" == "200" ]]; then
         echo "  ✓ Token validated successfully"
         return 0
@@ -97,7 +96,7 @@ validate_telegram_token() {
         return 1
     else
         echo "  ⚠️  Token format valid but API validation failed with HTTP $http_code"
-        return 0  # Don't fail the script, just warn
+        return 0 # Don't fail the script, just warn
     fi
 }
 
@@ -105,12 +104,12 @@ validate_telegram_token() {
 run_parallel() {
     local commands=("$@")
     local pids=()
-    
+
     for cmd in "${commands[@]}"; do
-        ( "$cmd" ) &
+        ("$cmd") &
         pids+=($!)
     done
-    
+
     # Wait for all background jobs to complete
     for pid in "${pids[@]}"; do
         wait "$pid"
@@ -173,22 +172,22 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
         1) AGENT_PREFIX="Deep Research" ;;
         2) AGENT_PREFIX="Developer" ;;
     esac
-    
+
     CURRENT_TOKEN=""
     ATTEMPT=0
-    
-    while [[ -z "$CURRENT_TOKEN" || "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" || \
-             "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" || "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; do
+
+    while [[ -z "$CURRENT_TOKEN" || "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ||
+        "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" || "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; do
         ((ATTEMPT++))
         if [[ $ATTEMPT -gt 3 ]]; then
             echo "  ⚠️  Warning: Failed to collect $AGENT_PREFIX token after 3 attempts."
             break
         fi
-        
+
         CURRENT_TOKEN=""
         read -r -s -p "Enter Telegram Bot Token for the $AGENT_PREFIX Agent: " CURRENT_TOKEN
         echo ""
-        
+
         if [[ -z "$CURRENT_TOKEN" ]]; then
             echo "  ✗ $AGENT_PREFIX token is required. Please try again."
         elif [[ "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ]]; then
@@ -201,7 +200,7 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
             break
         fi
     done
-    
+
     # Validate token format
     if [[ -n "$CURRENT_TOKEN" ]]; then
         if ! validate_telegram_token "$CURRENT_TOKEN"; then
@@ -217,7 +216,7 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
             ((current_token++))
         fi
     fi
-    
+
     echo ""
 done
 
@@ -317,7 +316,7 @@ steps=("Configuring sudo" "Configuring NodeSource PPA" "Updating and upgrading s
 total_steps=${#steps[@]}
 
 # Step 1/5
-progress_bar $total_steps 1
+progress_bar "$total_steps" 1
 echo "Step 1/5: Configuring sudo..."
 sudo -v || {
     echo "  ✗ Error: sudo access is required to install dependencies."
@@ -326,7 +325,7 @@ sudo -v || {
 }
 
 # Step 2/5
-progress_bar $total_steps 2
+progress_bar "$total_steps" 2
 echo "Step 2/5: Configuring NodeSource PPA..."
 if curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; then
     echo "  ✓ NodeSource PPA configured successfully"
@@ -335,25 +334,22 @@ else
 fi
 
 # Step 3/5
-progress_bar $total_steps 3
+progress_bar "$total_steps" 3
 echo "Step 3/5: Updating and upgrading system packages..."
-sudo apt update
-if [[ $? -eq 0 ]]; then
+if sudo apt update; then
     echo "  ✓ apt update completed"
 fi
 
-sudo apt upgrade -y
-if [[ $? -eq 0 ]]; then
+if sudo apt upgrade -y; then
     echo "  ✓ apt upgrade completed"
 else
     echo "  ⚠️  Warning: apt upgrade had issues. Attempting to continue..."
 fi
 
 # Step 4/5
-progress_bar $total_steps 4
+progress_bar "$total_steps" 4
 echo "Step 4/5: Installing curl, git, and Node.js..."
-sudo apt install -y curl git nodejs
-if [[ $? -eq 0 ]]; then
+if sudo apt install -y curl git nodejs; then
     echo "  ✓ curl, git, and nodejs installed successfully"
 else
     echo "  ✗ Error: Failed to install curl/git/nodejs. Cannot continue."
@@ -361,7 +357,7 @@ else
 fi
 
 # Step 5/5
-progress_bar $total_steps 5
+progress_bar "$total_steps" 5
 echo "Step 5/5: Installing OpenClaw..."
 if curl -fsSL https://openclaw.ai/install.sh | bash; then
     echo "  ✓ OpenClaw installed successfully"
@@ -385,8 +381,8 @@ else
 fi
 
 # Mark all steps complete
-progress_bar $total_steps $total_steps
-echo ""  # Newline after final progress bar
+progress_bar "$total_steps" "$total_steps"
+echo "" # Newline after final progress bar
 
 print_section_summary "System Preparation" \
     "Sudo configured" \
@@ -442,12 +438,12 @@ for i in "${!agents_to_provision[@]}"; do
     WORKSPACE="$HOME/.openclaw/workspace-${agent}"
     current=$((i + 1))
     progress_bar ${#agents_to_provision[@]} $current
-    
+
     echo "Provisioning agent: ${agent^^}..."
     openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive ||
         echo "Warning: Issue provisioning agent '$agent'. Continuing."
 done
-echo ""  # Newline after progress bar
+echo "" # Newline after progress bar
 
 echo "Assigning Qwen3.5-4B inference model to all agents..."
 openclaw config set agents.list.assistant.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for assistant agent."
@@ -585,7 +581,7 @@ memory_tasks=("Configuring memory search provider" "Configuring SQLite index sto
 total_tasks=${#memory_tasks[@]}
 
 # Task 1
-progress_bar $total_tasks 1
+progress_bar "$total_tasks" 1
 echo "Configuring memory search embedding provider..."
 openclaw config set agents.defaults.memorySearch.provider "openai" || {
     echo "Error: Failed to set memory search provider."
@@ -605,7 +601,7 @@ openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" |
 }
 
 # Task 2
-progress_bar $total_tasks 2
+progress_bar "$total_tasks" 2
 echo "Configuring per-agent SQLite index storage..."
 # Use static path with explicit file naming pattern to avoid expansion issues
 MEMORY_DIR="$HOME/.openclaw/memory"
@@ -616,23 +612,23 @@ openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentI
 }
 
 # Task 3
-progress_bar $total_tasks 3
+progress_bar "$total_tasks" 3
 echo "Enabling sqlite-vec vector search acceleration..."
 openclaw config set agents.defaults.memorySearch.store.vector.enabled true || echo "Warning: Failed to enable sqlite-vec. OpenClaw will use JS fallback."
 
 # Task 4
-progress_bar $total_tasks 4
+progress_bar "$total_tasks" 4
 echo "Enabling embedding cache..."
 openclaw config set agents.defaults.memorySearch.cache.enabled true || echo "Warning: Failed to enable embedding cache."
 
 # Task 5
-progress_bar $total_tasks 5
+progress_bar "$total_tasks" 5
 echo "Enabling session transcript indexing (experimental)..."
 openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true || echo "Warning: Failed to enable session memory indexing."
 openclaw config set agents.defaults.memorySearch.sources[0] "memory" || echo "Warning: Failed to set memory source."
 openclaw config set agents.defaults.memorySearch.sources[1] "sessions" || echo "Warning: Failed to set sessions source."
 
-echo ""  # Newline after progress bar
+echo "" # Newline after progress bar
 
 print_section_summary "Memory & Vector Search" \
     "Memory search embedding provider configured" \
