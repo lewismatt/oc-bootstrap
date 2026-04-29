@@ -583,7 +583,7 @@ echo "" # Newline after progress bar
 
 echo "Assigning Qwen3.5-4B inference model to all agents..."
 for agent in "${AGENTS[@]}"; do
-    openclaw config set agents.list.${agent}.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "[WARN] Failed to set model for ${agent} agent."
+    openclaw config set agents.list."${agent}".model "lemonade/user.Qwen3.5-4B-GGUF" || echo "[WARN] Failed to set model for ${agent} agent."
 done
 
 print_section_summary "Agent Workspace Provisioning" \
@@ -600,15 +600,15 @@ echo "=== Injecting Isolated Agent Secrets & MCPs ==="
 
 if [[ -n "$GITLAB_PAT" ]]; then
     for agent in "${AGENTS[@]}"; do
-        openclaw config set agents.list.${agent}.env.GITLAB_PERSONAL_ACCESS_TOKEN "$GITLAB_PAT" || handle_error_or_warn "Failed to set GitLab PAT for $agent." $E_CONFIG
-        openclaw config set agents.list.${agent}.env.GITLAB_API_URL "https://gitlab.com" || handle_error_or_warn "Failed to set GitLab URL for $agent." $E_CONFIG
+        openclaw config set agents.list."${agent}".env.GITLAB_PERSONAL_ACCESS_TOKEN "$GITLAB_PAT" || handle_error_or_warn "Failed to set GitLab PAT for $agent." $E_CONFIG
+        openclaw config set agents.list."${agent}".env.GITLAB_API_URL "https://gitlab.com" || handle_error_or_warn "Failed to set GitLab URL for $agent." $E_CONFIG
 
         echo "Binding local GitLab MCP server to ${agent^^} Agent..."
-        openclaw config set agents.list.${agent}.mcp.servers.gitlab.command "npx"
-        openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "-y" "@zereight/mcp-gitlab" || {
+        openclaw config set agents.list."${agent}".mcp.servers.gitlab.command "npx"
+        openclaw config set agents.list."${agent}".mcp.servers.gitlab.args "-y" "@zereight/mcp-gitlab" || {
             echo "[WARN] Array args syntax may not be supported. Trying alternative method..."
-            openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "-y" || echo "[WARN] Failed to set first MCP arg."
-            openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "@zereight/mcp-gitlab" || echo "[WARN] Failed to set second MCP arg."
+            openclaw config set agents.list."${agent}".mcp.servers.gitlab.args "-y" || echo "[WARN] Failed to set first MCP arg."
+            openclaw config set agents.list."${agent}".mcp.servers.gitlab.args "@zereight/mcp-gitlab" || echo "[WARN] Failed to set second MCP arg."
         }
     done
 else
