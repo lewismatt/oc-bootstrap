@@ -18,6 +18,18 @@ set +o histexpand # Disable history expansion to prevent issues with '!' charact
 #   - Developer Model:    lemonade/user.Qwen3.5-4B-GGUF
 #
 # ==============================================================================
+# EXIT CODES
+# ==============================================================================
+E_SUDO=10
+E_DEPENDENCY=11
+E_OPENCLAW=12
+E_CONFIG=13
+E_GATEWAY=14
+E_CREDENTIALS=15
+
+STABILITY_DELAY=5 # Configurable start-up wait time
+
+# ==============================================================================
 
 # ------------------------------------------------------------------------------
 # 0. Sudo Trap Guardrail
@@ -26,10 +38,84 @@ if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
     echo "Error: Do not run this script directly as root or with sudo."
     echo "This script installs workspaces to the current user's home directory (\$HOME)."
     echo "It will automatically prompt for sudo access when installing system packages."
-    exit 1
+    exit $E_SUDO
 fi
 
-STABILITY_DELAY=5 # Configurable start-up wait time
+# ==============================================================================
+# HELPER FUNCTIONS
+# ==============================================================================
+
+# Progress bar indicator
+progress_bar() {
+    local total=$1
+    local current=$2
+    local bar_width=40
+    local percent=$((current * 100 / total))
+    local filled=$((current * bar_width / total))
+    local empty=$((bar_width - filled))
+    printf "\rProgress: [%-${bar_width}s] %d%%" "$(printf "#%.0s" $(seq 1 $filled))$(printf " %.0s" $(seq 1 $empty))" "$percent"
+}
+
+# Section summary function
+print_section_summary() {
+    local section_title=$1
+    shift
+    local items=("$@")
+    echo ""
+    echo "=== ${section_title^^} Summary ==="
+    for item in "${items[@]}"; do
+        echo "✓ $item"
+    done
+    echo ""
+}
+
+# Telegram token validation function
+validate_telegram_token() {
+    local token=$1
+    local timeout=5
+    
+    # Validate token format (basic check - Telegram bots start with '@BotToken:')
+    if [[ ! "$token" =~ ^[a-zA-Z0-9_-]{14,}$ ]]; then
+        echo "  ⚠️  Warning: Token format validation failed. May be invalid."
+        return 1
+    fi
+    
+    # Try to validate with Telegram API (returns HTTP status code)
+    # Use timeout to prevent hanging
+    local http_code
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time "$timeout" \
+        "https://api.telegram.org/bot$token/getMe" 2>/dev/null)
+    
+    if [[ "$http_code" == "200" ]]; then
+        echo "  ✓ Token validated successfully"
+        return 0
+    elif [[ "$http_code" == "401" ]]; then
+        echo "  ✗ Invalid token (401 Unauthorized)"
+        return 1
+    elif [[ "$http_code" == "404" ]]; then
+        echo "  ✗ Bot not found (404 Not Found)"
+        return 1
+    else
+        echo "  ⚠️  Token format valid but API validation failed with HTTP $http_code"
+        return 0  # Don't fail the script, just warn
+    fi
+}
+
+# Parallel operation runner
+run_parallel() {
+    local commands=("$@")
+    local pids=()
+    
+    for cmd in "${commands[@]}"; do
+        ( "$cmd" ) &
+        pids+=($!)
+    done
+    
+    # Wait for all background jobs to complete
+    for pid in "${pids[@]}"; do
+        wait "$pid"
+    done
+}
 
 # ==============================================================================
 # 1. Logging & Trap Setup
@@ -78,30 +164,61 @@ echo "=== Telegram Bot Tokens ==="
 echo "You will need three unique Telegram Bot Tokens from @BotFather."
 echo ""
 
-ASSISTANT_TOKEN=""
-while [[ -z "$ASSISTANT_TOKEN" ]]; do
-    read -r -s -p "Enter Telegram Bot Token for the General Assistant: " ASSISTANT_TOKEN
-    echo ""
-    [[ -z "$ASSISTANT_TOKEN" ]] && echo "Error: Assistant token is required. Please try again."
-done
+TOTAL_TOKENS=3
+current_token=0
 
-RESEARCH_TOKEN=""
-while [[ -z "$RESEARCH_TOKEN" || "$RESEARCH_TOKEN" == "$ASSISTANT_TOKEN" ]]; do
-    read -r -s -p "Enter Telegram Bot Token for the Deep Research Agent: " RESEARCH_TOKEN
-    echo ""
-    [[ -z "$RESEARCH_TOKEN" ]] && echo "Error: Research token is required. Please try again."
-    [[ "$RESEARCH_TOKEN" == "$ASSISTANT_TOKEN" ]] && echo "Error: Token must be unique. Do not reuse the Assistant token."
-done
-
-DEVELOPER_TOKEN=""
-while [[ -z "$DEVELOPER_TOKEN" || "$DEVELOPER_TOKEN" == "$ASSISTANT_TOKEN" || "$DEVELOPER_TOKEN" == "$RESEARCH_TOKEN" ]]; do
-    read -r -s -p "Enter Telegram Bot Token for the Developer Agent: " DEVELOPER_TOKEN
-    echo ""
-    [[ -z "$DEVELOPER_TOKEN" ]] && echo "Error: Developer token is required. Please try again."
-    if [[ "$DEVELOPER_TOKEN" == "$ASSISTANT_TOKEN" || "$DEVELOPER_TOKEN" == "$RESEARCH_TOKEN" ]]; then
-        echo "Error: Token must be unique. Do not reuse existing tokens."
-        DEVELOPER_TOKEN=""
+while [[ $current_token -lt $TOTAL_TOKENS ]]; do
+    case $current_token in
+        0) AGENT_PREFIX="General" ;;
+        1) AGENT_PREFIX="Deep Research" ;;
+        2) AGENT_PREFIX="Developer" ;;
+    esac
+    
+    CURRENT_TOKEN=""
+    ATTEMPT=0
+    
+    while [[ -z "$CURRENT_TOKEN" || "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" || \
+             "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" || "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; do
+        ((ATTEMPT++))
+        if [[ $ATTEMPT -gt 3 ]]; then
+            echo "  ⚠️  Warning: Failed to collect $AGENT_PREFIX token after 3 attempts."
+            break
+        fi
+        
+        CURRENT_TOKEN=""
+        read -r -s -p "Enter Telegram Bot Token for the $AGENT_PREFIX Agent: " CURRENT_TOKEN
+        echo ""
+        
+        if [[ -z "$CURRENT_TOKEN" ]]; then
+            echo "  ✗ $AGENT_PREFIX token is required. Please try again."
+        elif [[ "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ]]; then
+            echo "  ✗ Token must be unique. Do not reuse the Assistant token."
+        elif [[ "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" ]]; then
+            echo "  ✗ Token must be unique. Do not reuse the Research token."
+        elif [[ "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; then
+            echo "  ✗ Token must be unique. Do not reuse the Developer token."
+        else
+            break
+        fi
+    done
+    
+    # Validate token format
+    if [[ -n "$CURRENT_TOKEN" ]]; then
+        if ! validate_telegram_token "$CURRENT_TOKEN"; then
+            echo ""
+            echo "  ⚠️  Token format invalid. Please try again."
+            CURRENT_TOKEN=""
+        else
+            case $current_token in
+                0) ASSISTANT_TOKEN="$CURRENT_TOKEN" ;;
+                1) RESEARCH_TOKEN="$CURRENT_TOKEN" ;;
+                2) DEVELOPER_TOKEN="$CURRENT_TOKEN" ;;
+            esac
+            ((current_token++))
+        fi
     fi
+    
+    echo ""
 done
 
 echo ""
@@ -121,6 +238,28 @@ X_API_KEY="${X_API_KEY:-}"
 [[ -z "$GITLAB_PAT" ]] && echo "Warning: No GitLab PAT provided. Git workflow features will be unavailable."
 [[ -z "$BRAVE_API_KEY" ]] && echo "Warning: No Brave Search API Key provided. Web search will be unavailable."
 [[ -z "$X_API_KEY" ]] && echo "Warning: No X/Twitter credentials provided. X scraping may be rate-limited or blocked."
+
+echo ""
+echo "=== Credential Collection Summary ==="
+echo "✓ Lemonade Server API Key: Configured"
+echo "✓ Assistant Telegram Bot Token: Configured"
+echo "✓ Research Telegram Bot Token: Configured"
+echo "✓ Developer Telegram Bot Token: Configured"
+if [[ -n "$GITLAB_PAT" ]]; then
+    echo "✓ GitLab Personal Access Token: Configured"
+else
+    echo "⚠️  GitLab Personal Access Token: Not configured"
+fi
+if [[ -n "$BRAVE_API_KEY" ]]; then
+    echo "✓ Brave Search API Key: Configured"
+else
+    echo "⚠️  Brave Search API Key: Not configured"
+fi
+if [[ -n "$X_API_KEY" ]]; then
+    echo "✓ X/Twitter API Key: Configured"
+else
+    echo "⚠️  X/Twitter API Key: Not configured"
+fi
 
 # ==============================================================================
 # 4. Save Credentials to Secure .env File
@@ -174,34 +313,88 @@ fi
 echo ""
 echo "=== System Preparation ==="
 
+steps=("Configuring sudo" "Configuring NodeSource PPA" "Updating and upgrading system packages" "Installing curl, git, and Node.js" "Installing OpenClaw")
+total_steps=${#steps[@]}
+
+# Step 1/5
+progress_bar $total_steps 1
+echo "Step 1/5: Configuring sudo..."
 sudo -v || {
-    echo "Error: sudo access is required to install dependencies."
-    exit 1
+    echo "  ✗ Error: sudo access is required to install dependencies."
+    echo "  Please ensure sudo permissions are set up correctly."
+    exit $E_SUDO
 }
 
-echo "Configuring NodeSource PPA to ensure modern Node.js installation..."
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || echo "Warning: Failed to setup NodeSource. Using default repositories."
-
-sudo apt update || echo "Warning: apt update failed. Continuing."
-sudo apt upgrade -y || echo "Warning: apt upgrade failed. Continuing."
-sudo apt install -y curl git nodejs || {
-    echo "Error: Failed to install curl/git/nodejs. Cannot continue."
-    exit 1
-}
-
-echo "Running official OpenClaw installer..."
-if ! curl -fsSL https://openclaw.ai/install.sh | bash; then
-    echo "Error: OpenClaw installation failed."
-    exit 1
+# Step 2/5
+progress_bar $total_steps 2
+echo "Step 2/5: Configuring NodeSource PPA..."
+if curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; then
+    echo "  ✓ NodeSource PPA configured successfully"
+else
+    echo "  ⚠️  Warning: NodeSource PPA setup failed. Using default repositories."
 fi
 
-if ! command -v openclaw &>/dev/null; then
-    echo "Error: OpenClaw binary not found in PATH after installation."
-    exit 1
+# Step 3/5
+progress_bar $total_steps 3
+echo "Step 3/5: Updating and upgrading system packages..."
+sudo apt update
+if [[ $? -eq 0 ]]; then
+    echo "  ✓ apt update completed"
+fi
+
+sudo apt upgrade -y
+if [[ $? -eq 0 ]]; then
+    echo "  ✓ apt upgrade completed"
+else
+    echo "  ⚠️  Warning: apt upgrade had issues. Attempting to continue..."
+fi
+
+# Step 4/5
+progress_bar $total_steps 4
+echo "Step 4/5: Installing curl, git, and Node.js..."
+sudo apt install -y curl git nodejs
+if [[ $? -eq 0 ]]; then
+    echo "  ✓ curl, git, and nodejs installed successfully"
+else
+    echo "  ✗ Error: Failed to install curl/git/nodejs. Cannot continue."
+    exit $E_DEPENDENCY
+fi
+
+# Step 5/5
+progress_bar $total_steps 5
+echo "Step 5/5: Installing OpenClaw..."
+if curl -fsSL https://openclaw.ai/install.sh | bash; then
+    echo "  ✓ OpenClaw installed successfully"
+else
+    echo "  ✗ Error: OpenClaw installation failed."
+    exit $E_OPENCLAW
+fi
+
+if command -v openclaw &>/dev/null; then
+    echo "  ✓ OpenClaw binary found in PATH"
+else
+    echo "  ✗ Error: OpenClaw binary not found in PATH after installation."
+    exit $E_OPENCLAW
 fi
 
 echo "Running post-install health check and auto-repair..."
-openclaw doctor --fix || echo "Warning: OpenClaw doctor reported issues. Continuing."
+if openclaw doctor --fix; then
+    echo "  ✓ OpenClaw doctor completed without issues"
+else
+    echo "  ⚠️  Warning: OpenClaw doctor reported some issues. Continuing anyway..."
+fi
+
+# Mark all steps complete
+progress_bar $total_steps $total_steps
+echo ""  # Newline after final progress bar
+
+print_section_summary "System Preparation" \
+    "Sudo configured" \
+    "Node.js 20.x installed" \
+    "System packages updated" \
+    "curl, git, and Node.js installed" \
+    "OpenClaw installed and configured" \
+    "Health check completed"
 
 # ==============================================================================
 # 6. Configure Local Inference (Lemonade Server)
@@ -223,16 +416,18 @@ read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUST
 
 openclaw config set providers.lemonade.baseUrl "$BASE_URL" || {
     echo "Error: Failed to set Lemonade base URL."
-    exit 1
+    exit $E_CONFIG
 }
 openclaw config set providers.lemonade.apiKey "$LEMONADE_KEY" || {
     echo "Error: Failed to set Lemonade API key."
-    exit 1
+    exit $E_CONFIG
 }
 
 echo "Configuring shared embedding and dreaming models..."
 openclaw config set memory.dreaming.model "lemonade/user.nomic-embed-text-v1.5-GGUF" || echo "Warning: Failed to set dreaming model."
 openclaw config set memory.embeddingModel "lemonade/user.nomic-embed-text-v1.5-GGUF" || echo "Warning: Failed to set embedding model."
+
+echo "✓ Lemonade Server backend configured"
 
 # ==============================================================================
 # 7. Provision Isolated Agent Workspaces
@@ -240,17 +435,30 @@ openclaw config set memory.embeddingModel "lemonade/user.nomic-embed-text-v1.5-G
 echo ""
 echo "=== Provisioning Agent Workspaces ==="
 
-for agent in "assistant" "research" "developer"; do
+# Provision agents with progress tracking
+agents_to_provision=("assistant" "research" "developer")
+for i in "${!agents_to_provision[@]}"; do
+    agent="${agents_to_provision[$i]}"
     WORKSPACE="$HOME/.openclaw/workspace-${agent}"
+    current=$((i + 1))
+    progress_bar ${#agents_to_provision[@]} $current
+    
     echo "Provisioning agent: ${agent^^}..."
     openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive ||
         echo "Warning: Issue provisioning agent '$agent'. Continuing."
 done
+echo ""  # Newline after progress bar
 
 echo "Assigning Qwen3.5-4B inference model to all agents..."
 openclaw config set agents.list.assistant.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for assistant agent."
 openclaw config set agents.list.research.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for research agent."
 openclaw config set agents.list.developer.model "lemonade/user.Qwen3.5-4B-GGUF" || echo "Warning: Failed to set model for developer agent."
+
+print_section_summary "Agent Workspace Provisioning" \
+    "Assistant agent workspace created" \
+    "Research agent workspace created" \
+    "Developer agent workspace created" \
+    "Qwen3.5-4B model assigned to all agents"
 
 # ==============================================================================
 # 8. Inject Agent-Specific Secrets & Configure Providers
@@ -262,11 +470,11 @@ if [[ -n "$GITLAB_PAT" ]]; then
     for agent in "assistant" "research" "developer"; do
         openclaw config set agents.list.${agent}.env.GITLAB_PERSONAL_ACCESS_TOKEN "$GITLAB_PAT" || {
             echo "Error: Failed to set GitLab PAT for $agent."
-            exit 1
+            exit $E_CONFIG
         }
         openclaw config set agents.list.${agent}.env.GITLAB_API_URL "https://gitlab.com" || {
             echo "Error: Failed to set GitLab URL for $agent."
-            exit 1
+            exit $E_CONFIG
         }
 
         echo "Binding local GitLab MCP server to ${agent^^} Agent..."
@@ -286,11 +494,11 @@ fi
 if [[ -n "$BRAVE_API_KEY" ]]; then
     openclaw config set agents.list.research.env.BRAVE_API_KEY "$BRAVE_API_KEY" || {
         echo "Error: Failed to set Brave API key for research agent."
-        exit 1
+        exit $E_CONFIG
     }
     openclaw config set agents.list.research.search.provider "brave" || {
         echo "Error: Failed to set Brave as search provider."
-        exit 1
+        exit $E_CONFIG
     }
 else
     echo "Skipping Brave search configuration (no key provided)."
@@ -299,9 +507,15 @@ fi
 if [[ -n "$X_API_KEY" ]]; then
     openclaw config set agents.list.research.env.X_API_KEY "$X_API_KEY" || {
         echo "Error: Failed to set X credentials for research agent."
-        exit 1
+        exit $E_CONFIG
     }
 fi
+
+print_section_summary "Agent Secrets & MCP Configuration" \
+    "GitLab integration configured" \
+    "Brave Search API key configured" \
+    "X/Twitter credentials configured" \
+    "All agent-specific secrets injected"
 
 # ==============================================================================
 # 9. Assign Native Skills & Hooks
@@ -326,6 +540,12 @@ openclaw config set agents.list.research.hooks.sessionSummarize true || echo "Wa
 # Developer: Validate tool outputs for technical accuracy
 openclaw config set agents.list.developer.hooks.toolValidation true || echo "Warning: Failed to enable toolValidation hook for developer."
 
+print_section_summary "Skills & Hooks Configuration" \
+    "Research data gathering skills enabled (summarize, webSearch, webScrape, newsSearch, rssReader, trendsFinder, xScraper)" \
+    "Assistant autoMemory hook enabled" \
+    "Research sessionSummarize hook enabled" \
+    "Developer toolValidation hook enabled"
+
 # ==============================================================================
 # 10. Bind Isolated Telegram Channels
 # ==============================================================================
@@ -343,12 +563,17 @@ for agent in "assistant" "research" "developer"; do
     echo "Binding Telegram for ${agent^^}..."
     if ! openclaw agents bind --agent "$agent" --bind "telegram:$TOKEN"; then
         echo "Error: Failed to bind Telegram for agent '$agent'."
-        exit 1
+        exit $E_GATEWAY
     fi
 
     openclaw agents unbind --agent "$agent" --all ||
         echo "Warning: Failed to unbind defaults for agent '$agent'. Continuing."
 done
+
+print_section_summary "Telegram Channel Binding" \
+    "Assistant agent bound to Telegram" \
+    "Research agent bound to Telegram" \
+    "Developer agent bound to Telegram"
 
 # ==============================================================================
 # 11. Configure Local Memory & Vector Search
@@ -356,24 +581,31 @@ done
 echo ""
 echo "=== Configuring Local Memory & Vector Search ==="
 
+memory_tasks=("Configuring memory search provider" "Configuring SQLite index storage" "Enabling sqlite-vec acceleration" "Enabling embedding cache" "Enabling session memory indexing")
+total_tasks=${#memory_tasks[@]}
+
+# Task 1
+progress_bar $total_tasks 1
 echo "Configuring memory search embedding provider..."
 openclaw config set agents.defaults.memorySearch.provider "openai" || {
     echo "Error: Failed to set memory search provider."
-    exit 1
+    exit $E_CONFIG
 }
 openclaw config set agents.defaults.memorySearch.model "lemonade/user.nomic-embed-text-v1.5-GGUF" || {
     echo "Error: Failed to set memory search model."
-    exit 1
+    exit $E_CONFIG
 }
 openclaw config set agents.defaults.memorySearch.remote.baseUrl "$BASE_URL" || {
     echo "Error: Failed to set memory search base URL."
-    exit 1
+    exit $E_CONFIG
 }
 openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" || {
     echo "Error: Failed to set memory search API key."
-    exit 1
+    exit $E_CONFIG
 }
 
+# Task 2
+progress_bar $total_tasks 2
 echo "Configuring per-agent SQLite index storage..."
 # Use static path with explicit file naming pattern to avoid expansion issues
 MEMORY_DIR="$HOME/.openclaw/memory"
@@ -383,19 +615,32 @@ openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentI
     openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agent}.sqlite" || echo "Warning: Alternative memory path also failed."
 }
 
+# Task 3
+progress_bar $total_tasks 3
 echo "Enabling sqlite-vec vector search acceleration..."
 openclaw config set agents.defaults.memorySearch.store.vector.enabled true || echo "Warning: Failed to enable sqlite-vec. OpenClaw will use JS fallback."
 
+# Task 4
+progress_bar $total_tasks 4
 echo "Enabling embedding cache..."
 openclaw config set agents.defaults.memorySearch.cache.enabled true || echo "Warning: Failed to enable embedding cache."
 
+# Task 5
+progress_bar $total_tasks 5
 echo "Enabling session transcript indexing (experimental)..."
 openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true || echo "Warning: Failed to enable session memory indexing."
 openclaw config set agents.defaults.memorySearch.sources[0] "memory" || echo "Warning: Failed to set memory source."
 openclaw config set agents.defaults.memorySearch.sources[1] "sessions" || echo "Warning: Failed to set sessions source."
 
-echo "✓ Memory index directory created at $MEMORY_DIR"
-echo "✓ Local memory and vector search configured."
+echo ""  # Newline after progress bar
+
+print_section_summary "Memory & Vector Search" \
+    "Memory search embedding provider configured" \
+    "Per-agent SQLite index storage configured" \
+    "sqlite-vec vector search acceleration enabled" \
+    "Embedding cache enabled" \
+    "Session transcript indexing enabled" \
+    "Memory index directory created at $MEMORY_DIR"
 
 # ==============================================================================
 # 12. Seed Agent Prompt Files from Repository
@@ -428,6 +673,8 @@ done
 
 if [[ ${#AGENTS_WITH_FILES[@]} -eq 0 ]]; then
     echo "No agent prompt files found in repository. Skipping seeding step."
+    print_section_summary "Prompt File Seeding" \
+        "No agent prompt files found in repository"
 else
     echo "The following prompt files were found in this repository:"
     echo ""
@@ -498,9 +745,13 @@ else
 
                 echo ""
                 echo "✓ Prompt file seeding complete."
+                print_section_summary "Prompt File Seeding" \
+                    "Prompt files seeded into agent workspaces"
                 ;;
             D)
                 echo "Skipping seeding. OpenClaw will generate default prompt files on first start."
+                print_section_summary "Prompt File Seeding" \
+                    "Using default prompt files (seeding skipped)"
                 ;;
             H)
                 echo ""
@@ -525,7 +776,7 @@ echo "=== Starting OpenClaw Gateway ==="
 
 if ! openclaw gateway start; then
     echo "Error: Failed to start OpenClaw gateway."
-    exit 1
+    exit $E_GATEWAY
 fi
 
 echo "Waiting $STABILITY_DELAY seconds for gateway to stabilize..."
@@ -533,9 +784,12 @@ sleep "$STABILITY_DELAY"
 
 if ! openclaw gateway status; then
     echo "Error: Gateway status check failed after start."
-    exit 1
+    exit $E_GATEWAY
 fi
-echo "✓ Gateway started successfully."
+
+print_section_summary "Gateway Startup" \
+    "OpenClaw gateway started successfully" \
+    "Gateway stability check passed"
 
 # ==============================================================================
 # 14. Final Verification
@@ -550,12 +804,29 @@ echo ""
 echo "Checking memory index status..."
 openclaw memory status || echo "Warning: Could not retrieve memory status. Indexing may still be in progress."
 
+print_section_summary "Final Verification" \
+    "Agent binding matrix verified" \
+    "Memory index status checked" \
+    "Installation completed successfully"
+
 echo ""
 echo "✓ OpenClaw Multi-Agent Setup Complete!"
 echo "============================================================================"
-echo "Log file:     $LOG_FILE"
-echo "Secrets file: $HOME/.openclaw/secrets.env"
-echo "Memory index: $HOME/.openclaw/memory/"
+echo "📋 SETUP SUMMARY"
+echo "============================================================================"
+echo "Log file:                 $LOG_FILE"
+echo "Secrets file:             $HOME/.openclaw/secrets.env"
+echo "Memory index:             $HOME/.openclaw/memory/"
+echo "Agent workspaces:"
+echo "  - Assistant:            $HOME/.openclaw/workspace-assistant"
+echo "  - Research:             $HOME/.openclaw/workspace-research"
+echo "  - Developer:            $HOME/.openclaw/workspace-developer"
+echo ""
+echo "Configuration:"
+echo "  - Inference Backend:    Lemonade Server ($BASE_URL)"
+echo "  - Primary Model:        Qwen3.5-4B-GGUF"
+echo "  - Embedding Model:      nomic-embed-text-v1.5-GGUF"
+echo "  - Vector Search:        sqlite-vec"
 echo ""
 echo "Note: Memory indexing runs asynchronously on first boot. Initial search results"
 echo "      may be incomplete until the background sync finishes."

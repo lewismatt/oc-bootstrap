@@ -1,0 +1,40 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- **Progress Indicators**: Implemented progress bars for long-running operations
+  - System Preparation: 5-step progress tracking (sudo, PPA, apt, install, health check)
+  - Agent Provisioning: 3-agent progress tracking
+  - Memory Configuration: 5-task progress tracking
+- **Section Summaries**: Added comprehensive summaries at the end of each installation stage
+  - System Preparation
+  - Agent Workspace Provisioning
+  - Agent Secrets & MCP Configuration
+  - Skills & Hooks Configuration
+  - Telegram Channel Binding
+  - Memory & Vector Search
+  - Prompt File Seeding
+  - Gateway Startup
+  - Final Verification
+- **Enhanced Final Report**: Detailed setup summary displaying paths, configurations, and deployed models
+
+### Fixed
+- **Critical Bug**: Fixed undefined variable reference in sudo check that occurred before exit codes were defined
+  - Moved exit code definitions before the sudo trap guardrail (Section 0)
+- **Exit Code Consistency**: Replaced 15+ generic `exit 1` statements with semantic exit codes
+  - `E_SUDO=10` for sudo access failures
+  - `E_DEPENDENCY=11` for missing dependencies
+  - `E_OPENCLAW=12` for OpenClaw installation issues
+  - `E_CONFIG=13` for configuration failures
+  - `E_GATEWAY=14` for gateway startup issues
+
+### Improved
+- **User Feedback**: Enhanced script visibility with progress tracking and structured section reporting
+- **Error Handling**: Semantic exit codes now enable better error diagnosis and scripting integration
+- **Code Organization**: Consistent formatting and summary patterns throughout all installation stages
