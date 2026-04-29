@@ -96,12 +96,16 @@ The `oc-bootstrap.sh` script is a production-ready deployment tool that manages
 the full agent lifecycle:
 
 1. **Credential Management:** Securely stores (`chmod 600`) tokens for Telegram,
-    Lemonade, GitLab, Brave, and X.
-2. **Infrastructure Provisioning:** Standardizes models, maps local inference,
-    and configures `sqlite-vec` memory.
-3. **Skill & Hook Deployment:** Unlocks advanced scraping skills and autonomous
-    operational hooks.
-4. **Binding & Isolation:** Enforces strict Telegram channel isolation.
+    Lemonade, GitLab, Brave, and X. Validates Telegram tokens against the Telegram
+    API and checks for existing secrets files with overwrite protection.
+2. **Infrastructure Provisioning:** Standardizes models, maps local inference with
+    OpenAI-compatible API interface (backed by Lemonade), and configures `sqlite-vec`
+    memory with embedding cache and session indexing.
+3. **Skill & Hook Deployment:** Unlocks advanced scraping skills on Research agent
+    and autonomous operational hooks on all three agents.
+4. **Binding & Isolation:** Enforces strict Telegram channel isolation, binds GitLab
+    MCP server to all agents for shared version control, and provisions isolated
+    workspace directories for each agent.
 
 ## 5. Directives for Future LLM Development
 

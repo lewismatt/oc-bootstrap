@@ -15,7 +15,7 @@
 | **Agent: Research**     | Deep-dive web research (`lemonade/user.Qwen3.5-4B-GGUF`)                              |
 | **Agent: Developer**    | Code and Git workflow (`lemonade/user.Qwen3.5-4B-GGUF`)                               |
 | **Shared Memory Model** | `lemonade/user.nomic-embed-text-v1.5-GGUF`                                            |
-| **Vector Store**        | Local SQLite-backed search with `sqlite-vec` acceleration                             |
+| **Vector Store**        | Local SQLite-backed search with `sqlite-vec` acceleration using OpenAI-compatible API (backed by Lemonade) |
 
 ---
 
@@ -24,7 +24,7 @@
 | Integration                  | Why it's needed                                          | How to obtain                                                                                                                                                       |
 |:-----------------------------|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Telegram** (required)      | Three distinct bots keep each agent's context isolated.  | Message **@BotFather** -> `/newbot` three times -> copy the HTTP API tokens.                                                                                        |
-| **Lemonade Server** (required) | Provides local inference.                                | Run a Lemonade instance and note its IP and API key. **CRITICAL:** Ensure both `Qwen3.5-4B-GGUF` **and** `nomic-embed-text-v1.5-GGUF` are downloaded and staged. |
+| **Lemonade Server** (required) | Provides local inference.                                | Run a Lemonade instance. The script will prompt you for the server IP (with validation), and will use it to configure the OpenAI-compatible API endpoint. **CRITICAL:** Ensure both `Qwen3.5-4B-GGUF` **and** `nomic-embed-text-v1.5-GGUF` are downloaded and staged on the server. |
 | **GitLab PAT** (optional)    | Allows all agents to read/write to a shared codebase.   | Create a Personal Access Token with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
 | **Brave Search** (optional)  | Powers live web searches for the Research agent.         | Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).                                                                         |
 | **X/Twitter** (optional)     | Enables real-time trend scraping for the Research agent. | Obtain an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).                                                                 |
@@ -62,18 +62,23 @@ chmod +x oc-bootstrap.sh
 1. **Installs Dependencies & Runs Health Check** - Safely provisions Node 20.x, 
    `curl`, the OpenClaw core daemon, and runs `openclaw doctor --fix` to 
    auto-repair common issues.
-2. **Secures Credentials** - Stores API keys in a `chmod 600`-protected local env file
-   and prevents duplicate Telegram tokens.
+2. **Secures Credentials** - Stores API keys in a `chmod 600`-protected local env file,
+   validates Telegram tokens against the Telegram API, and prevents duplicate token usage.
+   Checks for existing secrets file and prompts before overwriting.
 3. **Provisions Agents** - Creates isolated workspaces (`~/.openclaw/workspace-*`) for
    Assistant, Research, and Developer agents, then prompts for the Lemonade server IP
    and configures all inference endpoints.
 4. **Binds Skills and Hooks**:
-    - Adds live-scraping skills to the Research agent.
+    - Adds live-scraping skills to the Research agent (webSearch, webScrape, newsSearch,
+      rssReader, trendsFinder, xScraper).
     - Enables `autoMemory` on the Assistant, `sessionSummarize` on the Research agent,
       and `toolValidation` on the Developer agent.
-    - Connects the open-source `@zereight/mcp-gitlab` server for local Git operations.
-5. **Seeds Context** - Copies prompt files (`SOUL.md`, `USER.md`, `AGENTS.md`) from
-   any agent subdirectory found in this repo into each matching agent's workspace.
+    - Binds the open-source `@zereight/mcp-gitlab` server to **all three agents**
+      for unified version-controlled project memory.
+5. **Seeds Context** - Discovers prompt files (`SOUL.md`, `USER.md`, `AGENTS.md`)
+   from agent subdirectories in the repository, then interactively prompts the user to
+   choose between [S]eed (copy files), [D]efault (skip seeding), or [H]alt (review first).
+   If files exist in the workspace, shows a diff before overwriting.
 
 ---
 
