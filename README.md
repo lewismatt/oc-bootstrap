@@ -35,8 +35,8 @@
 
 ### What is Lemonade Server?
 
-**Lemonade Server** is a local inference backend that runs GGUF quantized models (LLMs and embedding models) 
-on your hardware. It provides an OpenAI-compatible REST API, allowing all three agents to perform inference 
+**Lemonade Server** is a local inference backend that runs GGUF quantized models (LLMs and embedding models)
+on your hardware. It provides an OpenAI-compatible REST API, allowing all three agents to perform inference
 without relying on cloud services.
 
 **Key features:**
@@ -65,7 +65,7 @@ without relying on cloud services.
    # For AMD ROCm support
    sudo apt install -y rocm-core rocm-libs
    export HSA_OVERRIDE_GFX_VERSION=11.0  # Adjust based on your GPU
-   
+
    # For general Python environment
    pip install -r requirements.txt
    ```
@@ -120,8 +120,8 @@ without relying on cloud services.
    ```powershell
    # Create models directory
    New-Item -Type Directory -Path "models\huggingface.co" -Force
-Example models
-   # Download using Hugging Face CLI (install first: pip install huggingface-hub)
+
+   # Download using Hugging Face CLI (Example models)
    huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf `
      --local-dir "models\huggingface.co\user.Qwen3.5-4B-GGUF"
 
@@ -192,8 +192,8 @@ chmod +x oc-bootstrap.sh
 
 ## What the Script Does
 
-1. **Installs Dependencies & Runs Health Check** - Safely provisions Node 20.x, 
-   `curl`, the OpenClaw core daemon, and runs `openclaw doctor --fix` to 
+1. **Installs Dependencies & Runs Health Check** - Safely provisions Node 20.x,
+   `curl`, the OpenClaw core daemon, and runs `openclaw doctor --fix` to
    auto-repair common issues.
 2. **Secures Credentials** - Stores API keys in a `chmod 600`-protected local env file,
    validates Telegram tokens against the Telegram API, and prevents duplicate token usage.

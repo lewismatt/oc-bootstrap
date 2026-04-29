@@ -300,7 +300,9 @@ echo ""
 echo "=== Infrastructure Credentials ==="
 read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
 LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
-Model Selection ==="
+
+echo ""
+echo "=== Model Selection ==="
 echo "Paste the Lemonade tags for your local models (e.g., lemonade/user.Qwen3.5-4B-GGUF)."
 echo ""
 
@@ -324,8 +326,6 @@ while [[ -z "$DEVELOPER_MODEL" ]]; do
     [[ -z "$DEVELOPER_MODEL" ]] && echo "  [ERROR] Developer model is required."
 done
 
-echo ""
-echo "=== 
 echo ""
 echo "=== Telegram Bot Tokens ==="
 echo "You will need three unique Telegram Bot Tokens from @BotFather."
