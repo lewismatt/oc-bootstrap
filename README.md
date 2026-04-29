@@ -64,13 +64,15 @@ chmod +x oc-bootstrap.sh
 2. **Secures Credentials** - Stores API keys in a `chmod 600`-protected local env file
    and prevents duplicate Telegram tokens.
 3. **Provisions Agents** - Creates isolated workspaces (`~/.openclaw/workspace-*`) for
-   Assistant, Research, and Developer agents.
+   Assistant, Research, and Developer agents, then prompts for the Lemonade server IP
+   and configures all inference endpoints.
 4. **Binds Skills and Hooks**:
     - Adds live-scraping skills to the Research agent.
-    - Sets up auto-memory summarisation.
+    - Enables `autoMemory` on the Assistant, `sessionSummarize` on the Research agent,
+      and `toolValidation` on the Developer agent.
     - Connects the open-source `@zereight/mcp-gitlab` server for local Git operations.
-5. **Seeds Context** - Copies the prompt files (`SOUL.md`, `USER.md`, `AGENTS.md`) from
-   this repo directly into each agent's operational memory.
+5. **Seeds Context** - Copies prompt files (`SOUL.md`, `USER.md`, `AGENTS.md`) from
+   any agent subdirectory found in this repo into each matching agent's workspace.
 
 ---
 

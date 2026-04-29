@@ -53,9 +53,9 @@ The project now implements native OpenClaw hooks to reduce manual overhead.
 
 ### D. Intelligent Prompt Seeding (GitOps Workflow)
 
-The script seeds `SOUL.md`, `USER.md`, and `AGENTS.md` files into agent workspaces (`~/.openclaw/workspace-*`).
+The script seeds `SOUL.md`, `USER.md`, and `AGENTS.md` files into agent workspaces (`~/.openclaw/workspace-*`), but only for agents that have a matching subdirectory in the repository.
 
-* **Why:** Allows version-controlling agent personas alongside infrastructure. A `diff --unified=2` check prevents accidental overwrites of existing workspace data.
+* **Why:** Allows version-controlling agent personas alongside infrastructure. A `diff -u` check prevents accidental overwrites of existing workspace data.
 
 ## 4. Current State of the Codebase
 
@@ -70,7 +70,7 @@ The `oc-bootstrap.sh` script is a production-ready deployment tool that manages 
 
 When proposing modifications, adhere strictly to these constraints:
 
-* **Maintain Bash Rigor:** Ensure `set -euo pipefail` and `set +H` remain intact.
+* **Maintain Bash Rigor:** Ensure `set -euo pipefail` and `set +o histexpand` remain intact.
 * **CLI Configuration Only:** Always use `openclaw config set`. Do not suggest manual JSON parsing.
 * **Zero Cloud Middlemen:** Prioritize native skills or local `stdio` MCP servers over hosted SaaS platforms.
 * **Resource Awareness:** Honor the 12GB VRAM constraint and optimize for token conservation.

@@ -217,7 +217,7 @@ validate_telegram_token() {
     fi
 }
 
-# Parallel operation runner
+# Parallel operation runner (reserved for future use — not currently called)
 ##
 # run_parallel("cmd1", "cmd2", ...)
 # Run each provided command string in a subshell concurrently and
@@ -315,7 +315,7 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
 
     while [[ -z "$CURRENT_TOKEN" || "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ||
         "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" || "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; do
-        ((ATTEMPT++))
+        ATTEMPT=$((ATTEMPT + 1))
         if [[ $ATTEMPT -gt 3 ]]; then
             echo "  [WARN] Failed to collect $AGENT_PREFIX token after 3 attempts."
             break
@@ -349,7 +349,7 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
                 1) RESEARCH_TOKEN="$CURRENT_TOKEN" ;;
                 2) DEVELOPER_TOKEN="$CURRENT_TOKEN" ;;
             esac
-            ((current_token++))
+            current_token=$((current_token + 1))
         fi
     fi
 
@@ -550,7 +550,6 @@ while true; do
 done
 
 BASE_URL="http://${LEMONADE_IP}:8000/v1"
-[ -t 0 ] || true
 read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL </dev/tty
 [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
 
@@ -822,7 +821,6 @@ else
                     WORKSPACE="$HOME/.openclaw/workspace-${agent}"
                     REPO_AGENT_DIR="$SCRIPT_DIR/$agent"
 
-                    # shellcheck disable=SC2086
                     while IFS= read -r file; do
                         SRC="$REPO_AGENT_DIR/$file"
                         DEST="$WORKSPACE/$file"
