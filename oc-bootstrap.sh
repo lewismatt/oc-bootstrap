@@ -799,7 +799,7 @@ else
             else
                 echo "    ./${agent}/${file}  →  ~/.openclaw/workspace-${agent}/${file}"
             fi
-        done <<< "${AGENT_SEED_FILES[$agent]}"
+        done <<<"${AGENT_SEED_FILES[$agent]}"
     done
     echo ""
 
@@ -850,7 +850,7 @@ else
                                 echo "  [OK] ${agent^^}: $file" ||
                                 echo "  [WARN] Failed to copy $file for $agent."
                         fi
-                        done <<<"${AGENT_SEED_FILES[$agent]}"
+                    done <<<"${AGENT_SEED_FILES[$agent]}"
                 done
 
                 echo ""
