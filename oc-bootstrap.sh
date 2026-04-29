@@ -382,10 +382,6 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
 
     echo ""
 done
-echo "[OK] Embedding Model: $EMBEDDING_MODEL"
-echo "[OK] Assistant Model: $ASSISTANT_MODEL"
-echo "[OK] Research Model: $RESEARCH_MODEL"
-echo "[OK] Developer Model: $DEVELOPER_MODEL"
 
 echo ""
 echo "=== Agent-Specific External Secrets (optional) ==="
@@ -422,14 +418,17 @@ else
     echo "[WARN] Brave Search API Key: Not configured"
 fi
 if [[ -n "$X_API_KEY" ]]; then
-    echo "[OK] XEMBEDDING_MODEL=%q\n' "$EMBEDDING_MODEL"
-        printf 'ASSISTANT_MODEL=%q\n' "$ASSISTANT_MODEL"
-        printf 'RESEARCH_MODEL=%q\n' "$RESEARCH_MODEL"
-        printf 'DEVELOPER_MODEL=%q\n' "$DEVELOPER_MODEL"
-        printf '/Twitter API Key: Configured"
+    echo "[OK] X/Twitter API Key: Configured"
 else
     echo "[WARN] X/Twitter API Key: Not configured"
 fi
+
+echo ""
+echo "=== Model Selection Summary ==="
+echo "[OK] Embedding Model: $EMBEDDING_MODEL"
+echo "[OK] Assistant Model: $ASSISTANT_MODEL"
+echo "[OK] Research Model: $RESEARCH_MODEL"
+echo "[OK] Developer Model: $DEVELOPER_MODEL"
 
 # ==============================================================================
 # 4. Save Credentials to Secure .env File
@@ -452,6 +451,10 @@ SECRETS_FILE="$HOME/.openclaw/secrets.env"
 write_secrets_file() {
     {
         printf 'LEMONADE_KEY=%q\n' "$LEMONADE_KEY"
+        printf 'EMBEDDING_MODEL=%q\n' "$EMBEDDING_MODEL"
+        printf 'ASSISTANT_MODEL=%q\n' "$ASSISTANT_MODEL"
+        printf 'RESEARCH_MODEL=%q\n' "$RESEARCH_MODEL"
+        printf 'DEVELOPER_MODEL=%q\n' "$DEVELOPER_MODEL"
         printf 'ASSISTANT_TOKEN=%q\n' "$ASSISTANT_TOKEN"
         printf 'RESEARCH_TOKEN=%q\n' "$RESEARCH_TOKEN"
         printf 'DEVELOPER_TOKEN=%q\n' "$DEVELOPER_TOKEN"
@@ -584,16 +587,16 @@ while true; do
     fi
 done
 
-BASE_URL="http://${LEMONADE_IP}:8000/v1"$EMBEDDING_MODEL" || echo "[WARN] Failed to set dreaming model."
-openclaw config set memory.embeddingModel "$EMBEDDING_MODELURL </dev/tty
+BASE_URL="http://${LEMONADE_IP}:8000/v1"
+read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL </dev/tty
 [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
 
 openclaw config set providers.lemonade.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set Lemonade base URL." $E_CONFIG
 openclaw config set providers.lemonade.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set Lemonade API key." $E_CONFIG
 
 echo "Configuring shared embedding and dreaming models..."
-openclaw config set memory.dreaming.model "lemonade/user.nomic-embed-text-v1.5-GGUF" || echo "[WARN] Failed to set dreaming model."
-openclaw config set memory.embeddingModel "lemonade/user.nomic-embed-text-v1.5-GGUF" || echo "[WARN] Failed to set embedding model."
+openclaw config set memory.dreaming.model "$EMBEDDING_MODEL" || echo "[WARN] Failed to set dreaming model."
+openclaw config set memory.embeddingModel "$EMBEDDING_MODEL" || echo "[WARN] Failed to set embedding model."
 
 echo "[OK] Lemonade Server backend configured"
 
@@ -608,7 +611,15 @@ for i in "${!agents_to_provision[@]}"; do
     agent="${agents_to_provision[$i]}"
     WORKSPACE="$HOME/.openclaw/workspace-${agent}"
     current=$((i + 1))
-    progress_barLLM inference models to agents..."
+    progress_bar ${#agents_to_provision[@]} $current
+
+    echo "Provisioning agent: ${agent^^}..."
+    openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive ||
+        echo "[WARN] Issue provisioning agent '$agent'. Continuing."
+done
+echo "" # Newline after progress bar
+
+echo "Assigning LLM inference models to agents..."
 openclaw config set agents.list.assistant.model "$ASSISTANT_MODEL" || echo "[WARN] Failed to set model for assistant agent."
 openclaw config set agents.list.research.model "$RESEARCH_MODEL" || echo "[WARN] Failed to set model for research agent."
 openclaw config set agents.list.developer.model "$DEVELOPER_MODEL" || echo "[WARN] Failed to set model for developer agent."
@@ -617,15 +628,7 @@ print_section_summary "Agent Workspace Provisioning" \
     "Assistant agent workspace created" \
     "Research agent workspace created" \
     "Developer agent workspace created" \
-    "User-defined modelsS[@]}"; do
-    openclaw config set agents.list."${agent}".model "lemonade/user.Qwen3.5-4B-GGUF" || echo "[WARN] Failed to set model for ${agent} agent."
-done
-
-print_section_summary "Agent Workspace Provisioning" \
-    "Assistant agent workspace created" \
-    "Research agent workspace created" \
-    "Developer agent workspace created" \
-    "Qwen3.5-4B model assigned to all agents"
+    "User-defined models assigned to all agents"
 
 # ==============================================================================
 # 8. Inject Agent-Specific Secrets & Configure Providers
@@ -737,7 +740,7 @@ print_section_summary "Telegram Channel Binding" \
 # ==============================================================================
 echo ""
 echo "=== Configuring Local Memory & Vector Search ==="
-$EMBEDDING_MODEL
+
 memory_tasks=("Configuring memory search provider" "Configuring SQLite index storage" "Enabling sqlite-vec acceleration" "Enabling embedding cache" "Enabling session memory indexing")
 total_tasks=${#memory_tasks[@]}
 
@@ -745,7 +748,7 @@ total_tasks=${#memory_tasks[@]}
 progress_bar "$total_tasks" 1
 echo "Configuring memory search embedding provider..."
 openclaw config set agents.defaults.memorySearch.provider "openai" || handle_error_or_warn "Failed to set memory search provider." $E_CONFIG
-openclaw config set agents.defaults.memorySearch.model "lemonade/user.nomic-embed-text-v1.5-GGUF" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
+openclaw config set agents.defaults.memorySearch.model "$EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
 openclaw config set agents.defaults.memorySearch.remote.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set memory search base URL." $E_CONFIG
 openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set memory search API key." $E_CONFIG
 
@@ -963,14 +966,14 @@ echo "Memory index:             $HOME/.openclaw/memory/"
 echo "Agent workspaces:"
 echo "  - Assistant:            $HOME/.openclaw/workspace-assistant"
 echo "  - Research:             $HOME/.openclaw/workspace-research"
+echo "  - Developer:            $HOME/.openclaw/workspace-developer"
+echo ""
+echo "Configuration:"
+echo "  - Inference Backend:    Lemonade Server ($BASE_URL)"
 echo "  - Assistant Model:      $ASSISTANT_MODEL"
 echo "  - Research Model:       $RESEARCH_MODEL"
 echo "  - Developer Model:      $DEVELOPER_MODEL"
-echo "  - Embedding Model:      $EMBEDDING_MODEL
-echo "Configuration:"
-echo "  - Inference Backend:    Lemonade Server ($BASE_URL)"
-echo "  - Primary Model:        Qwen3.5-4B-GGUF"
-echo "  - Embedding Model:      nomic-embed-text-v1.5-GGUF"
+echo "  - Embedding Model:      $EMBEDDING_MODEL"
 echo "  - Vector Search:        sqlite-vec"
 echo ""
 echo "Note: Memory indexing runs asynchronously on first boot. Initial search results"

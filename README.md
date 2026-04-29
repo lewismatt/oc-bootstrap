@@ -43,7 +43,8 @@ without relying on cloud services.
 - OpenAI-compatible `/v1` API endpoints for easy integration
 - Supports quantized GGUF models optimized for consumer GPUs (AMD ROCm, NVIDIA CUDA)
 - Runs entirely on-premises with zero cloud data leakage
-- Designed to run efficiently on systems with 12 GB VRAM minimum; additional VRAM enables improved performance and larger models
+- Designed to run efficiently on systems with 12 GB VRAM minimum;
+  additional VRAM enables improved performance and larger models
 
 ### Prerequisites
 
@@ -157,9 +158,12 @@ without relying on cloud services.
 
 ### Important Notes
 
-- **Model Paths:** Ensure model directory structure matches `models/huggingface.co/{model-namespace}/{model-name}/`. The script looks for files in this exact format.
-- **Network Access:** Lemonade must be accessible from your OpenClaw host. Note its IP address (e.g., `192.168.1.100`) for the bootstrap script.
-- **Port Mapping:** Default port is `8000`. If changed, remember to use `http://<IP>:PORT/v1` when running `oc-bootstrap.sh`.
+- **Model Paths:** Ensure model directory structure matches `models/huggingface.co/{model-namespace}/{model-name}/`.
+  The script looks for files in this exact format.
+- **Network Access:** Lemonade must be accessible from your OpenClaw host.
+  Note its IP address (e.g., `192.168.1.100`) for the bootstrap script.
+- **Port Mapping:** Default port is `8000`. If changed, remember to use
+  `http://<IP>:PORT/v1` when running `oc-bootstrap.sh`.
 - **Performance:** First inference request may be slow as models load into VRAM. Subsequent requests are faster.
 
 ---
@@ -217,12 +221,12 @@ chmod +x oc-bootstrap.sh
 
 ## Troubleshooting
 
-| Symptom                                                  | Likely Cause                                     | Fix                                                                                                                                        |
-| **Agents unresponsive via Telegram**                     | Lemonade server missing models or not reachable. | Verify the server is running and your chosen models are downloaded.                                  ||
-| **Agents unresponsive via Telegram**                     | Lemonade server missing models or not reachable. | Verify the server is running and both `Qwen3.5-4B-GGUF` and `nomic-embed-text-v1.5-GGUF` are downloaded.                                  |
-| **"Conflict: terminated by other getUpdates request"**   | Same Telegram token used for multiple agents.    | Re-run the setup and provide three **unique** bot tokens.                                                                                  |
-| **Ghost daemon processes**                               | Previous run left a PM2 daemon alive.            | Run `openclaw gateway stop && npx pm2 kill`, then restart the installer.                                                                   |
-| **MCP server errors**                                    | Node version too old for `@zereight/mcp-gitlab`. | Ensure Node >= 18 (`node -v`). The script will try to install Node 20 automatically, but you may need to resolve version conflicts manually. |
+| Symptom | Likely Cause | Fix |
+|:---|:---|:---|
+| **Agents unresponsive via Telegram** | Lemonade server missing models or not reachable. | Verify the server is running and your chosen models are downloaded. |
+| **"Conflict: terminated by other getUpdates request"** | Same Telegram token used for multiple agents. | Re-run the setup and provide three **unique** bot tokens. |
+| **Ghost daemon processes** | Previous run left a PM2 daemon alive. | Run `openclaw gateway stop && npx pm2 kill`, then restart the installer. |
+| **MCP server errors** | Node version too old for `@zereight/mcp-gitlab`. | Ensure Node >= 18 (`node -v`). The script will try to install Node 20 automatically, but you may need to resolve version conflicts manually. |
 
 ---
 
