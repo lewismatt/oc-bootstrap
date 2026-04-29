@@ -92,13 +92,13 @@ handle_error_or_warn() {
 valid_ipv4() {
     local ip=$1
     local IFS=.
-    read -r -a octets <<< "$ip"
+    read -r -a octets <<<"$ip"
     [[ ${#octets[@]} -eq 4 ]] || return 1
     for o in "${octets[@]}"; do
         if [[ ! "$o" =~ ^[0-9]+$ ]]; then
             return 1
         fi
-        if (( o < 0 || o > 255 )); then
+        if ((o < 0 || o > 255)); then
             return 1
         fi
     done
@@ -152,8 +152,8 @@ progress_bar() {
     local filled_str=""
     local empty_str=""
     local i
-    for ((i=0;i<filled;i++)); do filled_str+="#"; done
-    for ((i=0;i<empty;i++)); do empty_str+=" "; done
+    for ((i = 0; i < filled; i++)); do filled_str+="#"; done
+    for ((i = 0; i < empty; i++)); do empty_str+=" "; done
     printf "\rProgress: [%-${bar_width}s] %d%%" "${filled_str}${empty_str}" "$percent"
 }
 
@@ -416,14 +416,14 @@ SECRETS_FILE="$HOME/.openclaw/secrets.env"
 # special characters (spaces, $, !, etc.) when the file is later sourced.
 write_secrets_file() {
     {
-        printf 'LEMONADE_KEY=%q\n'      "$LEMONADE_KEY"
-        printf 'ASSISTANT_TOKEN=%q\n'   "$ASSISTANT_TOKEN"
-        printf 'RESEARCH_TOKEN=%q\n'    "$RESEARCH_TOKEN"
-        printf 'DEVELOPER_TOKEN=%q\n'   "$DEVELOPER_TOKEN"
-        printf 'GITLAB_PAT=%q\n'        "$GITLAB_PAT"
-        printf 'BRAVE_API_KEY=%q\n'     "$BRAVE_API_KEY"
-        printf 'X_API_KEY=%q\n'         "$X_API_KEY"
-    } > "$SECRETS_FILE"
+        printf 'LEMONADE_KEY=%q\n' "$LEMONADE_KEY"
+        printf 'ASSISTANT_TOKEN=%q\n' "$ASSISTANT_TOKEN"
+        printf 'RESEARCH_TOKEN=%q\n' "$RESEARCH_TOKEN"
+        printf 'DEVELOPER_TOKEN=%q\n' "$DEVELOPER_TOKEN"
+        printf 'GITLAB_PAT=%q\n' "$GITLAB_PAT"
+        printf 'BRAVE_API_KEY=%q\n' "$BRAVE_API_KEY"
+        printf 'X_API_KEY=%q\n' "$X_API_KEY"
+    } >"$SECRETS_FILE"
     chmod 600 "$SECRETS_FILE" || true
     chown "$(id -un):$(id -gn)" "$SECRETS_FILE" 2>/dev/null || true
 }
@@ -630,9 +630,9 @@ fi
 
 # FIX: Build the summary dynamically so it only reports items that were actually configured.
 _summary_items=()
-[[ -n "$GITLAB_PAT" ]]     && _summary_items+=("GitLab PAT injected and MCP server bound to all agents")
-[[ -n "$BRAVE_API_KEY" ]]  && _summary_items+=("Brave Search API key configured for Research agent")
-[[ -n "$X_API_KEY" ]]      && _summary_items+=("X/Twitter credentials configured for Research agent")
+[[ -n "$GITLAB_PAT" ]] && _summary_items+=("GitLab PAT injected and MCP server bound to all agents")
+[[ -n "$BRAVE_API_KEY" ]] && _summary_items+=("Brave Search API key configured for Research agent")
+[[ -n "$X_API_KEY" ]] && _summary_items+=("X/Twitter credentials configured for Research agent")
 [[ ${#_summary_items[@]} -eq 0 ]] && _summary_items+=("No optional integrations configured (all skipped)")
 print_section_summary "Agent Secrets & MCP Configuration" "${_summary_items[@]}"
 
@@ -675,7 +675,7 @@ for agent in "${AGENTS[@]}"; do
     TOKEN=""
     case "$agent" in
         "assistant") TOKEN="$ASSISTANT_TOKEN" ;;
-        "research")  TOKEN="$RESEARCH_TOKEN"  ;;
+        "research") TOKEN="$RESEARCH_TOKEN" ;;
         "developer") TOKEN="$DEVELOPER_TOKEN" ;;
     esac
 
@@ -850,7 +850,7 @@ else
                                 echo "  [OK] ${agent^^}: $file" ||
                                 echo "  [WARN] Failed to copy $file for $agent."
                         fi
-                    done <<< "${AGENT_SEED_FILES[$agent]}"
+                        done <<<"${AGENT_SEED_FILES[$agent]}"
                 done
 
                 echo ""
