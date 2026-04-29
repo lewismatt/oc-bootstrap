@@ -12,10 +12,10 @@ set +o histexpand # Disable history expansion to prevent issues with '!' charact
 #   - Execution: Native process daemon (no Docker overhead)
 #
 # INFERENCE BACKEND (Local Lemonade Server):
-#   - Dreaming/Embedding: lemonade/user.nomic-embed-text-v1.5-GGUF
-#   - Assistant Model:    lemonade/user.Qwen3.5-4B-GGUF
-#   - Research Model:     lemonade/user.Qwen3.5-4B-GGUF
-#   - Developer Model:    lemonade/user.Qwen3.5-4B-GGUF
+#   - Embedding Model: lemonade/user.nomic-embed-text-v1.5-GGUF
+#   - Assistant Model: lemonade/user.Qwen3.5-4B-GGUF
+#   - Research Model:  lemonade/user.Qwen3.5-4B-GGUF
+#   - Developer Model: lemonade/user.Qwen3.5-4B-GGUF
 #
 # ==============================================================================
 # EXIT CODES
@@ -110,7 +110,13 @@ valid_ipv4() {
 AGENTS=("assistant" "research" "developer")
 # Human-friendly prefixes used during interactive prompts
 AGENT_PREFIXES=("General" "Deep Research" "Developer")
-# ==============================================================================
+
+# FIX: Initialize token variables to empty strings before use.
+# Without this, referencing them in the uniqueness-check while condition
+# below triggers an "unbound variable" error under set -u.
+ASSISTANT_TOKEN=""
+RESEARCH_TOKEN=""
+DEVELOPER_TOKEN=""
 
 # ==============================================================================
 # 0. Sudo Trap Guardrail
@@ -173,22 +179,25 @@ print_section_summary() {
 # Telegram token validation function
 ##
 # validate_telegram_token(token)
-# Performs a lightweight format check then attempts an API `getMe`
-# request to Telegram to validate the token. Returns 0 on success,
-# 1 on fatal/format errors. Prints status messages to stdout.
+# Performs a format check then attempts an API `getMe` request to Telegram
+# to confirm the token is live. Returns 0 on success, 1 on failure.
+#
+# Token format: {8-10 digit bot ID}:{35-char alphanumeric+underscore string}
+# Example:      110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw
 ##
 validate_telegram_token() {
     local token=$1
     local timeout=5
 
-    # Validate token format (basic check)
-    if [[ ! "$token" =~ ^[a-zA-Z0-9_-]{14,}$ ]]; then
-        echo "  [WARN] Token format validation failed. May be invalid."
+    # FIX: Previous regex ^[a-zA-Z0-9_-]{14,}$ matched no colon, so every
+    # valid Telegram token (which always contains ':') was incorrectly rejected.
+    # Corrected to match the actual Telegram token format.
+    if [[ ! "$token" =~ ^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$ ]]; then
+        echo "  [WARN] Token format validation failed. Expected format: {8-10 digits}:{35 alphanumeric chars}"
         return 1
     fi
 
     # Try to validate with Telegram API (returns HTTP status code)
-    # Use timeout to prevent hanging
     local http_code
     http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time "$timeout" \
         "https://api.telegram.org/bot$token/getMe" 2>/dev/null)
@@ -239,7 +248,6 @@ run_parallel() {
         done
     fi
 
-    # Wait for all background jobs to complete
     local pid
     for pid in "${pids[@]}"; do
         wait "$pid"
@@ -314,7 +322,6 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
         fi
 
         CURRENT_TOKEN=""
-        # Read tokens from /dev/tty to avoid issues when stdout/stderr are redirected
         read -r -s -p "Enter Telegram Bot Token for the $AGENT_PREFIX Agent: " CURRENT_TOKEN </dev/tty
         echo ""
 
@@ -331,7 +338,6 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
         fi
     done
 
-    # Validate token format
     if [[ -n "$CURRENT_TOKEN" ]]; then
         if ! validate_telegram_token "$CURRENT_TOKEN"; then
             echo ""
@@ -405,6 +411,23 @@ mkdir -p "$HOME/.openclaw"
 
 SECRETS_FILE="$HOME/.openclaw/secrets.env"
 
+# Helper: write all secrets to the file using printf %q for safe quoting.
+# printf %q produces bash-compatible single-quoted output that survives
+# special characters (spaces, $, !, etc.) when the file is later sourced.
+write_secrets_file() {
+    {
+        printf 'LEMONADE_KEY=%q\n'      "$LEMONADE_KEY"
+        printf 'ASSISTANT_TOKEN=%q\n'   "$ASSISTANT_TOKEN"
+        printf 'RESEARCH_TOKEN=%q\n'    "$RESEARCH_TOKEN"
+        printf 'DEVELOPER_TOKEN=%q\n'   "$DEVELOPER_TOKEN"
+        printf 'GITLAB_PAT=%q\n'        "$GITLAB_PAT"
+        printf 'BRAVE_API_KEY=%q\n'     "$BRAVE_API_KEY"
+        printf 'X_API_KEY=%q\n'         "$X_API_KEY"
+    } > "$SECRETS_FILE"
+    chmod 600 "$SECRETS_FILE" || true
+    chown "$(id -un):$(id -gn)" "$SECRETS_FILE" 2>/dev/null || true
+}
+
 if [[ -f "$SECRETS_FILE" ]]; then
     echo ""
     echo "  [WARN] A secrets file already exists at $SECRETS_FILE"
@@ -416,32 +439,11 @@ if [[ -f "$SECRETS_FILE" ]]; then
         # shellcheck disable=SC1090
         source "$SECRETS_FILE"
     else
-        cat >"$SECRETS_FILE" <<'EOF'
-LEMONADE_KEY="$LEMONADE_KEY"
-ASSISTANT_TOKEN="$ASSISTANT_TOKEN"
-RESEARCH_TOKEN="$RESEARCH_TOKEN"
-DEVELOPER_TOKEN="$DEVELOPER_TOKEN"
-GITLAB_PAT="$GITLAB_PAT"
-BRAVE_API_KEY="$BRAVE_API_KEY"
-X_API_KEY="$X_API_KEY"
-EOF
-            chmod 600 "$SECRETS_FILE" || true
-            # Attempt to set owner to current user if possible; ignore failures
-            chown "$(id -un):$(id -gn)" "$SECRETS_FILE" 2>/dev/null || true
+        write_secrets_file
         echo "[OK] Credentials updated at $SECRETS_FILE"
     fi
 else
-    cat >"$SECRETS_FILE" <<'EOF'
-LEMONADE_KEY="$LEMONADE_KEY"
-ASSISTANT_TOKEN="$ASSISTANT_TOKEN"
-RESEARCH_TOKEN="$RESEARCH_TOKEN"
-DEVELOPER_TOKEN="$DEVELOPER_TOKEN"
-GITLAB_PAT="$GITLAB_PAT"
-BRAVE_API_KEY="$BRAVE_API_KEY"
-X_API_KEY="$X_API_KEY"
-EOF
-    chmod 600 "$SECRETS_FILE" || true
-    chown "$(id -un):$(id -gn)" "$SECRETS_FILE" 2>/dev/null || true
+    write_secrets_file
     echo "[OK] Credentials saved to $SECRETS_FILE"
 fi
 
@@ -567,7 +569,6 @@ echo "[OK] Lemonade Server backend configured"
 echo ""
 echo "=== Provisioning Agent Workspaces ==="
 
-# Provision agents with progress tracking
 agents_to_provision=("${AGENTS[@]}")
 for i in "${!agents_to_provision[@]}"; do
     agent="${agents_to_provision[$i]}"
@@ -605,10 +606,8 @@ if [[ -n "$GITLAB_PAT" ]]; then
 
         echo "Binding local GitLab MCP server to ${agent^^} Agent..."
         openclaw config set agents.list.${agent}.mcp.servers.gitlab.command "npx"
-        # Use space-separated args for better CLI compatibility
         openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "-y" "@zereight/mcp-gitlab" || {
             echo "[WARN] Array args syntax may not be supported. Trying alternative method..."
-            # Fallback: try setting each arg separately
             openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "-y" || echo "[WARN] Failed to set first MCP arg."
             openclaw config set agents.list.${agent}.mcp.servers.gitlab.args "@zereight/mcp-gitlab" || echo "[WARN] Failed to set second MCP arg."
         }
@@ -626,13 +625,17 @@ fi
 
 if [[ -n "$X_API_KEY" ]]; then
     openclaw config set agents.list.research.env.X_API_KEY "$X_API_KEY" || handle_error_or_warn "Failed to set X credentials for research agent." $E_CONFIG
+else
+    echo "[INFO] Skipping X/Twitter configuration (no key provided)."
 fi
 
-print_section_summary "Agent Secrets & MCP Configuration" \
-    "GitLab integration configured" \
-    "Brave Search API key configured" \
-    "X/Twitter credentials configured" \
-    "All agent-specific secrets injected"
+# FIX: Build the summary dynamically so it only reports items that were actually configured.
+_summary_items=()
+[[ -n "$GITLAB_PAT" ]]     && _summary_items+=("GitLab PAT injected and MCP server bound to all agents")
+[[ -n "$BRAVE_API_KEY" ]]  && _summary_items+=("Brave Search API key configured for Research agent")
+[[ -n "$X_API_KEY" ]]      && _summary_items+=("X/Twitter credentials configured for Research agent")
+[[ ${#_summary_items[@]} -eq 0 ]] && _summary_items+=("No optional integrations configured (all skipped)")
+print_section_summary "Agent Secrets & MCP Configuration" "${_summary_items[@]}"
 
 # ==============================================================================
 # 9. Assign Native Skills & Hooks
@@ -673,17 +676,21 @@ for agent in "${AGENTS[@]}"; do
     TOKEN=""
     case "$agent" in
         "assistant") TOKEN="$ASSISTANT_TOKEN" ;;
-        "research") TOKEN="$RESEARCH_TOKEN" ;;
+        "research")  TOKEN="$RESEARCH_TOKEN"  ;;
         "developer") TOKEN="$DEVELOPER_TOKEN" ;;
     esac
+
+    # FIX: Unbind any existing defaults BEFORE binding the new token.
+    # Previously this was done AFTER openclaw agents bind, which immediately
+    # undid the binding that had just been created.
+    echo "Clearing existing bindings for ${agent^^}..."
+    openclaw agents unbind --agent "$agent" --all ||
+        echo "[WARN] Failed to unbind defaults for agent '$agent'. Continuing."
 
     echo "Binding Telegram for ${agent^^}..."
     if ! openclaw agents bind --agent "$agent" --bind "telegram:$TOKEN"; then
         handle_error_or_warn "Failed to bind Telegram for agent '$agent'." $E_GATEWAY
     fi
-
-    openclaw agents unbind --agent "$agent" --all ||
-        echo "[WARN] Failed to unbind defaults for agent '$agent'. Continuing."
 done
 
 print_section_summary "Telegram Channel Binding" \
@@ -711,10 +718,10 @@ openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" |
 # Task 2
 progress_bar "$total_tasks" 2
 echo "Configuring per-agent SQLite index storage..."
-# Use static path with explicit file naming pattern to avoid expansion issues
 MEMORY_DIR="$HOME/.openclaw/memory"
 mkdir -p "$MEMORY_DIR"
-    openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentId}.sqlite" || {
+# FIX: Removed stray extra indent that caused inconsistent formatting in the log.
+openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentId}.sqlite" || {
     echo "[WARN] Failed to set memory index path with pattern. Attempting static path..."
     openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agent}.sqlite" || echo "[WARN] Alternative memory path also failed."
 }
@@ -733,6 +740,7 @@ openclaw config set agents.defaults.memorySearch.cache.enabled true || echo "[WA
 progress_bar "$total_tasks" 5
 echo "Enabling session transcript indexing (experimental)..."
 openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true || echo "[WARN] Failed to enable session memory indexing."
+
 openclaw config set agents.defaults.memorySearch.sources[0] "memory" || echo "[WARN] Failed to set memory source."
 openclaw config set agents.defaults.memorySearch.sources[1] "sessions" || echo "[WARN] Failed to set sessions source."
 
@@ -770,7 +778,6 @@ for agent in "${AGENTS[@]}"; do
     fi
 
     if [[ ${#found[@]} -gt 0 ]]; then
-        # Store as newline-separated list to safely handle filenames with spaces
         AGENT_SEED_FILES[$agent]="$(printf '%s\n' "${found[@]}")"
         AGENTS_WITH_FILES+=("$agent")
     fi
