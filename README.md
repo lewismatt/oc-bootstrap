@@ -10,12 +10,12 @@
 | Component               | Description                                                                         |
 |:------------------------|:--------------------------------------------------------------------------------------|
 | **Host**                | Ubuntu 24.04 (bare-metal)                                                             |
-| **Inference Backend**   | Local Lemonade server running GGUF models via AMD ROCm (designed for 12 GB VRAM minimum)   |
-| **Agent: Assistant**    | General-purpose aide (`lemonade/user.Qwen3.5-4B-GGUF`)                                |
-| **Agent: Research**     | Deep-dive web research (`lemonade/user.Qwen3.5-4B-GGUF`)                              |
-| **Agent: Developer**    | Code and Git workflow (`lemonade/user.Qwen3.5-4B-GGUF`)                               |
-| **Shared Memory Model** | `lemonade/user.nomic-embed-text-v1.5-GGUF`                                            |
-| **Vector Store**        | Local SQLite-backed search with `sqlite-vec` acceleration using OpenAI-compatible API (backed by Lemonade) |
+| **Inference Backend**   | Local Lemonade server running GGUF models via AMD ROCm                                |
+| **Agent: Assistant**    | User-defined LLM                                                                      |
+| **Agent: Research**     | User-defined LLM                                                                      |
+| **Agent: Developer**    | User-defined LLM                                                                      |
+| **Shared Memory Model** | User-defined embedding model                                                          |
+| **Vector Store**        | Local SQLite-backed search with `sqlite-vec` acceleration using OpenAI-compatible API |
 
 ---
 
@@ -24,7 +24,7 @@
 | Integration                  | Why it's needed                                          | How to obtain                                                                                                                                                       |
 |:-----------------------------|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Telegram** (required)      | Three distinct bots keep each agent's context isolated.  | Message **@BotFather** -> `/newbot` three times -> copy the HTTP API tokens.                                                                                        |
-| **Lemonade Server** (required) | Provides local inference.                                | Run a Lemonade instance. The script will prompt you for the server IP (with validation), and will use it to configure the OpenAI-compatible API endpoint. **CRITICAL:** Ensure both `Qwen3.5-4B-GGUF` **and** `nomic-embed-text-v1.5-GGUF` are downloaded and staged on the server. |
+| **Lemonade Server** (required) | Provides local inference.                                | Run a Lemonade instance. The script will prompt you for the server IP and the model tags you wish to use for each agent. **CRITICAL:** Ensure your chosen models are downloaded and staged on the server. |
 | **GitLab PAT** (optional)    | Allows all agents to read/write to a shared codebase.   | Create a Personal Access Token with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
 | **Brave Search** (optional)  | Powers live web searches for the Research agent.         | Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).                                                                         |
 | **X/Twitter** (optional)     | Enables real-time trend scraping for the Research agent. | Obtain an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).                                                                 |
@@ -75,12 +75,13 @@ without relying on cloud services.
    # Create models directory
    mkdir -p models/huggingface.co/user.model-name/
 
-   # Download Qwen3.5-4B (quantized GGUF format)
-   # Example using Hugging Face CLI or manual download
+   # Download your preferred LLM (quantized GGUF format)
+   # Example: Qwen3.5-4B
    huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf \
      --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
 
-   # Download nomic-embed-text (quantized GGUF format)
+   # Download your preferred embedding model (quantized GGUF format)
+   # Example: nomic-embed-text
    huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF \
      nomic-embed-text-v1.5.f16.gguf \
      --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
@@ -119,7 +120,7 @@ without relying on cloud services.
    ```powershell
    # Create models directory
    New-Item -Type Directory -Path "models\huggingface.co" -Force
-
+Example models
    # Download using Hugging Face CLI (install first: pip install huggingface-hub)
    huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf `
      --local-dir "models\huggingface.co\user.Qwen3.5-4B-GGUF"
@@ -199,7 +200,7 @@ chmod +x oc-bootstrap.sh
    Checks for existing secrets file and prompts before overwriting.
 3. **Provisions Agents** - Creates isolated workspaces (`~/.openclaw/workspace-*`) for
    Assistant, Research, and Developer agents, then prompts for the Lemonade server IP
-   and configures all inference endpoints.
+   and your preferred model tags, configuring all inference endpoints accordingly.
 4. **Binds Skills and Hooks**:
     - Adds live-scraping skills to the Research agent (webSearch, webScrape, newsSearch,
       rssReader, trendsFinder, xScraper).
@@ -217,7 +218,7 @@ chmod +x oc-bootstrap.sh
 ## Troubleshooting
 
 | Symptom                                                  | Likely Cause                                     | Fix                                                                                                                                        |
-|:---------------------------------------------------------|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------|
+| **Agents unresponsive via Telegram**                     | Lemonade server missing models or not reachable. | Verify the server is running and your chosen models are downloaded.                                  ||
 | **Agents unresponsive via Telegram**                     | Lemonade server missing models or not reachable. | Verify the server is running and both `Qwen3.5-4B-GGUF` and `nomic-embed-text-v1.5-GGUF` are downloaded.                                  |
 | **"Conflict: terminated by other getUpdates request"**   | Same Telegram token used for multiple agents.    | Re-run the setup and provide three **unique** bot tokens.                                                                                  |
 | **Ghost daemon processes**                               | Previous run left a PM2 daemon alive.            | Run `openclaw gateway stop && npx pm2 kill`, then restart the installer.                                                                   |

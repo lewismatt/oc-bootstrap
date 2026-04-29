@@ -32,23 +32,23 @@ environment.
 
 ## 2. Agent Topology & Architecture
 
-The system utilizes three distinct agents, all standardized to use the
-`lemonade/user.Qwen3.5-4B-GGUF` model to optimize VRAM utilization.
+The system utilizes three distinct agents, each configurable with the user's choice
+of local LLMs (e.g., `lemonade/user.Qwen3.5-4B-GGUF`) to optimize performance and
+VRAM utilization.
 
 1. **The General Assistant:** Handles ad-hoc queries, general tasks, and daily
-    life scheduling for the user in Nederland, CO.
+    life scheduling for the user.
 2. **The Deep Research Agent:** Empowered with extensive native data-gathering
     skills (`webSearch`, `webScrape`, `newsSearch`, `rssReader`, `trendsFinder`,
-    `xScraper`) via Brave and X APIs to monitor ongoing events (NBA, Ski Resorts,
-    local concerts) and synthesize reports.
+    `xScraper`) via Brave and X APIs to monitor ongoing events and synthesize reports.
 3. **The Developer Agent:** Focused on codebase management, local MCP
     orchestration, and CI/CD pipelines.
 
 **Inference & Memory:**
 
 * **Backend:** Local "Lemonade" server.
-* **Embedding/Dreaming:** Offloaded to
-    `lemonade/user.nomic-embed-text-v1.5-GGUF`.
+* **Embedding/Dreaming:** User-defined (e.g.,
+    `lemonade/user.nomic-embed-text-v1.5-GGUF`).
 * **Vector Search:** Accelerated locally via `sqlite-vec` to preserve compute
     cycles.
 
@@ -100,9 +100,9 @@ the full agent lifecycle:
 1. **Credential Management:** Securely stores (`chmod 600`) tokens for Telegram,
     Lemonade, GitLab, Brave, and X. Validates Telegram tokens against the Telegram
     API and checks for existing secrets files with overwrite protection.
-2. **Infrastructure Provisioning:** Standardizes models, maps local inference with
-    OpenAI-compatible API interface (backed by Lemonade), and configures `sqlite-vec`
-    memory with embedding cache and session indexing.
+2. **Infrastructure Provisioning:** Configures user-selected models, maps local
+    inference with OpenAI-compatible API interface (backed by Lemonade), and
+    configures `sqlite-vec` memory with embedding cache and session indexing.
 3. **Skill & Hook Deployment:** Unlocks advanced scraping skills on Research agent
     and autonomous operational hooks on all three agents.
 4. **Binding & Isolation:** Enforces strict Telegram channel isolation, binds GitLab

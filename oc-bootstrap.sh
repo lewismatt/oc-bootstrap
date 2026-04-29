@@ -12,10 +12,10 @@ set +o histexpand # Disable history expansion to prevent issues with '!' charact
 #   - Execution: Native process daemon (no Docker overhead)
 #
 # INFERENCE BACKEND (Local Lemonade Server):
-#   - Embedding Model: lemonade/user.nomic-embed-text-v1.5-GGUF
-#   - Assistant Model: lemonade/user.Qwen3.5-4B-GGUF
-#   - Research Model:  lemonade/user.Qwen3.5-4B-GGUF
-#   - Developer Model: lemonade/user.Qwen3.5-4B-GGUF
+#   - Embedding Model: (User-defined)
+#   - Assistant Model: (User-defined)
+#   - Research Model:  (User-defined)
+#   - Developer Model: (User-defined)
 #
 # ==============================================================================
 # EXIT CODES
@@ -111,12 +111,14 @@ AGENTS=("assistant" "research" "developer")
 # Human-friendly prefixes used during interactive prompts
 AGENT_PREFIXES=("General" "Deep Research" "Developer")
 
-# FIX: Initialize token variables to empty strings before use.
-# Without this, referencing them in the uniqueness-check while condition
-# below triggers an "unbound variable" error under set -u.
+# FIX: Initialize variables to empty strings before use.
 ASSISTANT_TOKEN=""
 RESEARCH_TOKEN=""
 DEVELOPER_TOKEN=""
+EMBEDDING_MODEL=""
+ASSISTANT_MODEL=""
+RESEARCH_MODEL=""
+DEVELOPER_MODEL=""
 
 # ==============================================================================
 # 0. Sudo Trap Guardrail
@@ -298,7 +300,32 @@ echo ""
 echo "=== Infrastructure Credentials ==="
 read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
 LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
+Model Selection ==="
+echo "Paste the Lemonade tags for your local models (e.g., lemonade/user.Qwen3.5-4B-GGUF)."
+echo ""
 
+while [[ -z "$EMBEDDING_MODEL" ]]; do
+    read -r -p "Enter Embedding Model tag (used for memory/dreaming): " EMBEDDING_MODEL </dev/tty
+    [[ -z "$EMBEDDING_MODEL" ]] && echo "  [ERROR] Embedding model is required."
+done
+
+while [[ -z "$ASSISTANT_MODEL" ]]; do
+    read -r -p "Enter Assistant Agent LLM tag: " ASSISTANT_MODEL </dev/tty
+    [[ -z "$ASSISTANT_MODEL" ]] && echo "  [ERROR] Assistant model is required."
+done
+
+while [[ -z "$RESEARCH_MODEL" ]]; do
+    read -r -p "Enter Research Agent LLM tag: " RESEARCH_MODEL </dev/tty
+    [[ -z "$RESEARCH_MODEL" ]] && echo "  [ERROR] Research model is required."
+done
+
+while [[ -z "$DEVELOPER_MODEL" ]]; do
+    read -r -p "Enter Developer Agent LLM tag: " DEVELOPER_MODEL </dev/tty
+    [[ -z "$DEVELOPER_MODEL" ]] && echo "  [ERROR] Developer model is required."
+done
+
+echo ""
+echo "=== 
 echo ""
 echo "=== Telegram Bot Tokens ==="
 echo "You will need three unique Telegram Bot Tokens from @BotFather."
@@ -355,6 +382,10 @@ while [[ $current_token -lt $TOTAL_TOKENS ]]; do
 
     echo ""
 done
+echo "[OK] Embedding Model: $EMBEDDING_MODEL"
+echo "[OK] Assistant Model: $ASSISTANT_MODEL"
+echo "[OK] Research Model: $RESEARCH_MODEL"
+echo "[OK] Developer Model: $DEVELOPER_MODEL"
 
 echo ""
 echo "=== Agent-Specific External Secrets (optional) ==="
@@ -391,7 +422,11 @@ else
     echo "[WARN] Brave Search API Key: Not configured"
 fi
 if [[ -n "$X_API_KEY" ]]; then
-    echo "[OK] X/Twitter API Key: Configured"
+    echo "[OK] XEMBEDDING_MODEL=%q\n' "$EMBEDDING_MODEL"
+        printf 'ASSISTANT_MODEL=%q\n' "$ASSISTANT_MODEL"
+        printf 'RESEARCH_MODEL=%q\n' "$RESEARCH_MODEL"
+        printf 'DEVELOPER_MODEL=%q\n' "$DEVELOPER_MODEL"
+        printf '/Twitter API Key: Configured"
 else
     echo "[WARN] X/Twitter API Key: Not configured"
 fi
@@ -549,8 +584,8 @@ while true; do
     fi
 done
 
-BASE_URL="http://${LEMONADE_IP}:8000/v1"
-read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL </dev/tty
+BASE_URL="http://${LEMONADE_IP}:8000/v1"$EMBEDDING_MODEL" || echo "[WARN] Failed to set dreaming model."
+openclaw config set memory.embeddingModel "$EMBEDDING_MODELURL </dev/tty
 [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
 
 openclaw config set providers.lemonade.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set Lemonade base URL." $E_CONFIG
@@ -573,16 +608,16 @@ for i in "${!agents_to_provision[@]}"; do
     agent="${agents_to_provision[$i]}"
     WORKSPACE="$HOME/.openclaw/workspace-${agent}"
     current=$((i + 1))
-    progress_bar ${#agents_to_provision[@]} $current
+    progress_barLLM inference models to agents..."
+openclaw config set agents.list.assistant.model "$ASSISTANT_MODEL" || echo "[WARN] Failed to set model for assistant agent."
+openclaw config set agents.list.research.model "$RESEARCH_MODEL" || echo "[WARN] Failed to set model for research agent."
+openclaw config set agents.list.developer.model "$DEVELOPER_MODEL" || echo "[WARN] Failed to set model for developer agent."
 
-    echo "Provisioning agent: ${agent^^}..."
-    openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive ||
-        echo "[WARN] Issue provisioning agent '$agent'. Continuing."
-done
-echo "" # Newline after progress bar
-
-echo "Assigning Qwen3.5-4B inference model to all agents..."
-for agent in "${AGENTS[@]}"; do
+print_section_summary "Agent Workspace Provisioning" \
+    "Assistant agent workspace created" \
+    "Research agent workspace created" \
+    "Developer agent workspace created" \
+    "User-defined modelsS[@]}"; do
     openclaw config set agents.list."${agent}".model "lemonade/user.Qwen3.5-4B-GGUF" || echo "[WARN] Failed to set model for ${agent} agent."
 done
 
@@ -702,7 +737,7 @@ print_section_summary "Telegram Channel Binding" \
 # ==============================================================================
 echo ""
 echo "=== Configuring Local Memory & Vector Search ==="
-
+$EMBEDDING_MODEL
 memory_tasks=("Configuring memory search provider" "Configuring SQLite index storage" "Enabling sqlite-vec acceleration" "Enabling embedding cache" "Enabling session memory indexing")
 total_tasks=${#memory_tasks[@]}
 
@@ -928,8 +963,10 @@ echo "Memory index:             $HOME/.openclaw/memory/"
 echo "Agent workspaces:"
 echo "  - Assistant:            $HOME/.openclaw/workspace-assistant"
 echo "  - Research:             $HOME/.openclaw/workspace-research"
-echo "  - Developer:            $HOME/.openclaw/workspace-developer"
-echo ""
+echo "  - Assistant Model:      $ASSISTANT_MODEL"
+echo "  - Research Model:       $RESEARCH_MODEL"
+echo "  - Developer Model:      $DEVELOPER_MODEL"
+echo "  - Embedding Model:      $EMBEDDING_MODEL
 echo "Configuration:"
 echo "  - Inference Backend:    Lemonade Server ($BASE_URL)"
 echo "  - Primary Model:        Qwen3.5-4B-GGUF"
