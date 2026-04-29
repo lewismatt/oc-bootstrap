@@ -20,9 +20,11 @@ environment.
 1. **Absolute Privacy:** Zero cloud data leakage. All inference, memory
     indexing, and tool execution must remain on the local network or establish
     direct, point-to-point connections with external services (no middleman hubs).
-2. **Resource Efficiency:** Operating within the constraints of an AMD GPU with
-    12GB of VRAM requires strict token conservation, lightweight models, and
-    offloading heavy vector operations to native database integrations.
+2. **Resource Efficiency:** The project is designed to work effectively with
+    12 GB of GPU VRAM as a recommended minimum through strict token conservation, lightweight
+    models, and offloading heavy vector operations to native database integrations. It can be
+    deployed on systems with less VRAM, though performance will be reduced; additional VRAM
+    enables larger models and better responsiveness.
 3. **Idempotency & CLI Supremacy:** The deployment script must be safely
     re-runnable without destroying existing workspaces, and all configuration
     must be executed via OpenClaw's official CLI (`openclaw config set`) rather
@@ -117,5 +119,6 @@ When proposing modifications, adhere strictly to these constraints:
     manual JSON parsing.
 * **Zero Cloud Middlemen:** Prioritize native skills or local `stdio` MCP
     servers over hosted SaaS platforms.
-* **Resource Awareness:** Honor the 12GB VRAM constraint and optimize for token
-    conservation.
+* **Resource Awareness:** Optimize for systems with 12 GB VRAM minimum, balancing token
+    conservation and model selection. Designs should scale gracefully for both constrained
+    and resource-rich deployments.

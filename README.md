@@ -10,7 +10,7 @@
 | Component               | Description                                                                         |
 |:------------------------|:--------------------------------------------------------------------------------------|
 | **Host**                | Ubuntu 24.04 (bare-metal)                                                             |
-| **Inference Backend**   | Local Lemonade server running GGUF models via AMD ROCm (optimized for 12 GB VRAM)   |
+| **Inference Backend**   | Local Lemonade server running GGUF models via AMD ROCm (designed for 12 GB VRAM minimum)   |
 | **Agent: Assistant**    | General-purpose aide (`lemonade/user.Qwen3.5-4B-GGUF`)                                |
 | **Agent: Research**     | Deep-dive web research (`lemonade/user.Qwen3.5-4B-GGUF`)                              |
 | **Agent: Developer**    | Code and Git workflow (`lemonade/user.Qwen3.5-4B-GGUF`)                               |
@@ -28,6 +28,138 @@
 | **GitLab PAT** (optional)    | Allows all agents to read/write to a shared codebase.   | Create a Personal Access Token with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
 | **Brave Search** (optional)  | Powers live web searches for the Research agent.         | Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).                                                                         |
 | **X/Twitter** (optional)     | Enables real-time trend scraping for the Research agent. | Obtain an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).                                                                 |
+
+---
+
+## Lemonade Server Setup
+
+### What is Lemonade Server?
+
+**Lemonade Server** is a local inference backend that runs GGUF quantized models (LLMs and embedding models) 
+on your hardware. It provides an OpenAI-compatible REST API, allowing all three agents to perform inference 
+without relying on cloud services.
+
+**Key features:**
+- OpenAI-compatible `/v1` API endpoints for easy integration
+- Supports quantized GGUF models optimized for consumer GPUs (AMD ROCm, NVIDIA CUDA)
+- Runs entirely on-premises with zero cloud data leakage
+- Designed to run efficiently on systems with 12 GB VRAM minimum; additional VRAM enables improved performance and larger models
+
+### Prerequisites
+
+- **System:** AMD GPU with 12+ GB VRAM (tested with AMD ROCm) or NVIDIA GPU with CUDA support
+- **Memory:** At least 16 GB system RAM recommended
+- **Disk Space:** ~15 GB for model storage (Qwen3.5-4B + nomic-embed-text)
+- **Network:** Accessible on local network at a fixed IP address
+
+### Setup on Linux (Ubuntu 24.04)
+
+1. **Clone the Lemonade repository:**
+   ```bash
+   git clone https://github.com/lemonade-ai/lemonade-server.git
+   cd lemonade-server
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   # For AMD ROCm support
+   sudo apt install -y rocm-core rocm-libs
+   export HSA_OVERRIDE_GFX_VERSION=11.0  # Adjust based on your GPU
+   
+   # For general Python environment
+   pip install -r requirements.txt
+   ```
+
+3. **Download required models:**
+   ```bash
+   # Create models directory
+   mkdir -p models/huggingface.co/user.model-name/
+
+   # Download Qwen3.5-4B (quantized GGUF format)
+   # Example using Hugging Face CLI or manual download
+   huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf \
+     --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
+
+   # Download nomic-embed-text (quantized GGUF format)
+   huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF \
+     nomic-embed-text-v1.5.f16.gguf \
+     --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
+   ```
+
+4. **Start Lemonade Server:**
+   ```bash
+   # Run in foreground (or use systemd/screen for background)
+   HSA_OVERRIDE_GFX_VERSION=11.0 python -m lemonade.server \
+     --host 0.0.0.0 \
+     --port 8000 \
+     --models-path ./models
+   ```
+
+5. **Verify it's running:**
+   ```bash
+   curl http://localhost:8000/v1/models
+   ```
+
+### Setup on Windows
+
+1. **Install prerequisites:**
+   - Download and install [Python 3.10+](https://www.python.org/downloads/)
+   - Install [Git for Windows](https://git-scm.com/)
+   - For AMD: Install [AMD ROCm for Windows](https://rocmdocs.amd.com/en/docs/deploy/windows/quick_start.html)
+   - For NVIDIA: Install [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit)
+
+2. **Clone and setup:**
+   ```powershell
+   git clone https://github.com/lemonade-ai/lemonade-server.git
+   cd lemonade-server
+   pip install -r requirements.txt
+   ```
+
+3. **Download models:**
+   ```powershell
+   # Create models directory
+   New-Item -Type Directory -Path "models\huggingface.co" -Force
+
+   # Download using Hugging Face CLI (install first: pip install huggingface-hub)
+   huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf `
+     --local-dir "models\huggingface.co\user.Qwen3.5-4B-GGUF"
+
+   huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF `
+     nomic-embed-text-v1.5.f16.gguf `
+     --local-dir "models\huggingface.co\user.nomic-embed-text-v1.5-GGUF"
+   ```
+
+4. **Start Lemonade Server:**
+   ```powershell
+   # For AMD ROCm (may need environment variable)
+   $env:HSA_OVERRIDE_GFX_VERSION = "11.0"  # Adjust for your GPU
+   python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ".\models"
+
+   # Or simply:
+   python -m lemonade.server
+   ```
+
+5. **Verify it's running:**
+   ```powershell
+   Invoke-WebRequest http://localhost:8000/v1/models
+   ```
+
+6. **Optional: Create a batch file for easy startup:**
+   ```batch
+   @echo off
+   cd /d %~dp0
+   set HSA_OVERRIDE_GFX_VERSION=11.0
+   python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ".\models"
+   pause
+   ```
+   Save as `start-lemonade.bat` and double-click to run.
+
+### Important Notes
+
+- **Model Paths:** Ensure model directory structure matches `models/huggingface.co/{model-namespace}/{model-name}/`. The script looks for files in this exact format.
+- **Network Access:** Lemonade must be accessible from your OpenClaw host. Note its IP address (e.g., `192.168.1.100`) for the bootstrap script.
+- **Port Mapping:** Default port is `8000`. If changed, remember to use `http://<IP>:PORT/v1` when running `oc-bootstrap.sh`.
+- **Performance:** First inference request may be slow as models load into VRAM. Subsequent requests are faster.
 
 ---
 
