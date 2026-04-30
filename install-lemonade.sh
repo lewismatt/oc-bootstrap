@@ -35,7 +35,13 @@ fi
 LEMONADE_DIR="$HOME/lemonade-server"
 if [[ -d "$LEMONADE_DIR" ]]; then
     echo "[INFO] Lemonade Server already exists at $LEMONADE_DIR. Updating..."
-    cd "$LEMONADE_DIR" && git pull || { echo "[ERROR] Failed to update repository"; exit 1; }
+    # Use explicit if/else instead of ambiguous &&/|| pattern
+    if cd "$LEMONADE_DIR" && git pull; then
+        : # success, nothing to do
+    else
+        echo "[ERROR] Failed to update repository"
+        exit 1
+    fi
 else
     echo "[INFO] Cloning Lemonade Server..."
     git clone https://github.com/lemonade-ai/lemonade-server.git "$LEMONADE_DIR" || \
@@ -76,7 +82,8 @@ fi
 
 # SECTION 5: Install Python dependencies in the virtual environment
 echo "[INFO] Installing Python requirements..."
-# shellcheck source=./venv/bin/activate  # suppresses shellcheck warnings for dynamic sourcing
+# shellcheck disable=SC1091
+# shellcheck source=./venv/bin/activate  # suppresses warning about missing file during analysis
 source venv/bin/activate
 
 # Upgrade pip first to avoid compatibility issues with newer packages
