@@ -55,7 +55,7 @@ load_secrets() {
 # Run OpenClaw doctor to verify installation
 verify_openclaw() {
     log "Verifying OpenClaw installation..."
-    if ! command -v openclaw &>/dev/null; then
+    if ! command -v openclaw &> /dev/null; then
         handle_error "OpenClaw CLI not found in PATH"
     fi
 

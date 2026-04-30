@@ -85,9 +85,9 @@ fail() {
 run_test() {
     local test_name="$1"
     local test_command="$2"
-    
+
     log "Running: $test_name"
-    
+
     if [[ "$VERBOSE" == "true" ]]; then
         if eval "$test_command"; then
             pass "$test_name"
@@ -113,17 +113,17 @@ run_test() {
 
 # Check if Docker is available
 check_docker() {
-    if ! command -v docker &>/dev/null; then
+    if ! command -v docker &> /dev/null; then
         error "Docker is not installed or not in PATH"
         exit 1
     fi
-    
-    if ! docker info &>/dev/null; then
+
+    if ! docker info &> /dev/null; then
         error "Docker daemon is not running"
         exit 1
     fi
-    
-    if ! command -v docker-compose &>/dev/null && ! docker compose version &>/dev/null; then
+
+    if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
         error "Docker Compose is not installed"
         exit 1
     fi
@@ -132,14 +132,14 @@ check_docker() {
 # Cleanup test resources
 cleanup() {
     log "Cleaning up test resources..."
-    
+
     # Stop and remove test container
-    docker stop "$TEST_CONTAINER_NAME" &>/dev/null 2>&1 || true
-    docker rm "$TEST_CONTAINER_NAME" &>/dev/null 2>&1 || true
-    
+    docker stop "$TEST_CONTAINER_NAME" &> /dev/null 2>&1 || true
+    docker rm "$TEST_CONTAINER_NAME" &> /dev/null 2>&1 || true
+
     # Remove test volume
-    docker volume rm "$TEST_VOLUME_NAME" &>/dev/null 2>&1 || true
-    
+    docker volume rm "$TEST_VOLUME_NAME" &> /dev/null 2>&1 || true
+
     # Remove test image (optional)
     # docker rmi oc-bootstrap-test:latest &>/dev/null 2>&1 || true
 }
@@ -173,7 +173,7 @@ test_docker_build() {
         warn "Skipping Docker build test (quick mode)"
         return 0
     fi
-    
+
     log "Building Docker image (this may take a few minutes)..."
     docker build -t oc-bootstrap-test:latest "$PROJECT_ROOT"
 }
@@ -195,36 +195,36 @@ test_container_runs() {
         -e DEVELOPER_TOKEN=test3 \
         oc-bootstrap-test:latest \
         sleep infinity
-    
+
     # Wait for container to start
     sleep 5
-    
+
     # Check if container is running
     docker ps --filter "name=$TEST_CONTAINER_NAME" --format '{{.Names}}' | grep -q "$TEST_CONTAINER_NAME"
 }
 
 test_container_stops() {
-    docker stop "$TEST_CONTAINER_NAME" &>/dev/null
-    docker rm "$TEST_CONTAINER_NAME" &>/dev/null
+    docker stop "$TEST_CONTAINER_NAME" &> /dev/null
+    docker rm "$TEST_CONTAINER_NAME" &> /dev/null
 }
 
 test_volume_persistence() {
     # Create a test volume
-    docker volume create "$TEST_VOLUME_NAME" &>/dev/null
-    
+    docker volume create "$TEST_VOLUME_NAME" &> /dev/null
+
     # Write test data to volume as openclaw user
     docker run --rm \
         -v "$TEST_VOLUME_NAME:/home/openclaw/.openclaw" \
         oc-bootstrap-test:latest \
         bash -c "echo 'test-data' > /home/openclaw/.openclaw/test.txt"
-    
+
     # Read test data back
     local data
     data=$(docker run --rm \
         -v "$TEST_VOLUME_NAME:/home/openclaw/.openclaw" \
         oc-bootstrap-test:latest \
         cat /home/openclaw/.openclaw/test.txt)
-    
+
     [[ "$data" == "test-data" ]]
 }
 
@@ -257,7 +257,7 @@ while [[ $# -gt 0 ]]; do
             VERBOSE=true
             shift
             ;;
-        --help|-h)
+        --help | -h)
             print_usage
             exit 0
             ;;
@@ -309,17 +309,17 @@ if [[ "$QUICK_MODE" != "true" ]]; then
     run_test "Container runs as non-root user" test_nonroot_user
     run_test "Entrypoint is executable" test_entrypoint_executable
     run_test "Shell access works" test_shell_access
-    
+
     echo ""
-    
+
     run_test "Container starts and stays running" test_container_runs
-    
+
     if docker ps --filter "name=$TEST_CONTAINER_NAME" --format '{{.Names}}' | grep -q "$TEST_CONTAINER_NAME"; then
         run_test "Container stops cleanly" test_container_stops
     fi
-    
+
     echo ""
-    
+
     run_test "Volume persistence works" test_volume_persistence
 fi
 

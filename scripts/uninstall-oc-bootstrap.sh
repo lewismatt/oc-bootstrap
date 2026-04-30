@@ -98,7 +98,7 @@ confirm() {
     fi
 
     print_question "$message"
-    read -r -p "Proceed? (y/N): " response </dev/tty
+    read -r -p "Proceed? (y/N): " response < /dev/tty
     response="${response:-$default}"
     if [[ "${response^^}" == "Y" ]]; then
         return 0
@@ -112,12 +112,12 @@ confirm() {
 # ==============================================================================
 
 check_openclaw_installed() {
-    command -v openclaw &>/dev/null
+    command -v openclaw &> /dev/null
 }
 
 get_openclaw_version() {
     if check_openclaw_installed; then
-        openclaw --version 2>/dev/null || echo "unknown"
+        openclaw --version 2> /dev/null || echo "unknown"
     else
         echo "not installed"
     fi
@@ -139,7 +139,7 @@ echo "OpenClaw directory: $OPENCLAW_DIR"
 
 if [[ -d "$OPENCLAW_DIR" ]]; then
     echo "Directory exists: Yes"
-    echo "Directory size: $(du -sh "$OPENCLAW_DIR" 2>/dev/null | cut -f1)"
+    echo "Directory size: $(du -sh "$OPENCLAW_DIR" 2> /dev/null | cut -f1)"
 
     # Count items
     if [[ -d "$OPENCLAW_DIR/workspace-assistant" ]]; then
@@ -170,9 +170,9 @@ echo ""
 print_header "Step 1: Stopping OpenClaw Gateway"
 
 if check_openclaw_installed; then
-    if openclaw gateway status &>/dev/null; then
+    if openclaw gateway status &> /dev/null; then
         print_info "Gateway is running. Attempting to stop..."
-        if openclaw gateway stop 2>/dev/null; then
+        if openclaw gateway stop 2> /dev/null; then
             print_info "Gateway stopped successfully."
         else
             print_warn "Could not stop gateway (may not be running or may require manual intervention)."
@@ -244,7 +244,7 @@ print_header "Step 4: Memory Index"
 MEMORY_DIR="$OPENCLAW_DIR/memory"
 if [[ -d "$MEMORY_DIR" ]]; then
     print_question "Found memory index: $MEMORY_DIR"
-    print_info "Size: $(du -sh "$MEMORY_DIR" 2>/dev/null | cut -f1)"
+    print_info "Size: $(du -sh "$MEMORY_DIR" 2> /dev/null | cut -f1)"
 
     if confirm "Delete memory index?"; then
         rm -rf "$MEMORY_DIR"
@@ -265,7 +265,7 @@ print_header "Step 5: Log Files"
 LOGS_DIR="$OPENCLAW_DIR/logs"
 if [[ -d "$LOGS_DIR" ]]; then
     print_question "Found logs directory: $LOGS_DIR"
-    print_info "Size: $(du -sh "$LOGS_DIR" 2>/dev/null | cut -f1)"
+    print_info "Size: $(du -sh "$LOGS_DIR" 2> /dev/null | cut -f1)"
 
     if confirm "Delete logs?"; then
         rm -rf "$LOGS_DIR"
@@ -305,15 +305,15 @@ print_header "Step 7: Main OpenClaw Directory"
 
 if [[ -d "$OPENCLAW_DIR" ]]; then
     # Check if directory is empty or only contains empty subdirectories
-    remaining_files=$(find "$OPENCLAW_DIR" -type f 2>/dev/null | wc -l)
+    remaining_files=$(find "$OPENCLAW_DIR" -type f 2> /dev/null | wc -l)
 
     if [[ "$remaining_files" -eq 0 ]]; then
         print_info "OpenClaw directory is now empty. Removing..."
-        rmdir "$OPENCLAW_DIR" 2>/dev/null || rm -rf "$OPENCLAW_DIR"
+        rmdir "$OPENCLAW_DIR" 2> /dev/null || rm -rf "$OPENCLAW_DIR"
         print_info "Deleted: $OPENCLAW_DIR"
     else
         print_warn "OpenClaw directory still contains files:"
-        find "$OPENCLAW_DIR" -type f 2>/dev/null | while read -r file; do
+        find "$OPENCLAW_DIR" -type f 2> /dev/null | while read -r file; do
             echo "  - $file"
         done
 
@@ -345,7 +345,7 @@ if check_openclaw_installed; then
         print_info "Attempting to uninstall OpenClaw..."
 
         # Try openclaw's uninstall if available
-        if openclaw uninstall &>/dev/null; then
+        if openclaw uninstall &> /dev/null; then
             print_info "OpenClaw uninstalled via 'openclaw uninstall'."
         else
             # Manual removal - find and remove openclaw
@@ -358,9 +358,9 @@ if check_openclaw_installed; then
                 fi
 
                 # Check for npm global installation
-                if npm list -g openclaw &>/dev/null; then
+                if npm list -g openclaw &> /dev/null; then
                     print_info "Detected npm global installation. Removing..."
-                    npm uninstall -g openclaw 2>/dev/null || sudo npm uninstall -g openclaw 2>/dev/null
+                    npm uninstall -g openclaw 2> /dev/null || sudo npm uninstall -g openclaw 2> /dev/null
                 fi
 
                 print_warn "Manual uninstall attempted. You may need to verify removal."
@@ -405,7 +405,7 @@ echo ""
 if [[ -d "$OPENCLAW_DIR" ]]; then
     print_warn "OpenClaw directory still exists: $OPENCLAW_DIR"
     print_info "Remaining files:"
-    find "$OPENCLAW_DIR" -type f 2>/dev/null | head -20
+    find "$OPENCLAW_DIR" -type f 2> /dev/null | head -20
 else
     print_info "OpenClaw directory removed."
 fi
