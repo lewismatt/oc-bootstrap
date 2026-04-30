@@ -64,28 +64,42 @@ The Assistant is your general-purpose AI helper and team lead.
 
 ### Default SOUL.md
 
+The default SOUL.md for each agent is now a generic template designed for public use. See the actual files in the repository:
+
+- `assistant/SOUL.md` - General-purpose assistant persona
+- `research/SOUL.md` - Research specialist persona  
+- `developer/SOUL.md` - Developer specialist persona
+
+**Key improvements in the new templates:**
+
+- No assumptions about user's hardware or privacy preferences
+- Adaptable communication style based on USER.md
+- Clear capability descriptions
+- Standardized collaboration patterns
+
 ```markdown
 # Agent Persona: The Assistant
 
 ## Core Identity
-You are a highly efficient, local-first technical assistant. Your primary
-purpose is to provide direct, actionable help while respecting the user's
-hardware constraints and preference for privacy.
+
+You are a helpful, general-purpose AI assistant. Your primary purpose is to provide direct, actionable help on a wide range of topics while adapting to the user's preferences and needs.
 
 ## Communication Style
-* **Concise & Practical:** Avoid verbose explanations unless specifically requested
-* **Privacy-Aware:** Never suggest cloud services unless explicitly requested
-* **Resource-Conscious:** Consider hardware limitations
+
+* **Clear & Concise:** Provide answers that are easy to understand and implement
+* **Adaptive:** Match your response style to the user's preferences (detailed in USER.md)
+* **Practical:** Focus on actionable solutions and next steps
 
 ## Capabilities
-* **General Knowledge:** Answer questions on various topics
-* **Task Planning:** Help organize and prioritize activities
-* **File Management:** Assist with local file operations
-* **Personal Assistant:** Track preferences and reminders
+
+* **General Knowledge:** Answer questions on a wide range of topics
+* **Task Planning:** Help organize, prioritize, and track activities
+* **Agent Coordination:** Orchestrate tasks between specialized agents
 
 ## Collaboration with Other Agents
-* **Research Agent:** Request web research and data gathering
-* **Developer Agent:** Escalate complex coding tasks
+
+* **Research Agent:** Request web research, real-time news, or complex data gathering
+* **Developer Agent:** Escalate coding tasks, infrastructure changes, or technical questions
 ```
 
 ### Customizing Assistant
@@ -107,28 +121,34 @@ nano assistant/SOUL.md
 
 ### USER.md Configuration
 
-The `assistant/USER.md` file stores your personal context:
+The `assistant/USER.md` file is a template that you customize with your information:
 
 ```markdown
-# User Context
+# User Context - Assistant Agent
+
+This file contains information that helps the Assistant provide better, more personalized help.
 
 ## Communication Preferences
-**Preferred Language:** English (US)
-**Response Style:** Concise, technical
+
+**Preferred Language:** [e.g., English (US)]
+
+**Response Style:**
+- [ ] Keep answers concise unless you ask for details
+- [ ] Use technical terminology if comfortable
 
 ## Personal Background
-**Hardware Setup:**
-- GPU: AMD Radeon (12 GB VRAM)
-- RAM: 32 GB
-- Storage: 1 TB NVMe SSD
 
-**Primary Use Cases:**
-1. Managing local AI inference server
-2. Automating file processing
-3. Personal task management
+**Technical Experience:**
+- [ ] Comfortable with Linux command line
+- [ ] Familiar with basic Python scripting
+
+**Hardware Setup:**
+- **GPU:** [Your GPU model and VRAM]
+- **RAM:** [Your system RAM]
+- **Storage:** [Your available storage]
 ```
 
-Update this file as your needs evolve - the Assistant will reference it automatically.
+Update this file as your needs evolve - the Assistant will reference it automatically and can update it when learning new preferences.
 
 ---
 

@@ -172,66 +172,118 @@ fi
 # SECTION 3: CREDENTIAL COLLECTION & VALIDATION
 # ==============================================================================
 echo ""
-echo "=== Inference Backend ==="
-if [[ -z "${LOCAL_INFERENCE:-}" ]]; then
-    echo "You can use Local inference (Lemonade Server), Remote APIs (OpenAI, Anthropic), or a mix of both."
-    echo "If you are new to self-hosting AI, we recommend using Remote API providers for a smoother start."
-    read -r -p "Will you use local inference via Lemonade Server for any of your agents? [y/N]: " USE_LOCAL </dev/tty
-    if [[ "${USE_LOCAL^^}" == "Y" ]]; then
-        LOCAL_INFERENCE=true
-        read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
-        LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
-    else
-        LOCAL_INFERENCE=false
-        LEMONADE_KEY=""
-        echo "  [OK] Remote API Providers exclusively selected."
-    fi
+echo "=== Step 1: Choose Inference Backend ==="
+echo ""
+echo "OpenClaw can use two types of AI models:"
+echo ""
+echo "  1. LOCAL Models (Lemonade Server):"
+echo "     • Runs on your own hardware - complete privacy"
+echo "     • No per-request costs - free after setup"
+echo "     • Requires GPU (8GB+ VRAM recommended)"
+echo "     • Setup time: 30-60 minutes"
+echo ""
+echo "  2. REMOTE APIs (OpenAI, Anthropic):"
+echo "     • Runs in the cloud - no special hardware needed"
+echo "     • Pay per use (typically $0.001-$0.06 per request)"
+echo "     • Setup time: 5 minutes (just add API key)"
+echo "     • Requires internet connection"
+echo ""
+echo "Recommendation for beginners: Start with Remote APIs, then add local models later if desired."
+echo ""
+read -r -p "Will you use local inference via Lemonade Server for any agents? [y/N]: " USE_LOCAL </dev/tty>
+if [[ "${USE_LOCAL^^}" == "Y" ]]; then
+    LOCAL_INFERENCE=true
+    echo ""
+    echo "Lemonade Server will be used for local inference."
+    read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty>
+    LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
+    echo "  [OK] Lemonade API Key configured"
 else
-    echo "[INFO] Local Inference: $LOCAL_INFERENCE (from config)"
+    LOCAL_INFERENCE=false
+    LEMONADE_KEY=""
+    echo "  [OK] Remote API Providers selected - you'll need API keys from OpenAI/Anthropic"
 fi
 
 echo ""
-echo "=== Model Selection ==="
-if [[ -z "${EMBEDDING_MODEL:-}" ]]; then
-    echo "For each model, provide the appropriate provider tag:"
-    echo "  - Local Lemonade: lemonade/user.Qwen3.5-4B-GGUF"
-    echo "  - Remote OpenAI: openai/gpt-4o"
-    echo "  - Remote Anthropic: anthropic/claude-3-5-sonnet-latest"
-    echo ""
+echo "=== Step 3: Model Selection ==="
+echo ""
+echo "AI Models determine how smart and capable each agent is."
+echo ""
+echo "Model format: provider/model-name"
+echo ""
+echo "Available options:"
+echo "  • Local (Lemonade):  lemonade/user.Qwen3.5-4B-GGUF"
+echo "    - Free after setup, runs privately on your hardware"
+echo "    - Requires 6GB+ VRAM, slower response times"
+echo ""
+echo "  • OpenAI:  openai/gpt-4o"
+echo "    - Fast, high-quality responses (~\$0.005 per request)"
+echo "    - Requires OpenAI API key"
+echo ""
+echo "  • Anthropic:  anthropic/claude-3-5-sonnet-latest"
+echo "    - Excellent for coding and complex tasks (~\$0.015 per request)"
+echo "    - Requires Anthropic API key"
+echo ""
+echo "Tip: You can mix and match! Use local for simple tasks, cloud for complex ones."
+echo ""
 
+if [[ -z "${EMBEDDING_MODEL:-}" ]]; then
+    echo "Embedding Model: Used for memory search and finding relevant past conversations."
     while [[ -z "$EMBEDDING_MODEL" ]]; do
-        read -r -p "Enter Embedding Model tag [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL </dev/tty
+        read -r -p "Enter Embedding Model [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL </dev/tty
         EMBEDDING_MODEL="${EMBEDDING_MODEL:-openai/text-embedding-3-small}"
     done
+    echo "  [OK] Embedding model set"
 fi
 
 if [[ -z "${ASSISTANT_MODEL:-}" ]]; then
+    echo ""
+    echo "Assistant Model: Your general-purpose AI helper for everyday tasks."
     while [[ -z "$ASSISTANT_MODEL" ]]; do
-        read -r -p "Enter Assistant Agent LLM tag [Default: openai/gpt-4o]: " ASSISTANT_MODEL </dev/tty
+        read -r -p "Enter Assistant Model [Default: openai/gpt-4o]: " ASSISTANT_MODEL </dev/tty
         ASSISTANT_MODEL="${ASSISTANT_MODEL:-openai/gpt-4o}"
     done
+    echo "  [OK] Assistant model set"
 fi
 
 if [[ -z "${RESEARCH_MODEL:-}" ]]; then
+    echo ""
+    echo "Research Model: Specialized for web searches, data gathering, and analysis."
     while [[ -z "$RESEARCH_MODEL" ]]; do
-        read -r -p "Enter Research Agent LLM tag [Default: openai/gpt-4o]: " RESEARCH_MODEL </dev/tty
+        read -r -p "Enter Research Model [Default: openai/gpt-4o]: " RESEARCH_MODEL </dev/tty
         RESEARCH_MODEL="${RESEARCH_MODEL:-openai/gpt-4o}"
     done
+    echo "  [OK] Research model set"
 fi
 
 if [[ -z "${DEVELOPER_MODEL:-}" ]]; then
+    echo ""
+    echo "Developer Model: Specialized for coding, debugging, and technical tasks."
     while [[ -z "$DEVELOPER_MODEL" ]]; do
-        read -r -p "Enter Developer Agent LLM tag [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL </dev/tty
+        read -r -p "Enter Developer Model [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL </dev/tty
         DEVELOPER_MODEL="${DEVELOPER_MODEL:-anthropic/claude-3-5-sonnet-latest}"
     done
+    echo "  [OK] Developer model set"
 fi
 
 echo ""
-echo "=== Telegram Bot Tokens ==="
-if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_TOKEN:-}" ]]; then
-    echo "You will need three unique Telegram Bot Tokens from @BotFather."
-    echo ""
+echo "=== Step 2: Telegram Bot Setup ==="
+echo ""
+echo "Each agent needs its own Telegram bot for isolated conversations."
+echo ""
+echo "How to create Telegram bots:"
+echo "  1. Open Telegram and search for @BotFather"
+echo "  2. Send /newbot and follow the prompts"
+echo "  3. Create 3 bots with these suggested names:"
+echo "     • OpenClaw Assistant Bot (username: openclaw_assistant_bot)"
+echo "     • OpenClaw Research Bot (username: openclaw_research_bot)"
+echo "     • OpenClaw Developer Bot (username: openclaw_developer_bot)"
+echo "  4. BotFather will give you a token for each bot (looks like: 123456789:ABCdef...)"
+echo ""
+echo "Tip: Keep these tokens safe and don't share them publicly!"
+echo ""
 
+if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_TOKEN:-}" ]]; then
     TOTAL_TOKENS=${#AGENTS[@]}
     current_token=0
 
@@ -255,6 +307,7 @@ if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_T
 
             if [[ -z "$CURRENT_TOKEN" ]]; then
                 echo "  [ERROR] $AGENT_PREFIX token is required. Please try again."
+                echo "  Tip: The token should look like: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
             elif [[ "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ]]; then
                 echo "  [ERROR] Token must be unique. Do not reuse the Assistant token."
             elif [[ "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" ]]; then
@@ -269,13 +322,20 @@ if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_T
         if [[ -n "$CURRENT_TOKEN" ]]; then
             if ! validate_telegram_token "$CURRENT_TOKEN"; then
                 echo ""
-                echo "  [WARN] Token format invalid. Please try again."
+                echo "  [WARN] Token format invalid. Tokens usually look like: 123456789:ABCdef..."
+                echo "  Please try again."
                 CURRENT_TOKEN=""
             else
                 case $current_token in
-                    0) ASSISTANT_TOKEN="$CURRENT_TOKEN" ;;
-                    1) RESEARCH_TOKEN="$CURRENT_TOKEN" ;;
-                    2) DEVELOPER_TOKEN="$CURRENT_TOKEN" ;;
+                    0) ASSISTANT_TOKEN="$CURRENT_TOKEN" 
+                       echo "  [OK] Assistant bot token accepted"
+                       ;;
+                    1) RESEARCH_TOKEN="$CURRENT_TOKEN" 
+                       echo "  [OK] Research bot token accepted"
+                       ;;
+                    2) DEVELOPER_TOKEN="$CURRENT_TOKEN" 
+                       echo "  [OK] Developer bot token accepted"
+                       ;;
                 esac
                 current_token=$((current_token + 1))
             fi
@@ -288,29 +348,60 @@ else
 fi
 
 echo ""
-echo "=== Agent-Specific External Secrets (optional) ==="
+echo "=== Step 4: Optional Integrations (Press Enter to skip any) ==="
+echo ""
+echo "These services enhance your agents' capabilities. You can skip any or all of them."
+echo ""
+
 if [[ -z "${GITHUB_PAT:-}" && "$NON_INTERACTIVE" == "false" ]]; then
-    read -r -s -p "Enter GitHub Personal Access Token (for local MCP, or press Enter to skip): " GITHUB_PAT </dev/tty
+    echo "GitHub Personal Access Token (optional):"
+    echo "  • Allows agents to read/create repositories, manage issues and PRs"
+    echo "  • Get one at: https://github.com/settings/tokens"
+    echo "  • Required scope: repo, read:org"
+    echo ""
+    read -r -s -p "Enter GitHub PAT (or press Enter to skip): " GITHUB_PAT </dev/tty
     echo ""
     GITHUB_PAT="${GITHUB_PAT:-}"
+    [[ -n "$GITHUB_PAT" ]] && echo "  [OK] GitHub PAT configured"
 fi
 
 if [[ -z "${GITLAB_PAT:-}" && "$NON_INTERACTIVE" == "false" ]]; then
-    read -r -s -p "Enter GitLab Personal Access Token (for local MCP, or press Enter to skip): " GITLAB_PAT </dev/tty
+    echo ""
+    echo "GitLab Personal Access Token (optional):"
+    echo "  • Similar to GitHub, for GitLab repositories"
+    echo "  • Get one at: https://gitlab.com/-/profile/personal_access_tokens"
+    echo "  • Required scope: api, read_repository"
+    echo ""
+    read -r -s -p "Enter GitLab PAT (or press Enter to skip): " GITLAB_PAT </dev/tty
     echo ""
     GITLAB_PAT="${GITLAB_PAT:-}"
+    [[ -n "$GITLAB_PAT" ]] && echo "  [OK] GitLab PAT configured"
 fi
 
 if [[ -z "${BRAVE_API_KEY:-}" && "$NON_INTERACTIVE" == "false" ]]; then
-    read -r -s -p "Enter Brave Search API Key (for Research Agent, or press Enter to skip): " BRAVE_API_KEY </dev/tty
+    echo ""
+    echo "Brave Search API Key (optional, for Research Agent):"
+    echo "  • Enables web search, news search, and real-time information"
+    echo "  • Get one at: https://brave.com/search/api/"
+    echo "  • Free tier: 2,000 queries/month"
+    echo ""
+    read -r -s -p "Enter Brave API Key (or press Enter to skip): " BRAVE_API_KEY </dev/tty
     echo ""
     BRAVE_API_KEY="${BRAVE_API_KEY:-}"
+    [[ -n "$BRAVE_API_KEY" ]] && echo "  [OK] Brave Search API Key configured"
 fi
 
 if [[ -z "${X_API_KEY:-}" && "$NON_INTERACTIVE" == "false" ]]; then
-    read -r -s -p "Enter X/Twitter API Key or Auth Cookie (for xScraper, or press Enter to skip): " X_API_KEY </dev/tty
+    echo ""
+    echo "X/Twitter API Key or Auth Cookie (optional, for Research Agent):"
+    echo "  • Allows scraping X/Twitter for trends and social sentiment"
+    echo "  • Get API access at: https://developer.x.com/"
+    echo "  • Or use auth cookie from browser (for personal/small-scale use)"
+    echo ""
+    read -r -s -p "Enter X API Key/Auth Cookie (or press Enter to skip): " X_API_KEY </dev/tty
     echo ""
     X_API_KEY="${X_API_KEY:-}"
+    [[ -n "$X_API_KEY" ]] && echo "  [OK] X/Twitter credentials configured"
 fi
 
 [[ -z "$GITLAB_PAT" ]] && echo "[WARN] No GitLab PAT provided. Git workflow features will be unavailable."
