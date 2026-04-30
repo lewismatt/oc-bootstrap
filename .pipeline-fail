@@ -1,295 +1,369 @@
-2026-04-30T07:18:48.6779121Z Current runner version: '2.334.0'
-2026-04-30T07:18:48.6850035Z ##[group]Runner Image Provisioner
-2026-04-30T07:18:48.6851146Z Hosted Compute Agent
-2026-04-30T07:18:48.6852053Z Version: 20260213.493
-2026-04-30T07:18:48.6852914Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
-2026-04-30T07:18:48.6854102Z Build Date: 2026-02-13T00:28:41Z
-2026-04-30T07:18:48.6855138Z Worker ID: {8cf6e032-5512-424f-a7c8-ba0adb8d705d}
-2026-04-30T07:18:48.6856150Z Azure Region: westcentralus
-2026-04-30T07:18:48.6856997Z ##[endgroup]
-2026-04-30T07:18:48.6859360Z ##[group]Operating System
-2026-04-30T07:18:48.6860241Z Ubuntu
-2026-04-30T07:18:48.6860914Z 24.04.4
-2026-04-30T07:18:48.6861643Z LTS
-2026-04-30T07:18:48.6862294Z ##[endgroup]
-2026-04-30T07:18:48.6862976Z ##[group]Runner Image
-2026-04-30T07:18:48.6863845Z Image: ubuntu-24.04
-2026-04-30T07:18:48.6864545Z Version: 20260413.86.1
-2026-04-30T07:18:48.6866338Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260413.86/images/ubuntu/Ubuntu2404-Readme.md
-2026-04-30T07:18:48.6889031Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260413.86
-2026-04-30T07:18:48.6890413Z ##[endgroup]
-2026-04-30T07:18:48.6892117Z ##[group]GITHUB_TOKEN Permissions
-2026-04-30T07:18:48.6894998Z Contents: read
-2026-04-30T07:18:48.6895834Z Metadata: read
-2026-04-30T07:18:48.6896531Z Packages: read
-2026-04-30T07:18:48.6917632Z ##[endgroup]
-2026-04-30T07:18:48.6920880Z Secret source: Actions
-2026-04-30T07:18:48.6922223Z Prepare workflow directory
-2026-04-30T07:18:48.7492626Z Prepare all required actions
-2026-04-30T07:18:48.7608050Z Getting action download info
-2026-04-30T07:18:49.3959940Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
-2026-04-30T07:18:50.9625198Z Download action repository 'ludeeus/action-shellcheck@master' (SHA:00b27aa7cb85167568cb48a3838b75f4265f2bca)
-2026-04-30T07:18:51.5975824Z Download action repository 'mfinelli/setup-shfmt@v3' (SHA:1a143389339b48c4b48ae3cdc058f3dbe336a701)
-2026-04-30T07:18:52.3601750Z Download action repository 'DavidAnson/markdownlint-cli2-action@v14' (SHA:455b6612a7b7a80f28be9e019b70abdd11696e4e)
-2026-04-30T07:18:53.2249589Z Download action repository 'ibiqlik/action-yamllint@v3' (SHA:2576378a8e339169678f9939646ee3ee325e845c)
-2026-04-30T07:18:53.8034366Z Complete job name: lint
-2026-04-30T07:18:53.8784552Z ##[group]Run actions/checkout@v4
-2026-04-30T07:18:53.8785081Z with:
-2026-04-30T07:18:53.8785276Z   repository: lewismatt/oc-bootstrap
-2026-04-30T07:18:53.8785763Z   token: ***
-2026-04-30T07:18:53.8785931Z   ssh-strict: true
-2026-04-30T07:18:53.8786125Z   ssh-user: git
-2026-04-30T07:18:53.8786314Z   persist-credentials: true
-2026-04-30T07:18:53.8786516Z   clean: true
-2026-04-30T07:18:53.8786711Z   sparse-checkout-cone-mode: true
-2026-04-30T07:18:53.8786954Z   fetch-depth: 1
-2026-04-30T07:18:53.8787146Z   fetch-tags: false
-2026-04-30T07:18:53.8787662Z   show-progress: true
-2026-04-30T07:18:53.8787914Z   lfs: false
-2026-04-30T07:18:53.8788084Z   submodules: false
-2026-04-30T07:18:53.8788322Z   set-safe-directory: true
-2026-04-30T07:18:53.8788795Z ##[endgroup]
-2026-04-30T07:18:53.9940358Z Syncing repository: lewismatt/oc-bootstrap
-2026-04-30T07:18:53.9941778Z ##[group]Getting Git version info
-2026-04-30T07:18:53.9942218Z Working directory is '/home/runner/work/oc-bootstrap/oc-bootstrap'
-2026-04-30T07:18:53.9942752Z [command]/usr/bin/git version
-2026-04-30T07:18:53.9979074Z git version 2.53.0
-2026-04-30T07:18:54.0004120Z ##[endgroup]
-2026-04-30T07:18:54.0021605Z Temporarily overriding HOME='/home/runner/work/_temp/78dfb3dd-a42c-4c39-8418-2b1ede90f411' before making global git config changes
-2026-04-30T07:18:54.0023630Z Adding repository directory to the temporary git global config as a safe directory
-2026-04-30T07:18:54.0043743Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/oc-bootstrap/oc-bootstrap
-2026-04-30T07:18:54.0076916Z Deleting the contents of '/home/runner/work/oc-bootstrap/oc-bootstrap'
-2026-04-30T07:18:54.0086292Z ##[group]Initializing the repository
-2026-04-30T07:18:54.0087463Z [command]/usr/bin/git init /home/runner/work/oc-bootstrap/oc-bootstrap
-2026-04-30T07:18:54.0188917Z hint: Using 'master' as the name for the initial branch. This default branch name
-2026-04-30T07:18:54.0190448Z hint: will change to "main" in Git 3.0. To configure the initial branch name
-2026-04-30T07:18:54.0191521Z hint: to use in all of your new repositories, which will suppress this warning,
-2026-04-30T07:18:54.0192359Z hint: call:
-2026-04-30T07:18:54.0192814Z hint:
-2026-04-30T07:18:54.0193816Z hint: 	git config --global init.defaultBranch <name>
-2026-04-30T07:18:54.0194484Z hint:
-2026-04-30T07:18:54.0195117Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-2026-04-30T07:18:54.0195994Z hint: 'development'. The just-created branch can be renamed via this command:
-2026-04-30T07:18:54.0196752Z hint:
-2026-04-30T07:18:54.0197382Z hint: 	git branch -m <name>
-2026-04-30T07:18:54.0198048Z hint:
-2026-04-30T07:18:54.0198870Z hint: Disable this message with "git config set advice.defaultBranchName false"
-2026-04-30T07:18:54.0200247Z Initialized empty Git repository in /home/runner/work/oc-bootstrap/oc-bootstrap/.git/
-2026-04-30T07:18:54.0202402Z [command]/usr/bin/git remote add origin https://github.com/lewismatt/oc-bootstrap
-2026-04-30T07:18:54.0228994Z ##[endgroup]
-2026-04-30T07:18:54.0229835Z ##[group]Disabling automatic garbage collection
-2026-04-30T07:18:54.0235438Z [command]/usr/bin/git config --local gc.auto 0
-2026-04-30T07:18:54.0263455Z ##[endgroup]
-2026-04-30T07:18:54.0264308Z ##[group]Setting up auth
-2026-04-30T07:18:54.0272217Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-2026-04-30T07:18:54.0303032Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-2026-04-30T07:18:54.0566459Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-2026-04-30T07:18:54.0599257Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-2026-04-30T07:18:54.0793108Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-2026-04-30T07:18:54.0832225Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-2026-04-30T07:18:54.1025614Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
-2026-04-30T07:18:54.1057025Z ##[endgroup]
-2026-04-30T07:18:54.1058611Z ##[group]Fetching the repository
-2026-04-30T07:18:54.1066288Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +eeca344299cf84e798a5137241da7afd56acc47c:refs/remotes/origin/main
-2026-04-30T07:18:54.5643034Z From https://github.com/lewismatt/oc-bootstrap
-2026-04-30T07:18:54.5644524Z  * [new ref]         eeca344299cf84e798a5137241da7afd56acc47c -> origin/main
-2026-04-30T07:18:54.5649451Z ##[endgroup]
-2026-04-30T07:18:54.5650206Z ##[group]Determining the checkout info
-2026-04-30T07:18:54.5651231Z ##[endgroup]
-2026-04-30T07:18:54.5651872Z [command]/usr/bin/git sparse-checkout disable
-2026-04-30T07:18:54.5655241Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
-2026-04-30T07:18:54.5657972Z ##[group]Checking out the ref
-2026-04-30T07:18:54.5658790Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
-2026-04-30T07:18:54.5659653Z Switched to a new branch 'main'
-2026-04-30T07:18:54.5660207Z branch 'main' set up to track 'origin/main'.
-2026-04-30T07:18:54.5661678Z ##[endgroup]
-2026-04-30T07:18:54.5683407Z [command]/usr/bin/git log -1 --format=%H
-2026-04-30T07:18:54.5704184Z eeca344299cf84e798a5137241da7afd56acc47c
-2026-04-30T07:18:54.5998883Z ##[group]Run ludeeus/action-shellcheck@master
-2026-04-30T07:18:54.5999388Z with:
-2026-04-30T07:18:54.5999547Z   scandir: .
-2026-04-30T07:18:54.5999780Z   additional_files: oc-bootstrap.sh install-lemonade.sh
-2026-04-30T07:18:54.6000071Z   disable_matcher: false
-2026-04-30T07:18:54.6000256Z   format: gcc
-2026-04-30T07:18:54.6000426Z   version: stable
-2026-04-30T07:18:54.6000597Z ##[endgroup]
-2026-04-30T07:18:54.6120840Z ##[group]Run if [[ "Linux" == "macOS" ]]; then
-2026-04-30T07:18:54.6121282Z [36;1mif [[ "Linux" == "macOS" ]]; then[0m
-2026-04-30T07:18:54.6121586Z [36;1m  osvariant="darwin"[0m
-2026-04-30T07:18:54.6121823Z [36;1melse[0m
-2026-04-30T07:18:54.6122021Z [36;1m  osvariant="linux"[0m
-2026-04-30T07:18:54.6122245Z [36;1mfi[0m
-2026-04-30T07:18:54.6122418Z [36;1m[0m
-2026-04-30T07:18:54.6122786Z [36;1mbaseurl="https://github.com/koalaman/shellcheck/releases/download"[0m
-2026-04-30T07:18:54.6123180Z [36;1m[0m
-2026-04-30T07:18:54.6123578Z [36;1mcurl -Lso "/home/runner/work/_actions/ludeeus/action-shellcheck/master/sc.tar.xz" \[0m
-2026-04-30T07:18:54.6124125Z [36;1m  "${baseurl}/${INPUT_VERSION}/shellcheck-${INPUT_VERSION}.${osvariant}.x86_64.tar.xz"[0m
-2026-04-30T07:18:54.6124503Z [36;1m[0m
-2026-04-30T07:18:54.6125049Z [36;1mtar -xf "/home/runner/work/_actions/ludeeus/action-shellcheck/master/sc.tar.xz" -C "/home/runner/work/_actions/ludeeus/action-shellcheck/master"[0m
-2026-04-30T07:18:54.6125832Z [36;1mmv "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck-${INPUT_VERSION}/shellcheck" \[0m
-2026-04-30T07:18:54.6126406Z [36;1m  "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck"[0m
-2026-04-30T07:18:54.6144155Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-2026-04-30T07:18:54.6144472Z env:
-2026-04-30T07:18:54.6144653Z   INPUT_VERSION: stable
-2026-04-30T07:18:54.6144846Z ##[endgroup]
-2026-04-30T07:18:55.3182509Z ##[group]Run "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck" --version
-2026-04-30T07:18:55.3183621Z [36;1m"/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck" --version[0m
-2026-04-30T07:18:55.3203941Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-2026-04-30T07:18:55.3204481Z ##[endgroup]
-2026-04-30T07:18:55.3266799Z ShellCheck - shell script analysis tool
-2026-04-30T07:18:55.3270672Z version: 0.11.0
-2026-04-30T07:18:55.3271306Z license: GNU General Public License, version 3
-2026-04-30T07:18:55.3271999Z website: https://www.shellcheck.net
-2026-04-30T07:18:55.3292511Z ##[group]Run declare -a options
-2026-04-30T07:18:55.3292801Z [36;1mdeclare -a options[0m
-2026-04-30T07:18:55.3293045Z [36;1mif [[ -n "${INPUT_SEVERITY}" ]]; then[0m
-2026-04-30T07:18:55.3293315Z [36;1m  options+=("-S ${INPUT_SEVERITY}")[0m
-2026-04-30T07:18:55.3293564Z [36;1mfi[0m
-2026-04-30T07:18:55.3293759Z [36;1moptions+=("--format=${INPUT_FORMAT}")[0m
-2026-04-30T07:18:55.3294070Z [36;1mecho "options=${options[@]}" >> $GITHUB_OUTPUT[0m
-2026-04-30T07:18:55.3306911Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-2026-04-30T07:18:55.3307451Z env:
-2026-04-30T07:18:55.3307664Z   INPUT_SEVERITY: 
-2026-04-30T07:18:55.3307847Z   INPUT_FORMAT: gcc
-2026-04-30T07:18:55.3308029Z ##[endgroup]
-2026-04-30T07:18:55.3379455Z ##[group]Run declare -a excludes
-2026-04-30T07:18:55.3379733Z [36;1mdeclare -a excludes[0m
-2026-04-30T07:18:55.3380079Z [36;1mset -f # temporarily disable globbing so that globs in input aren't expanded[0m
-2026-04-30T07:18:55.3380450Z [36;1m[0m
-2026-04-30T07:18:55.3380629Z [36;1mexcludes+=("! -path *./.git/*")[0m
-2026-04-30T07:18:55.3380887Z [36;1mexcludes+=("! -path *.go")[0m
-2026-04-30T07:18:55.3381130Z [36;1mexcludes+=("! -path */mvnw")[0m
-2026-04-30T07:18:55.3381384Z [36;1mif [[ -n "${INPUT_IGNORE}" ]]; then[0m
-2026-04-30T07:18:55.3381651Z [36;1m  for path in ${INPUT_IGNORE}; do[0m
-2026-04-30T07:18:55.3381952Z [36;1m    excludes+=("! -path *./$path/*")[0m
-2026-04-30T07:18:55.3382263Z [36;1m    excludes+=("! -path */$path/*")[0m
-2026-04-30T07:18:55.3382673Z [36;1m    excludes+=("! -path $path")[0m
-2026-04-30T07:18:55.3383000Z [36;1m  done[0m
-2026-04-30T07:18:55.3383169Z [36;1melse[0m
-2026-04-30T07:18:55.3383372Z [36;1m  for path in ${INPUT_IGNORE_PATHS}; do[0m
-2026-04-30T07:18:55.3383640Z [36;1m    excludes+=("! -path *./$path/*")[0m
-2026-04-30T07:18:55.3383910Z [36;1m    excludes+=("! -path */$path/*")[0m
-2026-04-30T07:18:55.3384162Z [36;1m    excludes+=("! -path $path")[0m
-2026-04-30T07:18:55.3384394Z [36;1m  done[0m
-2026-04-30T07:18:55.3384552Z [36;1mfi[0m
-2026-04-30T07:18:55.3384709Z [36;1m[0m
-2026-04-30T07:18:55.3384902Z [36;1mfor name in ${INPUT_IGNORE_NAMES}; do[0m
-2026-04-30T07:18:55.3385147Z [36;1m  excludes+=("! -name $name")[0m
-2026-04-30T07:18:55.3385368Z [36;1mdone[0m
-2026-04-30T07:18:55.3385588Z [36;1mecho "excludes=${excludes[@]}" >> $GITHUB_OUTPUT[0m
-2026-04-30T07:18:55.3385855Z [36;1m[0m
-2026-04-30T07:18:55.3386024Z [36;1mset +f # re-enable globbing[0m
-2026-04-30T07:18:55.3398815Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-2026-04-30T07:18:55.3399124Z env:
-2026-04-30T07:18:55.3399291Z   INPUT_IGNORE: 
-2026-04-30T07:18:55.3399478Z   INPUT_IGNORE_PATHS: 
-2026-04-30T07:18:55.3399667Z   INPUT_IGNORE_NAMES: 
-2026-04-30T07:18:55.3399850Z ##[endgroup]
-2026-04-30T07:18:55.3450403Z ##[group]Run declare -a files
-2026-04-30T07:18:55.3450673Z [36;1mdeclare -a files[0m
-2026-04-30T07:18:55.3450922Z [36;1mfor file in ${INPUT_ADDITIONAL_FILES}; do[0m
-2026-04-30T07:18:55.3451219Z [36;1m  files+=("-o -name *$file")[0m
-2026-04-30T07:18:55.3451444Z [36;1mdone[0m
-2026-04-30T07:18:55.3451660Z [36;1mecho "files=${files[@]}" >> $GITHUB_OUTPUT[0m
-2026-04-30T07:18:55.3463683Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-2026-04-30T07:18:55.3463974Z env:
-2026-04-30T07:18:55.3464220Z   INPUT_ADDITIONAL_FILES: oc-bootstrap.sh install-lemonade.sh
-2026-04-30T07:18:55.3464530Z ##[endgroup]
-2026-04-30T07:18:55.3517516Z ##[group]Run statuscode=0
-2026-04-30T07:18:55.3517809Z [36;1mstatuscode=0[0m
-2026-04-30T07:18:55.3518059Z [36;1mdeclare -a filepaths[0m
-2026-04-30T07:18:55.3518407Z [36;1mshebangregex="^#! */[^ ]*/(env *)?[abk]*sh"[0m
-2026-04-30T07:18:55.3518658Z [36;1m[0m
-2026-04-30T07:18:55.3518964Z [36;1mset -f # temporarily disable globbing so that globs in inputs aren't expanded[0m
-2026-04-30T07:18:55.3519326Z [36;1m[0m
-2026-04-30T07:18:55.3519500Z [36;1mwhile IFS= read -r -d '' file; do[0m
-2026-04-30T07:18:55.3519753Z [36;1m  filepaths+=("$file")[0m
-2026-04-30T07:18:55.3519981Z [36;1mdone < <(find "${INPUT_SCANDIR}" \[0m
-2026-04-30T07:18:55.3520231Z [36;1m    ${INPUT_EXCLUDE_ARGS} \[0m
-2026-04-30T07:18:55.3520453Z [36;1m    -type f \[0m
-2026-04-30T07:18:55.3520643Z [36;1m    '(' \[0m
-2026-04-30T07:18:55.3520817Z [36;1m    -name '*.bash' \[0m
-2026-04-30T07:18:55.3521031Z [36;1m    -o -name '.bashrc' \[0m
-2026-04-30T07:18:55.3521266Z [36;1m    -o -name 'bashrc' \[0m
-2026-04-30T07:18:55.3521488Z [36;1m    -o -name '.bash_aliases' \[0m
-2026-04-30T07:18:55.3521750Z [36;1m    -o -name '.bash_completion' \[0m
-2026-04-30T07:18:55.3521995Z [36;1m    -o -name '.bash_login' \[0m
-2026-04-30T07:18:55.3522238Z [36;1m    -o -name '.bash_logout' \[0m
-2026-04-30T07:18:55.3522467Z [36;1m    -o -name '.bash_profile' \[0m
-2026-04-30T07:18:55.3522711Z [36;1m    -o -name 'bash_profile' \[0m
-2026-04-30T07:18:55.3522936Z [36;1m    -o -name '*.ksh' \[0m
-2026-04-30T07:18:55.3523156Z [36;1m    -o -name 'suid_profile' \[0m
-2026-04-30T07:18:55.3523386Z [36;1m    -o -name '*.zsh' \[0m
-2026-04-30T07:18:55.3523597Z [36;1m    -o -name '.zlogin' \[0m
-2026-04-30T07:18:55.3523826Z [36;1m    -o -name 'zlogin' \[0m
-2026-04-30T07:18:55.3524041Z [36;1m    -o -name '.zlogout' \[0m
-2026-04-30T07:18:55.3524273Z [36;1m    -o -name 'zlogout' \[0m
-2026-04-30T07:18:55.3524492Z [36;1m    -o -name '.zprofile' \[0m
-2026-04-30T07:18:55.3524721Z [36;1m    -o -name 'zprofile' \[0m
-2026-04-30T07:18:55.3524947Z [36;1m    -o -name '.zsenv' \[0m
-2026-04-30T07:18:55.3525353Z [36;1m    -o -name 'zsenv' \[0m
-2026-04-30T07:18:55.3525571Z [36;1m    -o -name '.zshrc' \[0m
-2026-04-30T07:18:55.3525864Z [36;1m    -o -name 'zshrc' \[0m
-2026-04-30T07:18:55.3526123Z [36;1m    -o -name '*.sh' \[0m
-2026-04-30T07:18:55.3526341Z [36;1m    -o -path '*/.profile' \[0m
-2026-04-30T07:18:55.3526578Z [36;1m    -o -path '*/profile' \[0m
-2026-04-30T07:18:55.3526797Z [36;1m    -o -name '*.shlib' \[0m
-2026-04-30T07:18:55.3527040Z [36;1m    ${INPUT_ADDITIONAL_FILE_ARGS} \[0m
-2026-04-30T07:18:55.3527463Z [36;1m    ')' \[0m
-2026-04-30T07:18:55.3527667Z [36;1m    -print0)[0m
-2026-04-30T07:18:55.3527859Z [36;1m[0m
-2026-04-30T07:18:55.3528031Z [36;1mwhile IFS= read -r -d '' file; do[0m
-2026-04-30T07:18:55.3528336Z [36;1m  head -n1 "$file" | grep -Eqs "$shebangregex" || continue[0m
-2026-04-30T07:18:55.3528630Z [36;1m  filepaths+=("$file")[0m
-2026-04-30T07:18:55.3528864Z [36;1mdone < <(find "${INPUT_SCANDIR}" \[0m
-2026-04-30T07:18:55.3529105Z [36;1m    ${INPUT_EXCLUDE_ARGS} \[0m
-2026-04-30T07:18:55.3529358Z [36;1m    -type f ! -name '*.*' -perm /111 \[0m
-2026-04-30T07:18:55.3529607Z [36;1m    -print0)[0m
-2026-04-30T07:18:55.3529780Z [36;1m[0m
-2026-04-30T07:18:55.3529975Z [36;1mif [[ -n "${INPUT_CHECK_TOGETHER}" ]]; then[0m
-2026-04-30T07:18:55.3530352Z [36;1m  "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck" \[0m
-2026-04-30T07:18:55.3530775Z [36;1m    ${INPUT_SHELLCHECK_OPTIONS} \[0m
-2026-04-30T07:18:55.3531028Z [36;1m    "${filepaths[@]}" || statuscode=$?[0m
-2026-04-30T07:18:55.3531268Z [36;1melse[0m
-2026-04-30T07:18:55.3531464Z [36;1m  for file in "${filepaths[@]}"; do[0m
-2026-04-30T07:18:55.3531823Z [36;1m    "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck" \[0m
-2026-04-30T07:18:55.3532208Z [36;1m      ${INPUT_SHELLCHECK_OPTIONS} \[0m
-2026-04-30T07:18:55.3532452Z [36;1m      "$file" || statuscode=$?[0m
-2026-04-30T07:18:55.3532670Z [36;1m  done[0m
-2026-04-30T07:18:55.3532828Z [36;1mfi[0m
-2026-04-30T07:18:55.3532996Z [36;1m[0m
-2026-04-30T07:18:55.3533216Z [36;1mecho "filepaths=${filepaths[@]}" >> $GITHUB_OUTPUT[0m
-2026-04-30T07:18:55.3533554Z [36;1mecho "statuscode=$statuscode" >> $GITHUB_OUTPUT[0m
-2026-04-30T07:18:55.3533817Z [36;1m[0m
-2026-04-30T07:18:55.3533985Z [36;1mset +f # re-enable globbing[0m
-2026-04-30T07:18:55.3546348Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-2026-04-30T07:18:55.3546642Z env:
-2026-04-30T07:18:55.3546812Z   INPUT_SCANDIR: .
-2026-04-30T07:18:55.3547002Z   INPUT_CHECK_TOGETHER: 
-2026-04-30T07:18:55.3547452Z   INPUT_EXCLUDE_ARGS: ! -path *./.git/* ! -path *.go ! -path */mvnw
-2026-04-30T07:18:55.3547910Z   INPUT_ADDITIONAL_FILE_ARGS: -o -name *oc-bootstrap.sh -o -name *install-lemonade.sh
-2026-04-30T07:18:55.3548298Z   INPUT_SHELLCHECK_OPTIONS: --format=gcc
-2026-04-30T07:18:55.3548543Z ##[endgroup]
-2026-04-30T07:18:56.0506931Z ./oc-bootstrap.sh:133:25: note: Note that A && B || C is not if-then-else. C may run when A is true. [SC2015]
-2026-04-30T07:18:56.1151140Z ./install-lemonade.sh:56:8: note: Not following: venv/bin/activate was not specified as input (see shellcheck -x). [SC1091]
-2026-04-30T07:18:56.1192345Z ##[group]Run exit 1
-2026-04-30T07:18:56.1192683Z [36;1mexit 1[0m
-2026-04-30T07:18:56.1212866Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-2026-04-30T07:18:56.1213398Z ##[endgroup]
-2026-04-30T07:18:56.1277896Z ##[error]Process completed with exit code 1.
-2026-04-30T07:18:56.1414110Z Post job cleanup.
-2026-04-30T07:18:56.2373931Z [command]/usr/bin/git version
-2026-04-30T07:18:56.2411940Z git version 2.53.0
-2026-04-30T07:18:56.2455809Z Temporarily overriding HOME='/home/runner/work/_temp/53dad0d2-db82-4128-bc8c-f6632acf1332' before making global git config changes
-2026-04-30T07:18:56.2457469Z Adding repository directory to the temporary git global config as a safe directory
-2026-04-30T07:18:56.2463664Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/oc-bootstrap/oc-bootstrap
-2026-04-30T07:18:56.2510519Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-2026-04-30T07:18:56.2542998Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-2026-04-30T07:18:56.2735870Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-2026-04-30T07:18:56.2758288Z http.https://github.com/.extraheader
-2026-04-30T07:18:56.2772789Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
-2026-04-30T07:18:56.2803346Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-2026-04-30T07:18:56.2990276Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-2026-04-30T07:18:56.3020590Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-2026-04-30T07:18:56.3375852Z Cleaning up orphan processes
-2026-04-30T07:18:56.3563482Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-04-30T07:22:14.8218376Z Current runner version: '2.334.0'
+2026-04-30T07:22:14.8294066Z ##[group]Runner Image Provisioner
+2026-04-30T07:22:14.8295350Z Hosted Compute Agent
+2026-04-30T07:22:14.8296226Z Version: 20260213.493
+2026-04-30T07:22:14.8297158Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+2026-04-30T07:22:14.8298281Z Build Date: 2026-02-13T00:28:41Z
+2026-04-30T07:22:14.8299233Z Worker ID: {76d1475f-dd0c-4102-8c42-4abde921338a}
+2026-04-30T07:22:14.8300267Z Azure Region: eastus2
+2026-04-30T07:22:14.8301007Z ##[endgroup]
+2026-04-30T07:22:14.8324003Z ##[group]Operating System
+2026-04-30T07:22:14.8324839Z Ubuntu
+2026-04-30T07:22:14.8325679Z 24.04.4
+2026-04-30T07:22:14.8326298Z LTS
+2026-04-30T07:22:14.8326967Z ##[endgroup]
+2026-04-30T07:22:14.8327888Z ##[group]Runner Image
+2026-04-30T07:22:14.8328653Z Image: ubuntu-24.04
+2026-04-30T07:22:14.8329386Z Version: 20260413.86.1
+2026-04-30T07:22:14.8331331Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260413.86/images/ubuntu/Ubuntu2404-Readme.md
+2026-04-30T07:22:14.8333890Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260413.86
+2026-04-30T07:22:14.8335464Z ##[endgroup]
+2026-04-30T07:22:14.8337117Z ##[group]GITHUB_TOKEN Permissions
+2026-04-30T07:22:14.8339892Z Contents: read
+2026-04-30T07:22:14.8340703Z Metadata: read
+2026-04-30T07:22:14.8341512Z Packages: read
+2026-04-30T07:22:14.8362767Z ##[endgroup]
+2026-04-30T07:22:14.8366171Z Secret source: Actions
+2026-04-30T07:22:14.8367334Z Prepare workflow directory
+2026-04-30T07:22:14.9553632Z Prepare all required actions
+2026-04-30T07:22:14.9649772Z Getting action download info
+2026-04-30T07:22:15.4336293Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-04-30T07:22:15.5817836Z Download action repository 'ludeeus/action-shellcheck@master' (SHA:00b27aa7cb85167568cb48a3838b75f4265f2bca)
+2026-04-30T07:22:15.8225537Z Download action repository 'mfinelli/setup-shfmt@v3' (SHA:1a143389339b48c4b48ae3cdc058f3dbe336a701)
+2026-04-30T07:22:16.0505957Z Download action repository 'DavidAnson/markdownlint-cli2-action@v14' (SHA:455b6612a7b7a80f28be9e019b70abdd11696e4e)
+2026-04-30T07:22:16.3309194Z Download action repository 'ibiqlik/action-yamllint@v3' (SHA:2576378a8e339169678f9939646ee3ee325e845c)
+2026-04-30T07:22:17.4648202Z Complete job name: lint
+2026-04-30T07:22:17.5314354Z ##[group]Run actions/checkout@v4
+2026-04-30T07:22:17.5314933Z with:
+2026-04-30T07:22:17.5315192Z   repository: lewismatt/oc-bootstrap
+2026-04-30T07:22:17.5315772Z   token: ***
+2026-04-30T07:22:17.5316003Z   ssh-strict: true
+2026-04-30T07:22:17.5316437Z   ssh-user: git
+2026-04-30T07:22:17.5316767Z   persist-credentials: true
+2026-04-30T07:22:17.5317043Z   clean: true
+2026-04-30T07:22:17.5317289Z   sparse-checkout-cone-mode: true
+2026-04-30T07:22:17.5317595Z   fetch-depth: 1
+2026-04-30T07:22:17.5317832Z   fetch-tags: false
+2026-04-30T07:22:17.5318091Z   show-progress: true
+2026-04-30T07:22:17.5318344Z   lfs: false
+2026-04-30T07:22:17.5318559Z   submodules: false
+2026-04-30T07:22:17.5318821Z   set-safe-directory: true
+2026-04-30T07:22:17.5319348Z env:
+2026-04-30T07:22:17.5319597Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:17.5319898Z ##[endgroup]
+2026-04-30T07:22:17.6460698Z Syncing repository: lewismatt/oc-bootstrap
+2026-04-30T07:22:17.6463390Z ##[group]Getting Git version info
+2026-04-30T07:22:17.6464137Z Working directory is '/home/runner/work/oc-bootstrap/oc-bootstrap'
+2026-04-30T07:22:17.6465357Z [command]/usr/bin/git version
+2026-04-30T07:22:17.6466167Z git version 2.53.0
+2026-04-30T07:22:17.6485528Z ##[endgroup]
+2026-04-30T07:22:17.6503252Z Temporarily overriding HOME='/home/runner/work/_temp/4a044708-98eb-489c-a56d-2c64950c8d90' before making global git config changes
+2026-04-30T07:22:17.6505003Z Adding repository directory to the temporary git global config as a safe directory
+2026-04-30T07:22:17.6512539Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/oc-bootstrap/oc-bootstrap
+2026-04-30T07:22:17.6555670Z Deleting the contents of '/home/runner/work/oc-bootstrap/oc-bootstrap'
+2026-04-30T07:22:17.6560370Z ##[group]Initializing the repository
+2026-04-30T07:22:17.6566180Z [command]/usr/bin/git init /home/runner/work/oc-bootstrap/oc-bootstrap
+2026-04-30T07:22:17.6670476Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-04-30T07:22:17.6673655Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-04-30T07:22:17.6674774Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-04-30T07:22:17.6676924Z hint: call:
+2026-04-30T07:22:17.6677582Z hint:
+2026-04-30T07:22:17.6678275Z hint: 	git config --global init.defaultBranch <name>
+2026-04-30T07:22:17.6679065Z hint:
+2026-04-30T07:22:17.6679761Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-04-30T07:22:17.6680811Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-04-30T07:22:17.6681688Z hint:
+2026-04-30T07:22:17.6682440Z hint: 	git branch -m <name>
+2026-04-30T07:22:17.6683151Z hint:
+2026-04-30T07:22:17.6683866Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-04-30T07:22:17.6685213Z Initialized empty Git repository in /home/runner/work/oc-bootstrap/oc-bootstrap/.git/
+2026-04-30T07:22:17.6689912Z [command]/usr/bin/git remote add origin https://github.com/lewismatt/oc-bootstrap
+2026-04-30T07:22:17.6729354Z ##[endgroup]
+2026-04-30T07:22:17.6730343Z ##[group]Disabling automatic garbage collection
+2026-04-30T07:22:17.6733805Z [command]/usr/bin/git config --local gc.auto 0
+2026-04-30T07:22:17.6780832Z ##[endgroup]
+2026-04-30T07:22:17.6781759Z ##[group]Setting up auth
+2026-04-30T07:22:17.6783058Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-04-30T07:22:17.6821160Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-04-30T07:22:17.7133111Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-04-30T07:22:17.7173397Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-04-30T07:22:17.7477404Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-04-30T07:22:17.7543467Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-04-30T07:22:17.7853386Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-04-30T07:22:17.7894423Z ##[endgroup]
+2026-04-30T07:22:17.7913544Z ##[group]Fetching the repository
+2026-04-30T07:22:17.7933933Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +09478fa515b1e3d0b3fea541d2369bdfbf3cd466:refs/remotes/origin/main
+2026-04-30T07:22:18.0313968Z From https://github.com/lewismatt/oc-bootstrap
+2026-04-30T07:22:18.0315340Z  * [new ref]         09478fa515b1e3d0b3fea541d2369bdfbf3cd466 -> origin/main
+2026-04-30T07:22:18.0319250Z ##[endgroup]
+2026-04-30T07:22:18.0319877Z ##[group]Determining the checkout info
+2026-04-30T07:22:18.0320555Z ##[endgroup]
+2026-04-30T07:22:18.0320972Z [command]/usr/bin/git sparse-checkout disable
+2026-04-30T07:22:18.0344685Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-04-30T07:22:18.0376939Z ##[group]Checking out the ref
+2026-04-30T07:22:18.0381681Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-04-30T07:22:18.0630830Z Switched to a new branch 'main'
+2026-04-30T07:22:18.0632990Z branch 'main' set up to track 'origin/main'.
+2026-04-30T07:22:18.0636805Z ##[endgroup]
+2026-04-30T07:22:18.0639300Z [command]/usr/bin/git log -1 --format=%H
+2026-04-30T07:22:18.0640430Z 09478fa515b1e3d0b3fea541d2369bdfbf3cd466
+2026-04-30T07:22:18.0931921Z ##[group]Run ludeeus/action-shellcheck@master
+2026-04-30T07:22:18.0932515Z with:
+2026-04-30T07:22:18.0932740Z   scandir: .
+2026-04-30T07:22:18.0933052Z   additional_files: oc-bootstrap.sh install-lemonade.sh
+2026-04-30T07:22:18.0933406Z   disable_matcher: false
+2026-04-30T07:22:18.0933667Z   format: gcc
+2026-04-30T07:22:18.0933886Z   version: stable
+2026-04-30T07:22:18.1008454Z env:
+2026-04-30T07:22:18.1008867Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:18.1009353Z ##[endgroup]
+2026-04-30T07:22:18.1135646Z ##[group]Run if [[ "Linux" == "macOS" ]]; then
+2026-04-30T07:22:18.1136145Z [36;1mif [[ "Linux" == "macOS" ]]; then[0m
+2026-04-30T07:22:18.1136471Z [36;1m  osvariant="darwin"[0m
+2026-04-30T07:22:18.1136744Z [36;1melse[0m
+2026-04-30T07:22:18.1136984Z [36;1m  osvariant="linux"[0m
+2026-04-30T07:22:18.1137243Z [36;1mfi[0m
+2026-04-30T07:22:18.1137454Z [36;1m[0m
+2026-04-30T07:22:18.1137892Z [36;1mbaseurl="https://github.com/koalaman/shellcheck/releases/download"[0m
+2026-04-30T07:22:18.1138323Z [36;1m[0m
+2026-04-30T07:22:18.1138729Z [36;1mcurl -Lso "/home/runner/work/_actions/ludeeus/action-shellcheck/master/sc.tar.xz" \[0m
+2026-04-30T07:22:18.1139352Z [36;1m  "${baseurl}/${INPUT_VERSION}/shellcheck-${INPUT_VERSION}.${osvariant}.x86_64.tar.xz"[0m
+2026-04-30T07:22:18.1139795Z [36;1m[0m
+2026-04-30T07:22:18.1140391Z [36;1mtar -xf "/home/runner/work/_actions/ludeeus/action-shellcheck/master/sc.tar.xz" -C "/home/runner/work/_actions/ludeeus/action-shellcheck/master"[0m
+2026-04-30T07:22:18.1141275Z [36;1mmv "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck-${INPUT_VERSION}/shellcheck" \[0m
+2026-04-30T07:22:18.1141959Z [36;1m  "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck"[0m
+2026-04-30T07:22:18.1168339Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-30T07:22:18.1168739Z env:
+2026-04-30T07:22:18.1168996Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:18.1169334Z   INPUT_VERSION: stable
+2026-04-30T07:22:18.1169587Z ##[endgroup]
+2026-04-30T07:22:18.5424791Z ##[group]Run "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck" --version
+2026-04-30T07:22:18.5425510Z [36;1m"/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck" --version[0m
+2026-04-30T07:22:18.5448127Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-30T07:22:18.5448500Z env:
+2026-04-30T07:22:18.5448752Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:18.5449050Z ##[endgroup]
+2026-04-30T07:22:18.5504383Z ShellCheck - shell script analysis tool
+2026-04-30T07:22:18.5504999Z version: 0.11.0
+2026-04-30T07:22:18.5505462Z license: GNU General Public License, version 3
+2026-04-30T07:22:18.5506091Z website: https://www.shellcheck.net
+2026-04-30T07:22:18.5536763Z ##[group]Run declare -a options
+2026-04-30T07:22:18.5537083Z [36;1mdeclare -a options[0m
+2026-04-30T07:22:18.5537384Z [36;1mif [[ -n "${INPUT_SEVERITY}" ]]; then[0m
+2026-04-30T07:22:18.5537764Z [36;1m  options+=("-S ${INPUT_SEVERITY}")[0m
+2026-04-30T07:22:18.5538077Z [36;1mfi[0m
+2026-04-30T07:22:18.5538343Z [36;1moptions+=("--format=${INPUT_FORMAT}")[0m
+2026-04-30T07:22:18.5538706Z [36;1mecho "options=${options[@]}" >> $GITHUB_OUTPUT[0m
+2026-04-30T07:22:18.5560264Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-30T07:22:18.5560639Z env:
+2026-04-30T07:22:18.5560887Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:18.5561192Z   INPUT_SEVERITY: 
+2026-04-30T07:22:18.5561422Z   INPUT_FORMAT: gcc
+2026-04-30T07:22:18.5561653Z ##[endgroup]
+2026-04-30T07:22:18.5656787Z ##[group]Run declare -a excludes
+2026-04-30T07:22:18.5657163Z [36;1mdeclare -a excludes[0m
+2026-04-30T07:22:18.5657581Z [36;1mset -f # temporarily disable globbing so that globs in input aren't expanded[0m
+2026-04-30T07:22:18.5658028Z [36;1m[0m
+2026-04-30T07:22:18.5658262Z [36;1mexcludes+=("! -path *./.git/*")[0m
+2026-04-30T07:22:18.5658572Z [36;1mexcludes+=("! -path *.go")[0m
+2026-04-30T07:22:18.5659244Z [36;1mexcludes+=("! -path */mvnw")[0m
+2026-04-30T07:22:18.5659574Z [36;1mif [[ -n "${INPUT_IGNORE}" ]]; then[0m
+2026-04-30T07:22:18.5659908Z [36;1m  for path in ${INPUT_IGNORE}; do[0m
+2026-04-30T07:22:18.5660247Z [36;1m    excludes+=("! -path *./$path/*")[0m
+2026-04-30T07:22:18.5660575Z [36;1m    excludes+=("! -path */$path/*")[0m
+2026-04-30T07:22:18.5660875Z [36;1m    excludes+=("! -path $path")[0m
+2026-04-30T07:22:18.5661157Z [36;1m  done[0m
+2026-04-30T07:22:18.5661368Z [36;1melse[0m
+2026-04-30T07:22:18.5661622Z [36;1m  for path in ${INPUT_IGNORE_PATHS}; do[0m
+2026-04-30T07:22:18.5661945Z [36;1m    excludes+=("! -path *./$path/*")[0m
+2026-04-30T07:22:18.5663082Z [36;1m    excludes+=("! -path */$path/*")[0m
+2026-04-30T07:22:18.5663401Z [36;1m    excludes+=("! -path $path")[0m
+2026-04-30T07:22:18.5663687Z [36;1m  done[0m
+2026-04-30T07:22:18.5663914Z [36;1mfi[0m
+2026-04-30T07:22:18.5664124Z [36;1m[0m
+2026-04-30T07:22:18.5664376Z [36;1mfor name in ${INPUT_IGNORE_NAMES}; do[0m
+2026-04-30T07:22:18.5664698Z [36;1m  excludes+=("! -name $name")[0m
+2026-04-30T07:22:18.5664978Z [36;1mdone[0m
+2026-04-30T07:22:18.5665256Z [36;1mecho "excludes=${excludes[@]}" >> $GITHUB_OUTPUT[0m
+2026-04-30T07:22:18.5665587Z [36;1m[0m
+2026-04-30T07:22:18.5665807Z [36;1mset +f # re-enable globbing[0m
+2026-04-30T07:22:18.5687757Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-30T07:22:18.5688128Z env:
+2026-04-30T07:22:18.5688367Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:18.5688666Z   INPUT_IGNORE: 
+2026-04-30T07:22:18.5688891Z   INPUT_IGNORE_PATHS: 
+2026-04-30T07:22:18.5689152Z   INPUT_IGNORE_NAMES: 
+2026-04-30T07:22:18.5689379Z ##[endgroup]
+2026-04-30T07:22:18.5761392Z ##[group]Run declare -a files
+2026-04-30T07:22:18.5761716Z [36;1mdeclare -a files[0m
+2026-04-30T07:22:18.5762022Z [36;1mfor file in ${INPUT_ADDITIONAL_FILES}; do[0m
+2026-04-30T07:22:18.5762724Z [36;1m  files+=("-o -name *$file")[0m
+2026-04-30T07:22:18.5763013Z [36;1mdone[0m
+2026-04-30T07:22:18.5763300Z [36;1mecho "files=${files[@]}" >> $GITHUB_OUTPUT[0m
+2026-04-30T07:22:18.5784403Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-30T07:22:18.5784776Z env:
+2026-04-30T07:22:18.5785143Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:18.5785534Z   INPUT_ADDITIONAL_FILES: oc-bootstrap.sh install-lemonade.sh
+2026-04-30T07:22:18.5785886Z ##[endgroup]
+2026-04-30T07:22:18.5856579Z ##[group]Run statuscode=0
+2026-04-30T07:22:18.5856921Z [36;1mstatuscode=0[0m
+2026-04-30T07:22:18.5857182Z [36;1mdeclare -a filepaths[0m
+2026-04-30T07:22:18.5857490Z [36;1mshebangregex="^#! */[^ ]*/(env *)?[abk]*sh"[0m
+2026-04-30T07:22:18.5857806Z [36;1m[0m
+2026-04-30T07:22:18.5858162Z [36;1mset -f # temporarily disable globbing so that globs in inputs aren't expanded[0m
+2026-04-30T07:22:18.5858582Z [36;1m[0m
+2026-04-30T07:22:18.5858806Z [36;1mwhile IFS= read -r -d '' file; do[0m
+2026-04-30T07:22:18.5859112Z [36;1m  filepaths+=("$file")[0m
+2026-04-30T07:22:18.5859425Z [36;1mdone < <(find "${INPUT_SCANDIR}" \[0m
+2026-04-30T07:22:18.5859740Z [36;1m    ${INPUT_EXCLUDE_ARGS} \[0m
+2026-04-30T07:22:18.5860019Z [36;1m    -type f \[0m
+2026-04-30T07:22:18.5860251Z [36;1m    '(' \[0m
+2026-04-30T07:22:18.5860486Z [36;1m    -name '*.bash' \[0m
+2026-04-30T07:22:18.5860741Z [36;1m    -o -name '.bashrc' \[0m
+2026-04-30T07:22:18.5861020Z [36;1m    -o -name 'bashrc' \[0m
+2026-04-30T07:22:18.5861289Z [36;1m    -o -name '.bash_aliases' \[0m
+2026-04-30T07:22:18.5861592Z [36;1m    -o -name '.bash_completion' \[0m
+2026-04-30T07:22:18.5861877Z [36;1m    -o -name '.bash_login' \[0m
+2026-04-30T07:22:18.5862472Z [36;1m    -o -name '.bash_logout' \[0m
+2026-04-30T07:22:18.5862769Z [36;1m    -o -name '.bash_profile' \[0m
+2026-04-30T07:22:18.5863053Z [36;1m    -o -name 'bash_profile' \[0m
+2026-04-30T07:22:18.5863336Z [36;1m    -o -name '*.ksh' \[0m
+2026-04-30T07:22:18.5863595Z [36;1m    -o -name 'suid_profile' \[0m
+2026-04-30T07:22:18.5864048Z [36;1m    -o -name '*.zsh' \[0m
+2026-04-30T07:22:18.5864445Z [36;1m    -o -name '.zlogin' \[0m
+2026-04-30T07:22:18.5864729Z [36;1m    -o -name 'zlogin' \[0m
+2026-04-30T07:22:18.5865009Z [36;1m    -o -name '.zlogout' \[0m
+2026-04-30T07:22:18.5865282Z [36;1m    -o -name 'zlogout' \[0m
+2026-04-30T07:22:18.5865558Z [36;1m    -o -name '.zprofile' \[0m
+2026-04-30T07:22:18.5865830Z [36;1m    -o -name 'zprofile' \[0m
+2026-04-30T07:22:18.5866098Z [36;1m    -o -name '.zsenv' \[0m
+2026-04-30T07:22:18.5866358Z [36;1m    -o -name 'zsenv' \[0m
+2026-04-30T07:22:18.5866625Z [36;1m    -o -name '.zshrc' \[0m
+2026-04-30T07:22:18.5866879Z [36;1m    -o -name 'zshrc' \[0m
+2026-04-30T07:22:18.5867140Z [36;1m    -o -name '*.sh' \[0m
+2026-04-30T07:22:18.5867416Z [36;1m    -o -path '*/.profile' \[0m
+2026-04-30T07:22:18.5867693Z [36;1m    -o -path '*/profile' \[0m
+2026-04-30T07:22:18.5867971Z [36;1m    -o -name '*.shlib' \[0m
+2026-04-30T07:22:18.5868251Z [36;1m    ${INPUT_ADDITIONAL_FILE_ARGS} \[0m
+2026-04-30T07:22:18.5868556Z [36;1m    ')' \[0m
+2026-04-30T07:22:18.5868781Z [36;1m    -print0)[0m
+2026-04-30T07:22:18.5869014Z [36;1m[0m
+2026-04-30T07:22:18.5869241Z [36;1mwhile IFS= read -r -d '' file; do[0m
+2026-04-30T07:22:18.5869598Z [36;1m  head -n1 "$file" | grep -Eqs "$shebangregex" || continue[0m
+2026-04-30T07:22:18.5869953Z [36;1m  filepaths+=("$file")[0m
+2026-04-30T07:22:18.5870226Z [36;1mdone < <(find "${INPUT_SCANDIR}" \[0m
+2026-04-30T07:22:18.5870524Z [36;1m    ${INPUT_EXCLUDE_ARGS} \[0m
+2026-04-30T07:22:18.5870815Z [36;1m    -type f ! -name '*.*' -perm /111 \[0m
+2026-04-30T07:22:18.5871143Z [36;1m    -print0)[0m
+2026-04-30T07:22:18.5871376Z [36;1m[0m
+2026-04-30T07:22:18.5871629Z [36;1mif [[ -n "${INPUT_CHECK_TOGETHER}" ]]; then[0m
+2026-04-30T07:22:18.5872072Z [36;1m  "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck" \[0m
+2026-04-30T07:22:18.5872853Z [36;1m    ${INPUT_SHELLCHECK_OPTIONS} \[0m
+2026-04-30T07:22:18.5873185Z [36;1m    "${filepaths[@]}" || statuscode=$?[0m
+2026-04-30T07:22:18.5873482Z [36;1melse[0m
+2026-04-30T07:22:18.5873728Z [36;1m  for file in "${filepaths[@]}"; do[0m
+2026-04-30T07:22:18.5874150Z [36;1m    "/home/runner/work/_actions/ludeeus/action-shellcheck/master/shellcheck" \[0m
+2026-04-30T07:22:18.5874585Z [36;1m      ${INPUT_SHELLCHECK_OPTIONS} \[0m
+2026-04-30T07:22:18.5874880Z [36;1m      "$file" || statuscode=$?[0m
+2026-04-30T07:22:18.5875157Z [36;1m  done[0m
+2026-04-30T07:22:18.5875369Z [36;1mfi[0m
+2026-04-30T07:22:18.5875571Z [36;1m[0m
+2026-04-30T07:22:18.5875848Z [36;1mecho "filepaths=${filepaths[@]}" >> $GITHUB_OUTPUT[0m
+2026-04-30T07:22:18.5876234Z [36;1mecho "statuscode=$statuscode" >> $GITHUB_OUTPUT[0m
+2026-04-30T07:22:18.5876552Z [36;1m[0m
+2026-04-30T07:22:18.5876766Z [36;1mset +f # re-enable globbing[0m
+2026-04-30T07:22:18.5898173Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-30T07:22:18.5898540Z env:
+2026-04-30T07:22:18.5898779Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:18.5899096Z   INPUT_SCANDIR: .
+2026-04-30T07:22:18.5899327Z   INPUT_CHECK_TOGETHER: 
+2026-04-30T07:22:18.5899677Z   INPUT_EXCLUDE_ARGS: ! -path *./.git/* ! -path *.go ! -path */mvnw
+2026-04-30T07:22:18.5900201Z   INPUT_ADDITIONAL_FILE_ARGS: -o -name *oc-bootstrap.sh -o -name *install-lemonade.sh
+2026-04-30T07:22:18.5900648Z   INPUT_SHELLCHECK_OPTIONS: --format=gcc
+2026-04-30T07:22:18.5900935Z ##[endgroup]
+2026-04-30T07:22:19.5914470Z ##[group]Run exit 0
+2026-04-30T07:22:19.5914738Z [36;1mexit 0[0m
+2026-04-30T07:22:19.5936509Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-04-30T07:22:19.5936865Z env:
+2026-04-30T07:22:19.5937111Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:19.5937396Z ##[endgroup]
+2026-04-30T07:22:19.6057083Z ##[group]Run mfinelli/setup-shfmt@v3
+2026-04-30T07:22:19.6057359Z with:
+2026-04-30T07:22:19.6057538Z   shfmt-version: latest
+2026-04-30T07:22:19.6057740Z env:
+2026-04-30T07:22:19.6057925Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:19.6058356Z ##[endgroup]
+2026-04-30T07:22:19.7506889Z Downloading shfmt version 3.13.1 from https://github.com/mvdan/sh/releases/tag/v3.13.1
+2026-04-30T07:22:19.9440637Z [command]/usr/bin/chmod +x /home/runner/bin/shfmt
+2026-04-30T07:22:49.7609764Z ##[group]Run shfmt -d -i 4 -ci oc-bootstrap.sh install-lemonade.sh
+2026-04-30T07:22:49.7610316Z [36;1mshfmt -d -i 4 -ci oc-bootstrap.sh install-lemonade.sh[0m
+2026-04-30T07:22:49.7636208Z shell: /usr/bin/bash -e {0}
+2026-04-30T07:22:49.7636480Z env:
+2026-04-30T07:22:49.7636698Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-04-30T07:22:49.7636973Z ##[endgroup]
+2026-04-30T07:22:49.7729015Z diff oc-bootstrap.sh.orig oc-bootstrap.sh
+2026-04-30T07:22:49.7733149Z --- oc-bootstrap.sh.orig
+2026-04-30T07:22:49.7733690Z +++ oc-bootstrap.sh
+2026-04-30T07:22:49.7734007Z @@ -38,11 +38,11 @@
+2026-04-30T07:22:49.7734390Z  # ----------------------------------------------------------------------
+2026-04-30T07:22:49.7734879Z  while [[ $# -gt 0 ]]; do
+2026-04-30T07:22:49.7735208Z      case $1 in
+2026-04-30T07:22:49.7735528Z -        --non-interactive|-y)
+2026-04-30T07:22:49.7735897Z +        --non-interactive | -y)
+2026-04-30T07:22:49.7736290Z              NON_INTERACTIVE=true
+2026-04-30T07:22:49.7736766Z              shift
+2026-04-30T07:22:49.7737029Z              ;;
+2026-04-30T07:22:49.7759581Z -        --config|-c)
+2026-04-30T07:22:49.7759923Z +        --config | -c)
+2026-04-30T07:22:49.7760153Z              CONFIG_FILE="$2"
+2026-04-30T07:22:49.7760376Z              shift 2
+2026-04-30T07:22:49.7760571Z              ;;
+2026-04-30T07:22:49.7760770Z @@ -101,7 +101,7 @@
+2026-04-30T07:22:49.7761030Z          echo "      Install with: sudo apt install shellcheck"
+2026-04-30T07:22:49.7761388Z          return 0
+2026-04-30T07:22:49.7761602Z      fi
+2026-04-30T07:22:49.7761770Z -    
+2026-04-30T07:22:49.7761937Z +
+2026-04-30T07:22:49.7762401Z      echo "[INFO] Running ShellCheck static analysis..."
+2026-04-30T07:22:49.7762857Z      if shellcheck "$0" 2>/dev/null; then
+2026-04-30T07:22:49.7764041Z          echo "  [OK] ShellCheck analysis complete: No critical issues found."
+2026-04-30T07:22:49.7764660Z diff install-lemonade.sh.orig install-lemonade.sh
+2026-04-30T07:22:49.7765134Z --- install-lemonade.sh.orig
+2026-04-30T07:22:49.7765479Z +++ install-lemonade.sh
+2026-04-30T07:22:49.7765793Z @@ -66,16 +66,16 @@
+2026-04-30T07:22:49.7766161Z      echo "[INFO] Downloading Qwen2.5-4B-Instruct-GGUF..."
+2026-04-30T07:22:49.7766709Z      mkdir -p models/huggingface.co/user.Qwen3.5-4B-GGUF/
+2026-04-30T07:22:49.7767352Z      huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf \
+2026-04-30T07:22:49.7768068Z -      --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
+2026-04-30T07:22:49.7768618Z +        --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
+2026-04-30T07:22:49.7768930Z  
+2026-04-30T07:22:49.7769178Z      echo "[INFO] Downloading Nomic Embed Text v1.5 GGUF..."
+2026-04-30T07:22:49.7769586Z      mkdir -p models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
+2026-04-30T07:22:49.7770153Z      huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF nomic-embed-text-v1.5.Q4_K_M.gguf \
+2026-04-30T07:22:49.7770721Z -      --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
+2026-04-30T07:22:49.7771169Z +        --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
+2026-04-30T07:22:49.7771506Z  fi
+2026-04-30T07:22:49.7771668Z  
+2026-04-30T07:22:49.7771846Z  # 6. Create Startup Script
+2026-04-30T07:22:49.7772073Z -cat <<EOF > start-lemonade.sh
+2026-04-30T07:22:49.7772611Z +cat <<EOF >start-lemonade.sh
+2026-04-30T07:22:49.7772922Z  #!/bin/bash
+2026-04-30T07:22:49.7773144Z  source venv/bin/activate
+2026-04-30T07:22:49.7773403Z  # Adjust HSA_OVERRIDE_GFX_VERSION if needed for AMD GPUs
+2026-04-30T07:22:49.7784737Z ##[error]Process completed with exit code 1.
+2026-04-30T07:22:49.7898983Z Post job cleanup.
+2026-04-30T07:22:49.8850741Z [command]/usr/bin/git version
+2026-04-30T07:22:49.8905901Z git version 2.53.0
+2026-04-30T07:22:49.8947128Z Temporarily overriding HOME='/home/runner/work/_temp/e03ed0c5-1c25-49e4-a32d-01a42e0297f4' before making global git config changes
+2026-04-30T07:22:49.8949358Z Adding repository directory to the temporary git global config as a safe directory
+2026-04-30T07:22:49.8953621Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/oc-bootstrap/oc-bootstrap
+2026-04-30T07:22:49.9004726Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-04-30T07:22:49.9050274Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-04-30T07:22:49.9321595Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-04-30T07:22:49.9355505Z http.https://github.com/.extraheader
+2026-04-30T07:22:49.9365263Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-04-30T07:22:49.9405722Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-04-30T07:22:49.9708116Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-04-30T07:22:49.9749229Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-04-30T07:22:50.0170500Z Cleaning up orphan processes
+2026-04-30T07:22:50.0440190Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, mfinelli/setup-shfmt@v3. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
