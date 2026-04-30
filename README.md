@@ -4,7 +4,11 @@
 
 Automated setup for [OpenClaw](https://openclaw.ai) multi-agent AI system. Deploy three specialized AI agents that run on your own server and communicate privately through Telegram.
 
-> **📢 Refactored for Public Use (April 2026):** This repository has been refactored from a personal bootstrap tool into a public-friendly project. All personal references have been removed, agent templates are now generic, and the interactive setup is designed for users with basic Linux/command-line skills. See [REFACTOR.md](REFACTOR.md) for details.
+> **📢 Refactored for Public Use (April 2026):** This repository has been
+> refactored from a personal bootstrap tool into a public-friendly project.
+> All personal references have been removed, agent templates are now generic,
+> and the interactive setup is designed for users with basic
+> Linux/command-line skills. See [REFACTOR.md](REFACTOR.md) for details.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: Ubuntu 24.04](https://img.shields.io/badge/Platform-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/download/server)
