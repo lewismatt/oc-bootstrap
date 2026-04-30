@@ -1,0 +1,13 @@
+# Hadolint configuration for Dockerfile linting
+# https://github.com/hadolint/hadolint
+
+ignored:
+  - DL3008  # Pin versions in apt-get install
+  - DL3009  # Delete the apt-get lists after installing something
+  - DL3013  # Pin versions in pip install
+  - DL3015  # Avoid additional packages by specifying --no-install-recommends
+  - DL4006  # Set exec form in ENTRYPOINT
+
+trustedRegistries:
+  - docker.io
+  - ghcr.io
