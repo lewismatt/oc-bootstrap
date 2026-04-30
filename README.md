@@ -1,10 +1,52 @@
 # 🚀 OpenClaw Multi-Agent Bootstrap
 
+<div align="center">
+
 Automated setup for OpenClaw AI agents on Ubuntu 24.04. Deploy three specialized AI assistants that work securely on your server and communicate with you privately through Telegram.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform: Ubuntu 24.04](https://img.shields.io/badge/Platform-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/download/server)
+[![Node.js 22.x](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
+[![Docker Ready](https://img.shields.io/badge/Docker-Ready-blue.svg)](DOCKER.md)
+[![Telegram Bots](https://img.shields.io/badge/Telegram-Bots-2CA5E0.svg)](https://core.telegram.org/bots)
+
+</div>
 
 ---
 
-## 📖 Table of Contents
+## � Quick Start
+
+Get OpenClaw running in under 5 minutes:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/openclaw/oc-bootstrap.git
+cd oc-bootstrap
+
+# 2. Make scripts executable
+chmod +x *.sh
+
+# 3. Run the interactive installer
+./oc-bootstrap.sh
+```
+
+For Docker deployment:
+
+```bash
+# 1. Configure your environment
+cp docker-config.env.template docker-config.env
+nano docker-config.env  # Add your Telegram bot tokens
+
+# 2. Start with Docker Compose
+docker-compose up -d
+
+# 3. View logs
+docker-compose logs -f
+```
+
+---
+
+## �📖 Table of Contents
 
 1. [Overview](#-overview)
 2. [Architecture](#%EF%B8%8F-architecture)
@@ -770,6 +812,44 @@ oc-bootstrap/
 ├── LICENSE                      # MIT License
 └── CHANGELOG                    # Version history
 ```
+
+---
+
+## 📦 Dependencies & Attributions
+
+This project builds upon these excellent open source projects:
+
+### Core Dependencies
+
+| Project | Purpose | License | Version |
+|---------|---------|---------|---------|
+| [OpenClaw](https://github.com/openclaw/openclaw) | Self-hosted multi-agent AI platform | [MIT](https://github.com/openclaw/openclaw/blob/main/LICENSE) | Latest |
+| [Node.js](https://nodejs.org/) | JavaScript runtime for OpenClaw CLI | [MIT](https://github.com/nodejs/node/blob/main/LICENSE) | 22.x |
+| [Ubuntu](https://ubuntu.com/) | Base operating system | [Various](https://ubuntu.com/licensing) | 24.04 LTS |
+| [Docker](https://www.docker.com/) | Container platform for isolated deployment | [Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE) | Latest |
+
+### AI Model Providers
+
+| Provider | Usage | License |
+|----------|-------|---------|
+| [OpenAI](https://openai.com/) | GPT-4o models for Assistant & Research agents | [Terms](https://openai.com/policies/terms-of-use) |
+| [Anthropic](https://anthropic.com/) | Claude models for Developer agent | [Terms](https://www.anthropic.com/legal/terms) |
+| [Lemonade Server](https://lemonade.ai/) | Local LLM inference (optional) | [License](https://lemonade.ai/license) |
+
+### Tools & Libraries
+
+| Tool | Purpose | License |
+|------|---------|---------|
+| [Telegram Bot API](https://core.telegram.org/bots) | Agent communication interface | [Terms](https://core.telegram.org/bots/terms) |
+| [SQLite](https://www.sqlite.org/) | Vector memory storage | [Public Domain](https://www.sqlite.org/copyright.html) |
+| [Brave Search API](https://brave.com/search/api/) | Web search for Research agent | [Terms](https://brave.com/privacy/browser/legal/) |
+
+### Special Thanks
+
+- **OpenClaw Team** - For creating the amazing multi-agent AI platform
+- **Telegram** - For providing a secure, private messaging platform for agent communication
+- **NodeSource** - For maintaining the Node.js package repository
+- **The Open Source Community** - For the countless tools and libraries that make projects like this possible
 
 ---
 
