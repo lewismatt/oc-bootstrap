@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - **Progress Indicators**: Implemented progress bars for long-running operations
   - System Preparation: 5-step progress tracking (sudo, PPA, apt, install, health check)
   - Agent Provisioning: 3-agent progress tracking
@@ -25,13 +26,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enhanced Final Report**: Detailed setup summary displaying paths, configurations, and deployed models
 
 ### Changed
-- **Documentation**: Updated `LLM.md` to reflect that the dreaming process uses the generative Assistant Model rather than the embedding model.
-- **Gitignore**: Replaced hardcoded `.qwen-recommends.md` with agnostic `*.recommends.md` rule to support any chosen model.
+
+- **Documentation**: Updated `LLM.md` to reflect that the dreaming process uses the generative Assistant Model
+  rather than the embedding model.
+- **Gitignore**: Replaced hardcoded `.qwen-recommends.md` with agnostic `*.recommends.md` rule to support any
+  chosen model.
 
 ### Fixed
-- **Dreaming Model Assignment**: Assigned generative assistant model instead of embedding model to `memory.dreaming.model` to prevent crashes during the dreaming phase.
-- **Vector Search Model Prefix**: Stripped provider prefixes (e.g., `lemonade/`) from the embedding model tag before passing it to the OpenClaw `openai` provider block.
-- **Critical Bug**: Fixed undefined variable reference in sudo check that occurred before exit codes were defined
+
+- **Dreaming Model Assignment**: Assigned generative assistant model instead of embedding model to
+  `memory.dreaming.model` to prevent crashes during the dreaming phase.
+- **Vector Search Model Prefix**: Stripped provider prefixes (e.g., `lemonade/`) from the embedding model tag
+  before passing it to the OpenClaw `openai` provider block.
+- **Critical Bug**: Fixed undefined variable reference in sudo check that occurred before exit codes were
+  defined
   - Moved exit code definitions before the sudo trap guardrail (Section 0)
 - **Exit Code Consistency**: Replaced 15+ generic `exit 1` statements with semantic exit codes
   - `E_SUDO=10` for sudo access failures
@@ -41,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `E_GATEWAY=14` for gateway startup issues
 
 ### Improved
+
 - **User Feedback**: Enhanced script visibility with progress tracking and structured section reporting
 - **Error Handling**: Semantic exit codes now enable better error diagnosis and scripting integration
 - **Code Organization**: Consistent formatting and summary patterns throughout all installation stages

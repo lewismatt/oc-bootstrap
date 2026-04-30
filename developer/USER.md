@@ -1,6 +1,7 @@
 # User Context - Developer Agent
 
-This file contains technical context to help the Developer Agent understand your infrastructure, coding standards, and project goals.
+This file contains technical context to help the Developer Agent understand your infrastructure, coding standards,
+and project goals.
 
 ## Technical Preferences
 
@@ -34,12 +35,12 @@ This file contains technical context to help the Developer Agent understand your
 
 ## Current Projects & Goals
 
-1.  **OpenClaw Optimization:**
+1. **OpenClaw Optimization:**
     - Fine-tuning memory and vector search settings
     - Improving agent response times
     - Exploring new MCP integrations
 
-2.  **Automation Scripts:**
+2. **Automation Scripts:**
     - Developing Python scripts for data processing
     - Automating system maintenance tasks with Bash
 
@@ -55,11 +56,13 @@ This file contains technical context to help the Developer Agent understand your
 *You can store frequently used commands here for the Developer Agent to reference.*
 
 **Starting Lemonade Server:**
+
 ```bash
 HSA_OVERRIDE_GFX_VERSION=11.0 python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ./models
 ```
 
 **Checking OpenClaw Gateway Status:**
+
 ```bash
 openclaw gateway status
 ```

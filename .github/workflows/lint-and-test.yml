@@ -24,7 +24,7 @@ jobs:
       - run: shfmt -d -i 4 -ci oc-bootstrap.sh install-lemonade.sh
 
       - name: Markdownlint
-        uses: DavidAnson/github-lint-action@v1
+        uses: DavidAnson/markdownlint-cli2-action@v14
         with:
           glob: '**/*.md'
 
