@@ -26,7 +26,6 @@ configuration work correctly.
 
 ```bash
 ./tests/docker-integration-test.sh
-```bash
 ```
 
 ### Run with Verbose Output
@@ -93,7 +92,7 @@ The bootstrap script is expected to **fail** when run with dummy credentials bec
 
 ## Test Output Example
 
-```
+```text
 ==========================================
   OpenClaw Docker Integration Test
 ==========================================
@@ -134,10 +133,10 @@ To add a new test to `docker-integration-test.sh`:
 
 ```bash
 test_new_feature() {
-    # Description of what this tests"
+    # Description of what this tests
     docker exec "$TEST_CONTAINER_NAME" bash -c "
-        # Your test logic here"
-        command_that_should_pass"
+        # Your test logic here
+        command_that_should_pass
     "
 }
 ```
