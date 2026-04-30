@@ -1,5 +1,8 @@
 {
   "MD060": false,
+  "MD004": {
+    "style": "dash"
+  },
   "MD013": {
     "line_length": 200,
     "code_blocks": false,

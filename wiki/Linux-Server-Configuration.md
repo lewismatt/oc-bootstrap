@@ -345,8 +345,8 @@ sudo nano /etc/security/limits.conf
 Add these lines:
 
 ```
-* soft nofile 65536
-* hard nofile 65536
+- soft nofile 65536
+- hard nofile 65536
 root soft nofile 65536
 root hard nofile 65536
 ```

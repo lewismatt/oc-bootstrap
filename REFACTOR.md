@@ -8,7 +8,11 @@
 
 ## 🎯 Objective
 
-This repository began as a personal bootstrap mechanism for OpenClaw, tailored to the original creator's home server setup. The goal of this refactoring was to transform it into a project that **anyone with basic computer skills can clone and use** to bootstrap an OpenClaw instance on a Linux server, VM, or Docker container.
+This repository began as a personal bootstrap mechanism for OpenClaw, tailored to the
+original creator's home server setup. The goal of this refactoring was to
+transform it into a project that **anyone with basic computer skills
+can clone and use** to bootstrap an OpenClaw instance on a Linux
+server, VM, or Docker container.
 
 ---
 

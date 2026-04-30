@@ -329,7 +329,7 @@ To add custom API integrations:
 2. Configure agent to use it (in `SOUL.md`):
    ```markdown
    ## Capabilities
-   * Weather lookup (via wttr.in or custom API)
+   - Weather lookup (via wttr.in or custom API)
    ```
 
 ---

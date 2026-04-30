@@ -272,13 +272,13 @@ Customize behavior per channel:
 ## Channel-Specific Behavior
 
 **Private Chat:**
-* Respond immediately to all messages
-* Use concise format for quick answers
+- Respond immediately to all messages
+- Use concise format for quick answers
 
 **Group Chat:**
-* Only respond when mentioned (@openclaw_assistant_bot)
-* Provide detailed explanations
-* Include source links when researching
+- Only respond when mentioned (@openclaw_assistant_bot)
+- Provide detailed explanations
+- Include source links when researching
 ```
 
 ---
@@ -323,9 +323,9 @@ Implement custom message filters in agent configuration:
 # In AGENTS.md
 ## Message Filtering Rules
 
-* Ignore messages containing certain keywords
-* Only process messages with specific hashtags
-* Forward messages from specific users to specific agents
+- Ignore messages containing certain keywords
+- Only process messages with specific hashtags
+- Forward messages from specific users to specific agents
 ```
 
 ---
