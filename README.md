@@ -164,7 +164,7 @@ For beginners, we recommend **Remote APIs** (cloud-based, no GPU needed):
 | **Anthropic** | `anthropic/claude-3-5-sonnet-latest` | ~$0.003 per 1K tokens | 5 min (get API key) |
 | **Local (Lemonade)** | `lemonade/user.Qwen3.5-4B-GGUF` | Free (but needs GPU) | 30 min (setup server) |
 
-> 📌 **Default Configuration**: Assistant and Research use OpenAI GPT-4o; Developer uses Anthropic Claude. You can change these during setup.
+> 📌 **Default Configuration**: Assistant and Research use OpenAI GPT-4o; Developer uses Anthropic Claude 3.5 Sonnet (`anthropic/claude-3-5-sonnet-latest`). You can change these during setup.
 
 ### 4. Optional API Keys
 
