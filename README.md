@@ -52,6 +52,7 @@ on your hardware. It provides an OpenAI-compatible REST API, allowing all three 
 without relying on cloud services.
 
 **✨ Key features:**
+
 - OpenAI-compatible `/v1` API endpoints for easy integration
 - Supports quantized GGUF models optimized for consumer GPUs (AMD ROCm, NVIDIA CUDA)
 - Runs entirely on-premises with zero cloud data leakage
@@ -68,12 +69,14 @@ without relying on cloud services.
 ### 🐧 Setup on Linux (Ubuntu 24.04)
 
 1. **Clone the Lemonade repository:**
+
    ```bash
    git clone https://github.com/lemonade-ai/lemonade-server.git
    cd lemonade-server
    ```
 
 2. **Install dependencies:**
+
    ```bash
    # For AMD ROCm support
    sudo apt install -y rocm-core rocm-libs
@@ -84,6 +87,7 @@ without relying on cloud services.
    ```
 
 3. **Download required models:**
+
    ```bash
    # Create models directory
    mkdir -p models/huggingface.co/user.model-name/
@@ -101,6 +105,7 @@ without relying on cloud services.
    ```
 
 4. **Start Lemonade Server:**
+
    ```bash
    # Run in foreground (or use systemd/screen for background)
    HSA_OVERRIDE_GFX_VERSION=11.0 python -m lemonade.server \
@@ -110,6 +115,7 @@ without relying on cloud services.
    ```
 
 5. **Verify it's running:**
+
    ```bash
    curl http://localhost:8000/v1/models
    ```
@@ -123,6 +129,7 @@ without relying on cloud services.
    - For NVIDIA: Install [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit)
 
 2. **Clone and setup:**
+
    ```powershell
    git clone https://github.com/lemonade-ai/lemonade-server.git
    cd lemonade-server
@@ -130,6 +137,7 @@ without relying on cloud services.
    ```
 
 3. **Download models:**
+
    ```powershell
    # Create models directory
    New-Item -Type Directory -Path "models\huggingface.co" -Force
@@ -144,6 +152,7 @@ without relying on cloud services.
    ```
 
 4. **Start Lemonade Server:**
+
    ```powershell
    # For AMD ROCm (may need environment variable)
    $env:HSA_OVERRIDE_GFX_VERSION = "11.0"  # Adjust for your GPU
@@ -154,11 +163,13 @@ without relying on cloud services.
    ```
 
 5. **Verify it's running:**
+
    ```powershell
    Invoke-WebRequest http://localhost:8000/v1/models
    ```
 
 6. **Optional: Create a batch file for easy startup:**
+
    ```batch
    @echo off
    cd /d %~dp0
@@ -166,6 +177,7 @@ without relying on cloud services.
    python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ".\models"
    pause
    ```
+
    Save as `start-lemonade.bat` and double-click to run.
 
 ### 💡 Important Notes
