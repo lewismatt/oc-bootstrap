@@ -102,7 +102,7 @@ services:
   #     - LEMONADE_HOST=0.0.0.0
   #   
   #   volumes:
-  #     - ./install-lemonade.sh:/tmp/install-lemonade.sh:ro
+  #     - ./scripts/install-lemonade.sh:/tmp/install-lemonade.sh:ro
   #     - lemonade-data:/home/lemonade
   #   
   #   ports:

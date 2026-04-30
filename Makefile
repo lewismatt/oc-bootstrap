@@ -98,6 +98,52 @@ test-quick:
 
 ## Stop and remove containers (keep volumes)
 clean:
+	docker-compose -f $(COMPOSE_FILE) down
+
+## Stop and remove containers AND volumes (DESTRUCTIVE)
+clean-all:
+	docker-compose -f $(COMPOSE_FILE) down -v
+	rm -rf scripts/*.bak *.bak
+
+## Run docker cleanup script
+clean-docker:
+	./scripts/docker-cleanup.sh
+
+## Prune unused Docker resources
+prune:
+	./scripts/docker-cleanup.sh --prune
+
+## Full cleanup (containers, volumes, images, networks)
+clean-full:
+	./scripts/docker-cleanup.sh --all
+
+## Remove test images
+clean-images:
+	docker rmi $(IMAGE_NAME):$(IMAGE_TAG) || true
+
+# ==============================================================================
+# HELP
+# ==============================================================================
+
+help:
+	@echo "OpenClaw Docker Makefile - Available commands:"
+	@echo "  make build        - Build Docker image"
+	@echo "  make up            - Start services"
+	@echo "  make down          - Stop services"
+	@echo "  make restart       - Restart services"
+	@echo "  make logs          - View logs (follow)"
+	@echo "  make shell         - Open shell in container"
+	@echo "  make test          - Run tests"
+	@echo "  make clean         - Stop and remove containers"
+	@echo "  make clean-all     - Stop, remove containers AND volumes"
+	@echo "  make help          - Show this help message"
+
+# ==============================================================================
+# CLEANUP
+# ==============================================================================
+
+## Stop and remove containers (keep volumes)
+clean:
 	./docker-cleanup.sh
 
 ## Stop and remove containers + volumes (DESTRUCTIVE)

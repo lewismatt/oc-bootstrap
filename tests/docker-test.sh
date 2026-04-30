@@ -161,7 +161,7 @@ test_dockerignore_exists() {
 }
 
 test_entrypoint_exists() {
-    [[ -f "$PROJECT_ROOT/docker-entrypoint.sh" ]]
+    [[ -f "$PROJECT_ROOT/scripts/docker-entrypoint.sh" ]]
 }
 
 test_config_template_exists() {
