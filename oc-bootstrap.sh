@@ -307,7 +307,7 @@ echo "Paste the Lemonade tags for your local models (e.g., lemonade/user.Qwen3.5
 echo ""
 
 while [[ -z "$EMBEDDING_MODEL" ]]; do
-    read -r -p "Enter Embedding Model tag (used for memory/dreaming): " EMBEDDING_MODEL </dev/tty
+    read -r -p "Enter Embedding Model tag (used for memory vector search): " EMBEDDING_MODEL </dev/tty
     [[ -z "$EMBEDDING_MODEL" ]] && echo "  [ERROR] Embedding model is required."
 done
 
@@ -595,7 +595,7 @@ openclaw config set providers.lemonade.baseUrl "$BASE_URL" || handle_error_or_wa
 openclaw config set providers.lemonade.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set Lemonade API key." $E_CONFIG
 
 echo "Configuring shared embedding and dreaming models..."
-openclaw config set memory.dreaming.model "$EMBEDDING_MODEL" || echo "[WARN] Failed to set dreaming model."
+openclaw config set memory.dreaming.model "$ASSISTANT_MODEL" || echo "[WARN] Failed to set dreaming model."
 openclaw config set memory.embeddingModel "$EMBEDDING_MODEL" || echo "[WARN] Failed to set embedding model."
 
 echo "[OK] Lemonade Server backend configured"
@@ -748,7 +748,9 @@ total_tasks=${#memory_tasks[@]}
 progress_bar "$total_tasks" 1
 echo "Configuring memory search embedding provider..."
 openclaw config set agents.defaults.memorySearch.provider "openai" || handle_error_or_warn "Failed to set memory search provider." $E_CONFIG
-openclaw config set agents.defaults.memorySearch.model "$EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
+# Strip provider prefix (e.g. lemonade/) because the openai provider expects a raw model name
+CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
+openclaw config set agents.defaults.memorySearch.model "$CLEAN_EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
 openclaw config set agents.defaults.memorySearch.remote.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set memory search base URL." $E_CONFIG
 openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set memory search API key." $E_CONFIG
 

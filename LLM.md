@@ -47,8 +47,9 @@ VRAM utilization.
 **Inference & Memory:**
 
 * **Backend:** Local "Lemonade" server.
-* **Embedding/Dreaming:** User-defined (e.g.,
+* **Embedding:** User-defined (e.g.,
     `lemonade/user.nomic-embed-text-v1.5-GGUF`).
+* **Dreaming:** Uses the User-defined Assistant Model.
 * **Vector Search:** Accelerated locally via `sqlite-vec` to preserve compute
     cycles.
 
