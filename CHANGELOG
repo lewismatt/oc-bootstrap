@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Uninstall Script**: Created `uninstall-oc-bootstrap.sh` for safe removal of OpenClaw installations
+  - Interactive confirmation for each major deletion (workspaces, secrets, memory, config)
+  - Supports `--yes` flag for automated uninstalls (use with caution)
+  - Supports `--preserve-workspaces` flag to keep agent prompt files
+  - Stops gateway if running before removal
+  - Optionally removes OpenClaw binary (asks user)
+  - Does NOT remove system packages (curl, git, nodejs) - prints manual removal instructions
 - **Progress Indicators**: Implemented progress bars for long-running operations
   - System Preparation: 5-step progress tracking (sudo, PPA, apt, install, health check)
   - Agent Provisioning: 3-agent progress tracking

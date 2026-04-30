@@ -554,3 +554,37 @@ MIT License — See [LICENSE](LICENSE) file for details.
 ---
 
 **Happy bootstrapping! 🚀**
+
+### Uninstalling OpenClaw
+
+If you want to remove OpenClaw and all its data, use the provided uninstall script:
+
+```bash
+# Basic uninstall (interactive - will ask for confirmation)
+./uninstall-oc-bootstrap.sh
+
+# Skip all confirmations (use with caution!)
+./uninstall-oc-bootstrap.sh --yes
+
+# Keep agent workspaces (SOUL.md, AGENTS.md, etc.)
+./uninstall-oc-bootstrap.sh --preserve-workspaces
+```
+
+**What the uninstall script removes:**
+
+| Component | Removed? | Notes |
+|-----------|----------|-------|
+| Gateway process | ✅ | Stops if running |
+| Agent workspaces | ✅ | `~/.openclaw/workspace-*` (unless `--preserve-workspaces`) |
+| Secrets file | ✅ | `~/.openclaw/secrets.env` (contains API keys & tokens) |
+| Memory index | ✅ | `~/.openclaw/memory/` (vector search data) |
+| Log files | ✅ | `~/.openclaw/logs/` |
+| OpenClaw config | ✅ | `~/.config/openclaw/` |
+| OpenClaw binary | ⚠️ | Optional - script will ask |
+| System packages | ❌ | curl, git, nodejs - NOT removed (may be used by other apps) |
+
+> ⚠️ **Warning**: The uninstall script will ask before deleting each component. Use `--yes` to skip confirmations, but be careful—this will delete all your agent data and configurations!
+
+> 💡 **Tip**: If you just want to reset the configuration but keep your workspaces, use `--preserve-workspaces`.
+
+---
