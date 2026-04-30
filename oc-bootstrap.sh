@@ -410,7 +410,7 @@ sudo -v || {
 # Step 2/5
 progress_bar "$total_steps" 2
 echo "Step 2/5: Configuring NodeSource PPA..."
-if curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; then
+if curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -; then
     echo "  [OK] NodeSource PPA configured successfully"
 else
     echo "  [WARN] NodeSource PPA setup failed. Using default repositories."
