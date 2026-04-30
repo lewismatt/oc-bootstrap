@@ -306,67 +306,45 @@ read -r -p "Proceed with installation? (Y/n) " CONFIRM </dev/tty
 # ==============================================================================
 echo ""
 echo "=== Inference Backend ==="
-echo "If you are new to self-hosting AI, we recommend using Remote API providers (e.g., OpenAI, Anthropic) for a smoother start."
-echo "If you have a server with a dedicated GPU and want maximum privacy, choose Local inference via Lemonade Server."
-read -r -p "Will you use local inference via Lemonade Server or remote API providers? [L/r]: " USE_REMOTE </dev/tty
-if [[ "${USE_REMOTE^^}" == "R" ]]; then
-    LOCAL_INFERENCE=false
-    LEMONADE_KEY=""
-    echo "  [OK] Remote API Providers selected."
-else
+echo "You can use Local inference (Lemonade Server), Remote APIs (OpenAI, Anthropic), or a mix of both."
+echo "If you are new to self-hosting AI, we recommend using Remote API providers for a smoother start."
+read -r -p "Will you use local inference via Lemonade Server for any of your agents? [y/N]: " USE_LOCAL </dev/tty
+if [[ "${USE_LOCAL^^}" == "Y" ]]; then
     LOCAL_INFERENCE=true
     read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
     LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
+else
+    LOCAL_INFERENCE=false
+    LEMONADE_KEY=""
+    echo "  [OK] Remote API Providers exclusively selected."
 fi
 
 echo ""
 echo "=== Model Selection ==="
-if [[ "$LOCAL_INFERENCE" == true ]]; then
-    echo "Paste the Lemonade tags for your local models (e.g., lemonade/user.Qwen3.5-4B-GGUF)."
-else
-    echo "Paste the provider tags for your remote models."
-    echo "Defaults are provided for convenience (OpenAI/Anthropic)."
-fi
+echo "For each model, provide the appropriate provider tag:"
+echo "  - Local Lemonade: lemonade/user.Qwen3.5-4B-GGUF"
+echo "  - Remote OpenAI: openai/gpt-4o"
+echo "  - Remote Anthropic: anthropic/claude-3-5-sonnet-latest"
 echo ""
 
 while [[ -z "$EMBEDDING_MODEL" ]]; do
-    if [[ "$LOCAL_INFERENCE" == false ]]; then
-        read -r -p "Enter Embedding Model tag [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL </dev/tty
-        EMBEDDING_MODEL="${EMBEDDING_MODEL:-openai/text-embedding-3-small}"
-    else
-        read -r -p "Enter Embedding Model tag (used for memory vector search): " EMBEDDING_MODEL </dev/tty
-    fi
-    [[ -z "$EMBEDDING_MODEL" ]] && echo "  [ERROR] Embedding model is required."
+    read -r -p "Enter Embedding Model tag [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL </dev/tty
+    EMBEDDING_MODEL="${EMBEDDING_MODEL:-openai/text-embedding-3-small}"
 done
 
 while [[ -z "$ASSISTANT_MODEL" ]]; do
-    if [[ "$LOCAL_INFERENCE" == false ]]; then
-        read -r -p "Enter Assistant Agent LLM tag [Default: openai/gpt-4o]: " ASSISTANT_MODEL </dev/tty
-        ASSISTANT_MODEL="${ASSISTANT_MODEL:-openai/gpt-4o}"
-    else
-        read -r -p "Enter Assistant Agent LLM tag: " ASSISTANT_MODEL </dev/tty
-    fi
-    [[ -z "$ASSISTANT_MODEL" ]] && echo "  [ERROR] Assistant model is required."
+    read -r -p "Enter Assistant Agent LLM tag [Default: openai/gpt-4o]: " ASSISTANT_MODEL </dev/tty
+    ASSISTANT_MODEL="${ASSISTANT_MODEL:-openai/gpt-4o}"
 done
 
 while [[ -z "$RESEARCH_MODEL" ]]; do
-    if [[ "$LOCAL_INFERENCE" == false ]]; then
-        read -r -p "Enter Research Agent LLM tag [Default: openai/gpt-4o]: " RESEARCH_MODEL </dev/tty
-        RESEARCH_MODEL="${RESEARCH_MODEL:-openai/gpt-4o}"
-    else
-        read -r -p "Enter Research Agent LLM tag: " RESEARCH_MODEL </dev/tty
-    fi
-    [[ -z "$RESEARCH_MODEL" ]] && echo "  [ERROR] Research model is required."
+    read -r -p "Enter Research Agent LLM tag [Default: openai/gpt-4o]: " RESEARCH_MODEL </dev/tty
+    RESEARCH_MODEL="${RESEARCH_MODEL:-openai/gpt-4o}"
 done
 
 while [[ -z "$DEVELOPER_MODEL" ]]; do
-    if [[ "$LOCAL_INFERENCE" == false ]]; then
-        read -r -p "Enter Developer Agent LLM tag [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL </dev/tty
-        DEVELOPER_MODEL="${DEVELOPER_MODEL:-anthropic/claude-3-5-sonnet-latest}"
-    else
-        read -r -p "Enter Developer Agent LLM tag: " DEVELOPER_MODEL </dev/tty
-    fi
-    [[ -z "$DEVELOPER_MODEL" ]] && echo "  [ERROR] Developer model is required."
+    read -r -p "Enter Developer Agent LLM tag [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL </dev/tty
+    DEVELOPER_MODEL="${DEVELOPER_MODEL:-anthropic/claude-3-5-sonnet-latest}"
 done
 
 echo ""
@@ -802,16 +780,15 @@ total_tasks=${#memory_tasks[@]}
 # Task 1
 progress_bar "$total_tasks" 1
 echo "Configuring memory search embedding provider..."
-if [[ "$LOCAL_INFERENCE" == true ]]; then
+MEM_PROVIDER="${EMBEDDING_MODEL%%/*}"
+CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
+
+if [[ "$MEM_PROVIDER" == "lemonade" ]]; then
     openclaw config set agents.defaults.memorySearch.provider "openai" || handle_error_or_warn "Failed to set memory search provider." $E_CONFIG
-    # Strip provider prefix (e.g. lemonade/) because the openai provider expects a raw model name
-    CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
     openclaw config set agents.defaults.memorySearch.model "$CLEAN_EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
-    openclaw config set agents.defaults.memorySearch.remote.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set memory search base URL." $E_CONFIG
-    openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set memory search API key." $E_CONFIG
+    openclaw config set agents.defaults.memorySearch.remote.baseUrl "${BASE_URL:-http://127.0.0.1:8000/v1}" || handle_error_or_warn "Failed to set memory search base URL." $E_CONFIG
+    openclaw config set agents.defaults.memorySearch.remote.apiKey "${LEMONADE_KEY:-local-dummy-key}" || handle_error_or_warn "Failed to set memory search API key." $E_CONFIG
 else
-    MEM_PROVIDER="${EMBEDDING_MODEL%%/*}"
-    CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
     openclaw config set agents.defaults.memorySearch.provider "$MEM_PROVIDER" || handle_error_or_warn "Failed to set memory search provider." $E_CONFIG
     openclaw config set agents.defaults.memorySearch.model "$CLEAN_EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
 fi
@@ -984,9 +961,30 @@ fi
 # 13. Start & Verify Gateway
 # ==============================================================================
 echo ""
-if [[ "$LOCAL_INFERENCE" == true ]]; then
-    echo "=== Starting OpenClaw Gateway ==="
+echo "=== Gateway Startup ==="
 
+HAS_REMOTE_MODELS=false
+if [[ "$EMBEDDING_MODEL" != lemonade/* || "$ASSISTANT_MODEL" != lemonade/* || "$RESEARCH_MODEL" != lemonade/* || "$DEVELOPER_MODEL" != lemonade/* ]]; then
+    HAS_REMOTE_MODELS=true
+fi
+
+if [[ "$HAS_REMOTE_MODELS" == true ]]; then
+    echo "Notice: You have configured remote API provider tags. OpenClaw requires your API keys to function."
+    echo "You can provide these keys by running: openclaw onboarding"
+    echo ""
+    read -r -p "Have you already configured your API keys and want to start the gateway now? (y/N) " START_GATEWAY </dev/tty
+    START_GATEWAY="${START_GATEWAY:-N}"
+else
+    echo "Your local Lemonade configuration has been applied."
+    echo "You may still want to configure additional API keys or review settings before starting."
+    echo ""
+    read -r -p "Would you like to start the OpenClaw gateway now? (Y/n) " START_GATEWAY </dev/tty
+    START_GATEWAY="${START_GATEWAY:-Y}"
+fi
+
+if [[ "${START_GATEWAY^^}" == "Y" ]]; then
+    echo ""
+    echo "Starting OpenClaw Gateway..."
     if ! openclaw gateway start; then
         handle_error_or_warn "Failed to start OpenClaw gateway." $E_GATEWAY
     fi
@@ -1002,17 +1000,12 @@ if [[ "$LOCAL_INFERENCE" == true ]]; then
         "OpenClaw gateway started successfully" \
         "Gateway stability check passed"
 else
-    echo "=== Remote API Providers Setup ==="
-    echo "You have chosen to use remote API providers. To configure your keys,"
-    echo "you must run the OpenClaw onboarding tool before starting the gateway:"
     echo ""
-    echo "    openclaw onboarding"
-    echo ""
-    echo "After completing the onboarding process, start the gateway with:"
+    echo "Gateway startup deferred."
+    echo "When you are ready, you can start the gateway by running:"
     echo "    openclaw gateway start"
-    echo ""
     print_section_summary "Gateway Startup" \
-        "Gateway start deferred pending openclaw onboarding"
+        "Gateway start deferred by user"
 fi
 
 # ==============================================================================
