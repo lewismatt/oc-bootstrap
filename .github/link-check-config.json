@@ -1,0 +1,10 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^https://lemonade.ai"
+    },
+    {
+      "pattern": "^https://discord.gg/openclaw"
+    }
+  ]
+}

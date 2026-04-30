@@ -4,9 +4,9 @@
 # Orchestrates OpenClaw services with optional Lemonade Server for local inference
 # 
 # Usage:
-#   docker-compose up -d          # Start all services
-#   docker-compose down            # Stop all services
-#   docker-compose logs -f         # View logs
+#   docker compose up -d          # Start all services
+#   docker compose down            # Stop all services
+#   docker compose logs -f         # View logs
 # ==============================================================================
 
 version: '3.8'

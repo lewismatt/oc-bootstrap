@@ -9,6 +9,7 @@ Automated setup for OpenClaw AI agents on Ubuntu 24.04. Deploy three specialized
 [![Node.js 22.x](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
 [![Docker Ready](https://img.shields.io/badge/Docker-Ready-blue.svg)](DOCKER.md)
 [![Telegram Bots](https://img.shields.io/badge/Telegram-Bots-2CA5E0.svg)](https://core.telegram.org/bots)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/openclaw/oc-bootstrap/ci.yml)](https://github.com/openclaw/oc-bootstrap/actions)
 
 </div>
 
@@ -430,7 +431,7 @@ You:        "What's the capital of France?"
 Assistant:  "The capital of France is Paris..."
 
 You:        "Search the web for latest AI news"
-You:        "@research_bot search: latest AI trends 2025"
+You:        "@research_bot search: latest AI trends 2026"
 Research:   "Here are the latest developments in AI..."
 
 You:        "@developer_bot write a Python function to sort a list"
@@ -823,7 +824,7 @@ oc-bootstrap/
 │   ├── SOUL.md
 │   ├── USER.md
 │   └── AGENTS.md
-├── .env.template                # Config file template
+├── docker-config.env.template                # Config file template
 ├── .gitignore                   # Don't commit .env or logs
 ├── LICENSE                      # MIT License
 └── CHANGELOG                    # Version history
