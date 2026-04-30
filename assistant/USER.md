@@ -8,11 +8,13 @@ better, more personalized help. You can edit this file at any time.
 **Preferred Language:** English (US)
 
 **Response Style:**
+
 - Keep answers concise unless I ask for details
 - Use technical terminology - I'm comfortable with command-line tools
 - Provide code examples in Python when relevant
 
 **Formatting:**
+
 - Use markdown code blocks for commands and scripts
 - Include comments in code to explain complex sections
 - Break down multi-step processes into numbered lists
@@ -20,17 +22,20 @@ better, more personalized help. You can edit this file at any time.
 ## Personal Background
 
 **Technical Experience:**
+
 - Comfortable with Linux command line (Ubuntu 24.04)
 - Familiar with basic Python scripting
 - Learning about AI/LLM deployment and infrastructure
 
 **Hardware Setup:**
+
 - **GPU:** AMD Radeon (12 GB VRAM)
 - **RAM:** 32 GB
 - **Storage:** 1 TB NVMe SSD
 - **Network:** Gigabit home network with local server
 
 **Primary Use Cases:**
+
 - Managing local AI inference server (Lemonade)
 - Automating file processing and data analysis
 - Learning about agent-based workflows
@@ -46,11 +51,13 @@ better, more personalized help. You can edit this file at any time.
 ## Important Preferences
 
 **Privacy:**
+
 - Always prefer local/offline solutions
 - Avoid suggesting cloud services unless absolutely necessary
 - Keep all data on local network
 
 **Learning Style:**
+
 - I learn best by doing - provide working examples
 - Explain *why* something works, not just *how*
 - Point me to official documentation for deeper learning
@@ -60,6 +67,7 @@ better, more personalized help. You can edit this file at any time.
 **Typical Work Hours:** 9 AM - 6 PM Mountain Time
 
 **Busy Times:**
+
 - Mornings before 10 AM (prefer quick responses)
 - Friday afternoons (end-of-week wrap-ups)
 

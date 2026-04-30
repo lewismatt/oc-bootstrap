@@ -6,6 +6,7 @@ interests, industries, and information needs.
 ## Research Interests
 
 ### Technology Topics
+
 - **AI/Machine Learning:** Local LLM deployment, open-source models,
   AMD GPU optimization
 - **Software Development:** Python automation, bash scripting, GitOps workflows
@@ -13,12 +14,14 @@ interests, industries, and information needs.
   software
 
 ### Industry Focus
+
 - Open-source software trends
 - AI regulation and policy developments
 - Privacy and data security news
 - AMD graphics card updates (VRAM optimization, ROCm releases)
 
 ### Personal Interests
+
 - [Add your hobbies, sports teams, music artists, etc.]
 - Example: "Colorado Avalanche hockey, Tyler Childers tour dates, ski
   conditions in Summit County"
@@ -26,6 +29,7 @@ interests, industries, and information needs.
 ## Research Preferences
 
 **Source Priorities:**
+
 1. Official documentation and technical blogs
 2. Peer-reviewed research and academic papers
 3. Established tech news outlets (Ars Technica, The Verge, Hacker News)
@@ -33,11 +37,13 @@ interests, industries, and information needs.
 5. Reddit technical communities (r/LocalLLaMA, r/selfhosted)
 
 **Avoid:**
+
 - Clickbait or sensationalist sources
 - Content farms and SEO spam
 - Unverified social media rumors (unless explicitly researching sentiment)
 
 **Citation Style:**
+
 - Always include URLs for verification
 - Prefer primary sources over aggregators
 - Note publication dates for time-sensitive topics
@@ -64,17 +70,20 @@ interests, industries, and information needs.
 ## Research Output Preferences
 
 **Format:**
+
 - Start with executive summary (2-3 sentences)
 - Use bullet points for key findings
 - Include full analysis for complex topics
 - Always provide source links
 
 **Depth Levels:**
+
 - **Quick Answer:** 1-2 paragraphs with sources (for simple factual queries)
 - **Standard Research:** 3-5 key findings with analysis (default)
 - **Deep Dive:** Comprehensive report with cross-referencing (when requested)
 
 **Archival:**
+
 - Commit important research to `research/logs/` via GitLab MCP
 - Use descriptive filenames: `YYYY-MM-DD-topic-slug.md`
 - Tag research by category in commit messages
@@ -83,19 +92,19 @@ interests, industries, and information needs.
 
 **Quick Factual:**
 > "What's the current stable version of Python?"
-> 
+>
 > Expected: Brief answer with link to Python.org release page
 
 **Standard Investigation:**
 > "What are the best practices for securing a self-hosted web server?"
-> 
+>
 > Expected: 5-7 recommendations with sources, security audit checklist,
 > links to hardening guides
 
 **Deep Research:**
 > "Research the pros and cons of different vector databases for local AI
 > memory systems."
-> 
+>
 > Expected: Comparison table, performance benchmarks, integration
 > complexity analysis, recommendation based on 12GB VRAM constraint, full
 > report committed to research/logs/
@@ -109,12 +118,14 @@ When analyzing social media or community sentiment:
 **Time Window:** Default to 24-48 hours for trending topics
 
 **Breakdowns to Include:**
+
 - Overall sentiment distribution (positive/neutral/negative %)
 - Top themes in each category
 - Demographic insights (if available)
 - Trend direction (sentiment improving/declining)
 
 **Caveats to Note:**
+
 - Bot activity and astroturfing
 - Echo chamber effects
 - Selection bias in platform choice
@@ -130,6 +141,7 @@ When analyzing social media or community sentiment:
 5. Provide verdict: Verified / Likely True / Unconfirmed / False
 
 **Red Flags:**
+
 - "According to sources..." without attribution
 - Extraordinary claims without extraordinary evidence
 - Information that conflicts with established facts
@@ -140,6 +152,7 @@ When analyzing social media or community sentiment:
 **Primary Time Zone:** Mountain Time (MT)
 
 **Best Times for Real-Time Research:**
+
 - Breaking news: Monitor between 6 AM - 10 PM MT
 - Stock/crypto updates: Market hours + after-hours
 - Social trends: Peak activity 11 AM - 9 PM MT

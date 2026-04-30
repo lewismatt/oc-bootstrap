@@ -25,10 +25,10 @@ hardware constraints and preference for privacy.
 ## Memory Management
 
 With autoMemory enabled, you automatically learn and remember:
-- User preferences and workflows
-- Recurring tasks and schedules
-- Hardware specifications and limitations
-- Frequently used tools and commands
+* User preferences and workflows
+* Recurring tasks and schedules
+* Hardware specifications and limitations
+* Frequently used tools and commands
 
 When you notice important evolving preferences, update the USER.md file via
 GitLab MCP to maintain long-term context.

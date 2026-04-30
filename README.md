@@ -1,6 +1,6 @@
 # 🚀 OpenClaw Multi-Agent Bootstrapper
 
-Welcome to OpenClaw! This tool automatically sets up a team of AI assistants on your computer. They will live securely on your server but communicate with you directly and privately through Telegram. 
+Welcome to OpenClaw! This tool automatically sets up a team of AI assistants on your computer. They will live securely on your server but communicate with you directly and privately through Telegram.
 
 If you are new to self-hosted AI, don't worry. This guide is designed for anyone with basic command-line experience. The setup script does the heavy lifting for you!
 
@@ -21,10 +21,11 @@ If you are new to self-hosted AI, don't worry. This guide is designed for anyone
 ## 🧠 AI Concepts (Jargon Buster)
 
 Before we start, here are a few terms you'll see in the installer:
+
 - **Agents**: Think of these as your digital employees. You will have three: an **Assistant** (general tasks), a **Research Agent** (web searching), and a **Developer** (coding).
 - **LLM / Model**: The "brain" powering the agent. Examples are OpenAI's GPT-4o or Anthropic's Claude.
 - **Embedding Model**: A special AI tool that helps your agents search through their memory of your past conversations.
-- **Remote vs. Local**: 
+- **Remote vs. Local**:
   - *Remote APIs*: Your agents use cloud services like OpenAI or Anthropic (**Recommended for beginners**).
   - *Local Inference*: Your agents use a powerful graphics card (GPU) on your own server to run the AI completely privately (Advanced).
 
@@ -33,20 +34,25 @@ Before we start, here are a few terms you'll see in the installer:
 ## 📋 Checklist: What You Need Before Starting
 
 ### 1. Telegram Bots (Required)
+
 Each of your three agents needs its own Telegram bot so it can message you securely.
+
 1. Open Telegram and search for [**@BotFather**](https://t.me/BotFather).
 2. Send the message `/newbot` and follow the prompts to create your first bot (e.g., "My Assistant").
 3. Copy the **HTTP API Token** it gives you.
 4. Repeat this two more times for your "Research Agent" and "Developer" bots. Keep these three unique tokens handy!
 
 ### 2. Choose Your AI "Brains" (Remote APIs)
+
 For beginners, we highly recommend using Remote APIs. You will need an API key from at least one of these providers:
+
 - **OpenAI** (platform.openai.com)
 - **Anthropic** (console.anthropic.com)
 
 *Note: The setup script will ask for model tags. We provide default tags (like `openai/gpt-4o`) that you can just accept by pressing Enter during the script.*
 
 ### 3. Optional Extras
+
 - **Brave Search API Key**: Lets your Research agent search the live internet (Free at brave.com/search/api).
 - **GitLab Token**: Lets your Developer agent read/write code from GitLab.
 
@@ -81,11 +87,13 @@ chmod +x oc-bootstrap.sh
 If you chose to use Remote API providers (OpenAI, Anthropic) instead of local inference during setup, you'll need to provide your API keys before starting the gateway.
 
 Run the OpenClaw onboarding wizard to enter your keys:
+
 ```bash
 openclaw onboarding
 ```
 
 Once configured, start the gateway:
+
 ```bash
 openclaw gateway start
 ```
@@ -95,6 +103,7 @@ openclaw gateway start
 ## 🛠️ What the Script Actually Does
 
 Behind the scenes, the installer handles the complicated parts for you:
+
 1. **Installs Requirements**: Safely downloads Node.js, `curl`, and the OpenClaw software.
 2. **Secures Passwords**: Saves your Telegram tokens safely on your machine.
 3. **Builds Workspaces**: Creates isolated folders (`~/.openclaw/workspace-*`) so your agents don't accidentally mix up their files or memories.
@@ -109,11 +118,13 @@ Congratulations! Your OpenClaw agents are now set up. Here's how to start using 
 ### 1. Start Chatting on Telegram
 
 Open Telegram and find the three bots you created earlier. Each bot represents one of your agents:
+
 - **Assistant Bot** - Your general-purpose helper for daily tasks
 - **Research Bot** - Your web research specialist
 - **Developer Bot** - Your coding and technical expert
 
 Just send a message to any bot to start! Try:
+
 - "What can you help me with?"
 - "Search for the latest news about AI"
 - "Help me write a Python script to..."
@@ -135,6 +146,7 @@ See the example files in this repository's subdirectories (assistant/, research/
 ### 3. Monitor Agent Activity
 
 Check what your agents are doing:
+
 ```bash
 # View gateway status
 openclaw gateway status
@@ -188,12 +200,14 @@ If you want 100% privacy and zero cloud usage, you can run the AI brains on your
 ### Setup on Linux (Ubuntu 24.04)
 
 1. **Clone the Lemonade repository:**
+
    ```bash
    git clone https://github.com/lemonade-ai/lemonade-server.git
    cd lemonade-server
    ```
 
 2. **Install dependencies:**
+
    ```bash
    # For AMD ROCm support (adjust for NVIDIA if needed)
    sudo apt install -y rocm-core rocm-libs
@@ -202,6 +216,7 @@ If you want 100% privacy and zero cloud usage, you can run the AI brains on your
    ```
 
 3. **Download a model:**
+
    ```bash
    mkdir -p models/huggingface.co/user.model-name/
 
@@ -211,6 +226,7 @@ If you want 100% privacy and zero cloud usage, you can run the AI brains on your
    ```
 
 4. **Start the server:**
+
    ```bash
    HSA_OVERRIDE_GFX_VERSION=11.0 python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ./models
    ```
