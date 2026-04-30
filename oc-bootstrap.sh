@@ -297,13 +297,25 @@ read -r -p "Proceed with installation? (Y/n) " CONFIRM </dev/tty
 # 3. Credential Collection
 # ==============================================================================
 echo ""
-echo "=== Infrastructure Credentials ==="
-read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
-LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
+echo "=== Inference Backend ==="
+read -r -p "Will you use local inference via Lemonade Server or remote API providers (e.g., OpenAI, Anthropic)? [L/r]: " USE_REMOTE </dev/tty
+if [[ "${USE_REMOTE^^}" == "R" ]]; then
+    LOCAL_INFERENCE=false
+    LEMONADE_KEY=""
+    echo "  [OK] Remote API Providers selected."
+else
+    LOCAL_INFERENCE=true
+    read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
+    LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
+fi
 
 echo ""
 echo "=== Model Selection ==="
-echo "Paste the Lemonade tags for your local models (e.g., lemonade/user.Qwen3.5-4B-GGUF)."
+if [[ "$LOCAL_INFERENCE" == true ]]; then
+    echo "Paste the Lemonade tags for your local models (e.g., lemonade/user.Qwen3.5-4B-GGUF)."
+else
+    echo "Paste the provider tags for your remote models (e.g., openai/gpt-4o, anthropic/claude-3-sonnet)."
+fi
 echo ""
 
 while [[ -z "$EMBEDDING_MODEL" ]]; do
@@ -403,7 +415,11 @@ X_API_KEY="${X_API_KEY:-}"
 
 echo ""
 echo "=== Credential Collection Summary ==="
-echo "[OK] Lemonade Server API Key: Configured"
+if [[ "$LOCAL_INFERENCE" == true ]]; then
+    echo "[OK] Lemonade Server API Key: Configured"
+else
+    echo "[OK] Inference Backend: Remote API Providers"
+fi
 echo "[OK] Assistant Telegram Bot Token: Configured"
 echo "[OK] Research Telegram Bot Token: Configured"
 echo "[OK] Developer Telegram Bot Token: Configured"
@@ -450,6 +466,7 @@ SECRETS_FILE="$HOME/.openclaw/secrets.env"
 # special characters (spaces, $, !, etc.) when the file is later sourced.
 write_secrets_file() {
     {
+        printf 'LOCAL_INFERENCE=%q\n' "$LOCAL_INFERENCE"
         printf 'LEMONADE_KEY=%q\n' "$LEMONADE_KEY"
         printf 'EMBEDDING_MODEL=%q\n' "$EMBEDDING_MODEL"
         printf 'ASSISTANT_MODEL=%q\n' "$ASSISTANT_MODEL"
@@ -572,33 +589,40 @@ print_section_summary "System Preparation" \
     "Health check completed"
 
 # ==============================================================================
-# 6. Configure Local Inference (Lemonade Server)
+# 6. Configure Inference Backend
 # ==============================================================================
 echo ""
-echo "=== Linking Lemonade Server Backend ==="
+if [[ "$LOCAL_INFERENCE" == true ]]; then
+    echo "=== Linking Lemonade Server Backend ==="
 
-LEMONADE_IP=""
-while true; do
-    read -r -p "Enter Lemonade server IP address (e.g., 192.168.12.50): " LEMONADE_IP </dev/tty
-    if valid_ipv4 "$LEMONADE_IP"; then
-        break
-    else
-        echo "[ERROR] Invalid IP address format. Please try again."
-    fi
-done
+    LEMONADE_IP=""
+    while true; do
+        read -r -p "Enter Lemonade server IP address (e.g., 192.168.12.50): " LEMONADE_IP </dev/tty
+        if valid_ipv4 "$LEMONADE_IP"; then
+            break
+        else
+            echo "[ERROR] Invalid IP address format. Please try again."
+        fi
+    done
 
-BASE_URL="http://${LEMONADE_IP}:8000/v1"
-read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL </dev/tty
-[[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
+    BASE_URL="http://${LEMONADE_IP}:8000/v1"
+    read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL </dev/tty
+    [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
 
-openclaw config set providers.lemonade.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set Lemonade base URL." $E_CONFIG
-openclaw config set providers.lemonade.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set Lemonade API key." $E_CONFIG
+    openclaw config set providers.lemonade.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set Lemonade base URL." $E_CONFIG
+    openclaw config set providers.lemonade.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set Lemonade API key." $E_CONFIG
+else
+    echo "=== Skipping Local Inference Backend Linking ==="
+    echo "[INFO] Using remote API providers."
+fi
 
 echo "Configuring shared embedding and dreaming models..."
 openclaw config set memory.dreaming.model "$ASSISTANT_MODEL" || echo "[WARN] Failed to set dreaming model."
 openclaw config set memory.embeddingModel "$EMBEDDING_MODEL" || echo "[WARN] Failed to set embedding model."
 
-echo "[OK] Lemonade Server backend configured"
+if [[ "$LOCAL_INFERENCE" == true ]]; then
+    echo "[OK] Lemonade Server backend configured"
+fi
 
 # ==============================================================================
 # 7. Provision Isolated Agent Workspaces
@@ -747,12 +771,19 @@ total_tasks=${#memory_tasks[@]}
 # Task 1
 progress_bar "$total_tasks" 1
 echo "Configuring memory search embedding provider..."
-openclaw config set agents.defaults.memorySearch.provider "openai" || handle_error_or_warn "Failed to set memory search provider." $E_CONFIG
-# Strip provider prefix (e.g. lemonade/) because the openai provider expects a raw model name
-CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
-openclaw config set agents.defaults.memorySearch.model "$CLEAN_EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
-openclaw config set agents.defaults.memorySearch.remote.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set memory search base URL." $E_CONFIG
-openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set memory search API key." $E_CONFIG
+if [[ "$LOCAL_INFERENCE" == true ]]; then
+    openclaw config set agents.defaults.memorySearch.provider "openai" || handle_error_or_warn "Failed to set memory search provider." $E_CONFIG
+    # Strip provider prefix (e.g. lemonade/) because the openai provider expects a raw model name
+    CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
+    openclaw config set agents.defaults.memorySearch.model "$CLEAN_EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
+    openclaw config set agents.defaults.memorySearch.remote.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set memory search base URL." $E_CONFIG
+    openclaw config set agents.defaults.memorySearch.remote.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set memory search API key." $E_CONFIG
+else
+    MEM_PROVIDER="${EMBEDDING_MODEL%%/*}"
+    CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
+    openclaw config set agents.defaults.memorySearch.provider "$MEM_PROVIDER" || handle_error_or_warn "Failed to set memory search provider." $E_CONFIG
+    openclaw config set agents.defaults.memorySearch.model "$CLEAN_EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
+fi
 
 # Task 2
 progress_bar "$total_tasks" 2
@@ -922,22 +953,36 @@ fi
 # 13. Start & Verify Gateway
 # ==============================================================================
 echo ""
-echo "=== Starting OpenClaw Gateway ==="
+if [[ "$LOCAL_INFERENCE" == true ]]; then
+    echo "=== Starting OpenClaw Gateway ==="
 
-if ! openclaw gateway start; then
-    handle_error_or_warn "Failed to start OpenClaw gateway." $E_GATEWAY
+    if ! openclaw gateway start; then
+        handle_error_or_warn "Failed to start OpenClaw gateway." $E_GATEWAY
+    fi
+
+    echo "Waiting $STABILITY_DELAY seconds for gateway to stabilize..."
+    sleep "$STABILITY_DELAY"
+
+    if ! openclaw gateway status; then
+        handle_error_or_warn "Gateway status check failed after start." $E_GATEWAY
+    fi
+
+    print_section_summary "Gateway Startup" \
+        "OpenClaw gateway started successfully" \
+        "Gateway stability check passed"
+else
+    echo "=== Remote API Providers Setup ==="
+    echo "You have chosen to use remote API providers. To configure your keys,"
+    echo "you must run the OpenClaw onboarding tool before starting the gateway:"
+    echo ""
+    echo "    openclaw onboarding"
+    echo ""
+    echo "After completing the onboarding process, start the gateway with:"
+    echo "    openclaw gateway start"
+    echo ""
+    print_section_summary "Gateway Startup" \
+        "Gateway start deferred pending openclaw onboarding"
 fi
-
-echo "Waiting $STABILITY_DELAY seconds for gateway to stabilize..."
-sleep "$STABILITY_DELAY"
-
-if ! openclaw gateway status; then
-    handle_error_or_warn "Gateway status check failed after start." $E_GATEWAY
-fi
-
-print_section_summary "Gateway Startup" \
-    "OpenClaw gateway started successfully" \
-    "Gateway stability check passed"
 
 # ==============================================================================
 # 14. Final Verification
@@ -950,7 +995,11 @@ openclaw agents list --bindings || echo "[WARN] Could not retrieve agent binding
 
 echo ""
 echo "Checking memory index status..."
-openclaw memory status || echo "[WARN] Could not retrieve memory status. Indexing may still be in progress."
+if [[ "$LOCAL_INFERENCE" == true ]]; then
+    openclaw memory status || echo "[WARN] Could not retrieve memory status. Indexing may still be in progress."
+else
+    echo "[INFO] Gateway not started. Memory indexing will begin after gateway starts."
+fi
 
 print_section_summary "Final Verification" \
     "Agent binding matrix verified" \
@@ -971,7 +1020,11 @@ echo "  - Research:             $HOME/.openclaw/workspace-research"
 echo "  - Developer:            $HOME/.openclaw/workspace-developer"
 echo ""
 echo "Configuration:"
-echo "  - Inference Backend:    Lemonade Server ($BASE_URL)"
+if [[ "$LOCAL_INFERENCE" == true ]]; then
+    echo "  - Inference Backend:    Lemonade Server ($BASE_URL)"
+else
+    echo "  - Inference Backend:    Remote API Providers"
+fi
 echo "  - Assistant Model:      $ASSISTANT_MODEL"
 echo "  - Research Model:       $RESEARCH_MODEL"
 echo "  - Developer Model:      $DEVELOPER_MODEL"

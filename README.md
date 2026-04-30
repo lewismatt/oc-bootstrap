@@ -22,7 +22,7 @@
 | Component               | Description                                                                         |
 |:------------------------|:--------------------------------------------------------------------------------------|
 | **💻 Host**                | Ubuntu 24.04 (bare-metal)                                                             |
-| **🧠 Inference Backend**   | Local [Lemonade Server](https://lemonade.ai) running GGUF models via AMD ROCm         |
+| **🧠 Inference Backend**   | Local [Lemonade Server](https://lemonade.ai) OR Remote APIs (OpenAI, Anthropic)         |
 | **🤖 Agent: Assistant**    | User-defined LLM                                                                      |
 | **🔍 Agent: Research**     | User-defined LLM                                                                      |
 | **💻 Agent: Developer**    | User-defined LLM                                                                      |
@@ -36,7 +36,7 @@
 | Integration                  | Why it's needed                                          | How to obtain                                                                                                                                                       |
 |:-----------------------------|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **💬 Telegram** (required)      | Three distinct bots keep each agent's context isolated.  | Message [**@BotFather**](https://t.me/BotFather) -> `/newbot` three times -> copy the HTTP API tokens.                                                                                        |
-| **🍋 Lemonade Server** (required) | Provides local inference.                                | Run a [Lemonade instance](https://lemonade.ai). The script will prompt you for the server IP and the model tags you wish to use for each agent. **CRITICAL:** Ensure your chosen models are downloaded and staged on the server. |
+| **🍋 Lemonade Server** (optional) | Provides local inference.                                | Run a [Lemonade instance](https://lemonade.ai). If using local inference, the script will prompt you for the server IP and model tags. If you select remote APIs (e.g. OpenAI), you will use the OpenClaw onboarding tool instead. |
 | **🦊 GitLab PAT** (optional)    | Allows all agents to read/write to a shared codebase.   | Create a [Personal Access Token](https://gitlab.com/-/profile/personal_access_tokens) with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
 | **🦁 Brave Search** (optional)  | Powers live web searches for the Research agent.         | Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).                                                                         |
 | **🐦 X/Twitter** (optional)     | Enables real-time trend scraping for the Research agent. | Obtain an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).                                                                 |
@@ -227,8 +227,9 @@ chmod +x oc-bootstrap.sh
    validates Telegram tokens against the Telegram API, and prevents duplicate token usage.
    Checks for existing secrets file and prompts before overwriting.
 3. **👥 Provisions Agents** - Creates isolated workspaces (`~/.openclaw/workspace-*`) for
-   Assistant, Research, and Developer agents, then prompts for the Lemonade server IP
-   and your preferred model tags, configuring all inference endpoints accordingly.
+   Assistant, Research, and Developer agents, then prompts for your preferred model tags
+   (Lemonade or remote API providers). If you use local inference, it auto-configures Lemonade;
+   otherwise, it instructs you to run `openclaw onboarding`.
 4. **🔌 Binds Skills and Hooks**:
     - Adds live-scraping skills to the Research agent (webSearch, webScrape, newsSearch,
       rssReader, trendsFinder, xScraper).
@@ -247,7 +248,7 @@ chmod +x oc-bootstrap.sh
 
 | Symptom | Likely Cause | Fix |
 |:---|:---|:---|
-| **Agents unresponsive via Telegram** | Lemonade server missing models or not reachable. | Verify the server is running and your chosen models are downloaded. |
+| **Agents unresponsive via Telegram** | Missing models or unconfigured remote APIs. | Verify Lemonade is running with models, or run `openclaw onboarding` for remote APIs. |
 | **"Conflict: terminated by other getUpdates request"** | Same Telegram token used for multiple agents. | Re-run the setup and provide three **unique** bot tokens. |
 | **Ghost daemon processes** | Previous run left a PM2 daemon alive. | Run `openclaw gateway stop && npx pm2 kill`, then restart the installer. |
 | **MCP server errors** | Node version too old for `@zereight/mcp-gitlab`. | Ensure Node >= 18 (`node -v`). The script will try to install Node 20 automatically, but you may need to resolve version conflicts manually. |
