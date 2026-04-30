@@ -6,10 +6,12 @@ on:
     branches:
       - main
       - development
+      - docker
   pull_request:
     branches:
       - main
       - development
+      - docker
 
 jobs:
   lint:
