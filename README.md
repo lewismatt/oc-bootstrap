@@ -1,253 +1,556 @@
-# 🚀 OpenClaw Multi-Agent Bootstrapper
+# 🚀 OpenClaw Multi-Agent Bootstrap
 
-Welcome to OpenClaw! This tool automatically sets up a team of AI assistants on your computer.
-They will live securely on your server but communicate with you directly and privately through Telegram.
-
-If you are new to self-hosted AI, don't worry. This guide is designed for anyone with basic command-line
-experience. The setup script does the heavy lifting for you!
+Automated setup for OpenClaw AI agents on Ubuntu 24.04. Deploy three specialized AI assistants that work securely on your server and communicate with you privately through Telegram.
 
 ---
 
-## 🗺️ Table of Contents
+## 📖 Table of Contents
 
-- [🧠 AI Concepts (Jargon Buster)](#-ai-concepts-jargon-buster)
-- [📋 Checklist: What You Need Before Starting](#-checklist-what-you-need-before-starting)
-- [⚡ Quick-Start and Installation](#-quick-start-and-installation)
-- [🛠️ What the Script Actually Does](#%EF%B8%8F-what-the-script-actually-does)
-- [🎯 Next Steps: Using Your Agents](#-next-steps-using-your-agents)
-- [❓ Troubleshooting](#-troubleshooting)
-- [🍋 Advanced: Local AI with Lemonade Server](#-advanced-local-ai-with-lemonade-server)
-
----
-
-## 🧠 AI Concepts (Jargon Buster)
-
-Before we start, here are a few terms you'll see in the installer:
-
-- **Agents**: Think of these as your digital employees. You will have three: an **Assistant** (general tasks), a **Research Agent** (web searching), and a **Developer** (coding).
-- **LLM / Model**: The "brain" powering the agent. Examples are OpenAI's GPT-4o or Anthropic's Claude.
-- **Embedding Model**: A special AI tool that helps your agents search through their memory of your past
-  conversations.
-- **Remote vs. Local**:
-  - *Remote APIs*: Your agents use cloud services like OpenAI or Anthropic (**Recommended for beginners**).
-  - *Local Inference*: Your agents use a powerful graphics card (GPU) on your own server to run the AI
-    completely privately (Advanced).
+1. [Overview](#-overview)
+2. [Architecture](#%EF%B8%8F-architecture)
+3. [Prerequisites Checklist](#-prerequisites-checklist)
+4. [Installation](#-installation)
+5. [Configuration](#-configuration)
+6. [After Installation](#-after-installation)
+7. [Troubleshooting](#-troubleshooting)
+8. [Advanced Topics](#-advanced-topics)
+9. [Project Structure](#-project-structure)
 
 ---
 
-## 📋 Checklist: What You Need Before Starting
+## 🎯 Overview
 
-### 1. Telegram Bots (Required)
+**OpenClaw** is a self-hosted multi-agent AI platform. This bootstrap script automates the complex setup process so you can get started in minutes.
 
-Each of your three agents needs its own Telegram bot so it can message you securely.
+### What You Get
 
-1. Open Telegram and search for [**@BotFather**](https://t.me/BotFather).
-2. Send the message `/newbot` and follow the prompts to create your first bot (e.g., "My Assistant").
-3. Copy the **HTTP API Token** it gives you.
-4. Repeat this two more times for your "Research Agent" and "Developer" bots. Keep these three unique tokens
-   handy! (You'll enter them during the script, or you can paste them into a `.env` file for an automated setup).
+| Agent | Purpose | Example Tasks |
+|-------|---------|----------------|
+| **Assistant** | General-purpose AI helper | Answer questions, brainstorm, summarize text |
+| **Research** | Web research specialist | Search the internet, scrape news, analyze trends |
+| **Developer** | Coding expert | Write code, debug, read repositories |
 
-### 2. Choose Your AI "Brains" (Remote APIs)
-
-For beginners, we highly recommend using Remote APIs. You will need an API key from at least one of these
-providers:
-
-- **OpenAI** (platform.openai.com)
-- **Anthropic** (console.anthropic.com)
-
-*Note: The setup script will ask for model tags. We provide default tags (like `openai/gpt-4o`) that you can
-just accept by pressing Enter during the script.*
-
-### 3. Optional Extras
-
-- **Brave Search API Key**: Lets your Research agent search the live internet (Free at brave.com/search/api).
-- **GitHub/GitLab Token**: Lets your Developer agent read/write code from your repositories.
+All three agents:
+- Run securely on your own server (no data sent to external services unless you configure APIs)
+- Communicate privately via Telegram
+- Use isolated workspaces with separate memories
+- Support both local and cloud-based AI models
 
 ---
 
-## ⚡ Quick-Start and Installation
+## 🏗️ Architecture
 
-### 📋 Prerequisites
+### System Overview
 
-- Ubuntu 24.04 with a regular (non-root) user.
-- `git` installed (`sudo apt install git`).
+```
+┌─────────────────────────────────────────────────────────┐
+│         Your Ubuntu 24.04 Server                         │
+├─────────────────────────────────────────────────────────┤
+│                                                           │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │         OpenClaw Gateway                           │  │
+│  │  (Central routing, memory indexing, config)        │  │
+│  └────────────────────────────────────────────────────┘  │
+│           ↓            ↓            ↓                     │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐      │
+│  │ Assistant    │ │ Research     │ │ Developer    │      │
+│  │ Agent        │ │ Agent        │ │ Agent        │      │
+│  │              │ │              │ │              │      │
+│  │ Model: GPT4o │ │ Model: GPT4o │ │ Claude 3.5   │      │
+│  └──────────────┘ └──────────────┘ └──────────────┘      │
+│           ↓            ↓            ↓                     │
+│  ┌──────────────────────────────────────────────────┐    │
+│  │        SQLite Memory Indexes + Vector Search      │    │
+│  │        (~/.openclaw/memory/)                      │    │
+│  └──────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+         ↕                                    ↕
+    Telegram Bot                         API Providers
+    (You)                           (OpenAI, Anthropic, etc.)
+```
 
-> ⚠️ **Do not run the script as root.** The installer will request `sudo` only when
-> necessary.
+### Directory Structure
 
-### 👣 Installation Methods
+```
+~/.openclaw/
+├── logs/                          # Installation and runtime logs
+│   └── openclaw-setup.log
+├── secrets.env                    # Encrypted credentials (chmod 600)
+├── memory/                        # SQLite vector indexes
+│   ├── assistant.sqlite
+│   ├── research.sqlite
+│   └── developer.sqlite
+└── workspace-{agent}/             # Agent-specific workspaces
+    ├── SOUL.md                    # Agent personality & instructions
+    ├── USER.md                    # User preferences & context
+    ├── AGENTS.md                  # Multi-agent collaboration rules
+    └── config/
+```
 
-#### Option A: Interactive Setup (Recommended for beginners)
+---
 
-Follow the guided prompts to set up your agents and models.
+## 📋 Prerequisites Checklist
+
+### 1. System Requirements
+
+- **OS**: Ubuntu 24.04 (bare-metal or WSL2)
+- **User**: Non-root user with `sudo` access
+- **Network**: Stable internet connection (required for setup; agents can work offline after)
+
+### 2. Telegram Bots (Required)
+
+You need **three unique Telegram bot tokens** (one for each agent).
+
+**To create a bot:**
+
+1. Open Telegram and search for [@BotFather](https://t.me/BotFather)
+2. Send `/newbot` and follow the prompts
+3. Copy the **HTTP API Token** (looks like: `110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`)
+4. Repeat 2 more times for total of 3 unique tokens
+
+### 3. Choose Your AI Models (Required)
+
+For beginners, we recommend **Remote APIs** (cloud-based, no GPU needed):
+
+| Provider | Recommended Model | Cost | Setup Time |
+|----------|-------------------|------|------------|
+| **OpenAI** | `openai/gpt-4o` | ~$0.03 per 1K tokens | 5 min (get API key) |
+| **Anthropic** | `anthropic/claude-3-5-sonnet-latest` | ~$0.003 per 1K tokens | 5 min (get API key) |
+| **Local (Lemonade)** | `lemonade/user.Qwen3.5-4B-GGUF` | Free (but needs GPU) | 30 min (setup server) |
+
+> 📌 **Default Configuration**: Assistant and Research use OpenAI GPT-4o; Developer uses Anthropic Claude. You can change these during setup.
+
+### 4. Optional API Keys
+
+These unlock additional features:
+
+| Service | Feature | Cost | Required? |
+|---------|---------|------|-----------|
+| **Brave Search** | Live web search for Research agent | Free tier available | No |
+| **GitHub PAT** | Developer agent can read/write repos | Free | No |
+| **GitLab PAT** | Developer agent can access GitLab | Free | No |
+| **X/Twitter API** | Research agent can scrape posts | $100/month | No |
+
+---
+
+## ⚡ Installation
+
+### Quick Start (Interactive Mode)
+
+**Recommended for first-time users.**
 
 ```bash
-# 1. Clone the repo
+# 1. Clone this repository
 git clone https://github.com/openclaw/oc-bootstrap.git openclaw-setup
 cd openclaw-setup
 
-# 2. Make the scripts executable
+# 2. Make scripts executable
 chmod +x oc-bootstrap.sh install-lemonade.sh
 
 # 3. Run the installer
 ./oc-bootstrap.sh
 ```
 
-#### Option B: Fast/Automated Setup (For advanced users)
+The script will interactively prompt you for:
+- Whether to use local or remote inference
+- Telegram bot tokens
+- Model preferences
+- Optional API keys
 
-Pre-configure everything via a file to skip the interactive prompts.
+**Installation time**: ~5–10 minutes (depending on internet speed)
+
+### Automated Setup (Non-Interactive Mode)
+
+**For advanced users or CI/CD pipelines.**
 
 ```bash
 # 1. Prepare your configuration
 cp .env.template .env
-nano .env  # Fill in your tokens and model choices
+nano .env
+# Fill in your tokens, models, and API keys
 
 # 2. Run non-interactively
 ./oc-bootstrap.sh --config .env --non-interactive
 ```
 
-### 🌍 After Installation: Finalizing API Keys
-
-If you chose to use Remote API providers (OpenAI, Anthropic) and didn't start the gateway during the setup
-script, you'll need to provide your API keys first.
-
-1. **Run the onboarding wizard** to enter your keys:
-
-   ```bash
-   openclaw onboarding
-   ```
-
-2. **Start the gateway**:
-
-   ```bash
-   openclaw gateway start
-   ```
-
-3. **Check the status**:
-
-   ```bash
-   openclaw gateway status
-   ```
-
 ---
 
-## 🛠️ What the Script Actually Does
+## 🛠️ Configuration
 
-Behind the scenes, the installer handles the complicated parts for you:
+### Configuration File Format (.env)
 
-1. **Installs Requirements**: Safely downloads Node.js, `curl`, and the OpenClaw software.
-2. **Secures Passwords**: Saves your Telegram tokens safely on your machine.
-3. **Builds Workspaces**: Creates isolated folders (`~/.openclaw/workspace-*`) so your agents don't
-   accidentally mix up their files or memories.
-4. **Teaches Skills**: Gives your Research agent the ability to read websites and your Developer agent the
-   ability to write code.
-
----
-
-## 🎯 Next Steps: Using Your Agents
-
-Congratulations! Your OpenClaw agents are now set up. Here's how to start using them:
-
-### 1. Start Chatting on Telegram
-
-Open Telegram and find the three bots you created earlier. Each bot represents one of your agents:
-
-- **Assistant Bot** - Your general-purpose helper for daily tasks
-- **Research Bot** - Your web research specialist
-- **Developer Bot** - Your coding and technical expert
-
-Just send a message to any bot to start! Try:
-
-- "What can you help me with?"
-- "Search for the latest news about AI"
-- "Help me write a Python script to..."
-
-### 2. Customize Agent Personalities
-
-You can personalize each agent by editing their prompt files. Your Assistant will even try to learn your
-preferences and update your `USER.md` automatically!
+The `--config` file uses standard bash variable syntax:
 
 ```bash
-# Edit the Assistant's core personality
-nano ~/.openclaw/workspace-assistant/SOUL.md
+# === Inference Backend ===
+LOCAL_INFERENCE=false                    # Use local Lemonade (true/false)
+LEMONADE_KEY="local-dummy-key"           # Only needed if LOCAL_INFERENCE=true
+LEMONADE_IP="192.168.1.100"              # IP of Lemonade server (if local)
 
-# Update your personal profile (Hardware, Schedule, Preferences)
-nano ~/.openclaw/workspace-assistant/USER.md
+# === Model Selection ===
+EMBEDDING_MODEL="openai/text-embedding-3-small"
+ASSISTANT_MODEL="openai/gpt-4o"
+RESEARCH_MODEL="openai/gpt-4o"
+DEVELOPER_MODEL="anthropic/claude-3-5-sonnet-latest"
+
+# === Telegram Bot Tokens ===
+ASSISTANT_TOKEN="110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw"
+RESEARCH_TOKEN="110201544:BBIjfRhfDG2jHXKyGDjkrBbtbDL1MAkLbx"
+DEVELOPER_TOKEN="110201545:CChJkSlhEJ3kJYLzHEklsCcuCEM2NBmMcy"
+
+# === API Credentials (Optional) ===
+GITHUB_PAT="ghp_YOUR_GITHUB_TOKEN_HERE"
+GITLAB_PAT="glpat-YOUR_GITLAB_TOKEN_HERE"
+BRAVE_API_KEY="YOUR_BRAVE_API_KEY_HERE"
+X_API_KEY="YOUR_X_BEARER_TOKEN_HERE"
 ```
 
-See the example files in this repository's subdirectories (`assistant/`, `research/`, `developer/`) for
-inspiration.
+### Environment Variables
 
-### 3. Monitor Agent Activity
-
-Check what your agents are doing:
+You can set these before running the script to pre-populate configuration:
 
 ```bash
-# View gateway status
+export ASSISTANT_TOKEN="..."
+export RESEARCH_TOKEN="..."
+export DEVELOPER_TOKEN="..."
+./oc-bootstrap.sh
+```
+
+---
+
+## 🎯 After Installation
+
+### Starting the Gateway
+
+If the installer didn't start the gateway for you:
+
+```bash
+openclaw gateway start
+```
+
+Check the status:
+
+```bash
 openclaw gateway status
+```
 
-# View agent logs
-openclaw logs --agent assistant
+### Configuring API Keys (if not done during setup)
 
-# Check memory indexing progress
+```bash
+openclaw onboarding
+```
+
+This interactive wizard will walk you through entering:
+- OpenAI API key
+- Anthropic API key
+- Other provider credentials
+
+### Communicating with Your Agents
+
+Once the gateway is running, message your agents on Telegram:
+
+**Example conversation with Assistant:**
+
+```
+You:        "What's the capital of France?"
+Assistant:  "The capital of France is Paris..."
+
+You:        "Search the web for latest AI news"
+You:        "@research_bot search: latest AI trends 2025"
+Research:   "Here are the latest developments in AI..."
+
+You:        "@developer_bot write a Python function to sort a list"
+Developer:  "Here's a Python function..."
+```
+
+### Checking Agent Status
+
+```bash
+openclaw agents list --bindings
+```
+
+### Viewing Memory & Search
+
+```bash
 openclaw memory status
 ```
 
-### 4. Manage Your Setup
-
-```bash
-# Restart the gateway
-openclaw gateway restart
-
-# Stop the gateway
-openclaw gateway stop
-
-# Update agent configuration
-openclaw config set agents.list.assistant.model "anthropic/claude-3-5-sonnet-latest"
-
-# Re-run onboarding to update API keys
-openclaw onboarding
-```
+Shows:
+- Number of indexed memories per agent
+- Vector search index size
+- Last indexing time
 
 ---
 
 ## ❓ Troubleshooting
 
-| Problem                                           | Likely Cause                                            | How to Fix                                                                                                         |
-| :------------------------------------------------ | :------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------- |
-| **Agents won't reply on Telegram**                | Missing API keys or gateway isn't running.              | Run `openclaw onboarding` to add API keys, then `openclaw gateway start`.<br>Check status with `openclaw gateway status`. |
-| **"Conflict: terminated by other getUpdates request"** | You gave the exact same Telegram token to multiple agents. | Each agent needs a unique bot token.<br>Re-run `./oc-bootstrap.sh` and create three different bots in @BotFather.    |
-| **"Model not found" error**                       | Invalid model tag or missing API key for that provider. | Check model tags: `openclaw config get agents.list.<agent>.model`.<br>Ensure API keys are set with `openclaw onboarding`. |
-| **Slow or no responses**                          | Memory indexing still in progress, or local model overloaded. | Check `openclaw memory status`.<br>For local inference, reduce concurrent requests or upgrade model.                    |
-| **Gateway won't start**                           | Port conflict or configuration error.                   | Check logs at `~/.openclaw/logs/`.<br>Try `openclaw gateway stop` then restart.<br>Verify config with `openclaw config list`. |
-| **Agent forgot conversation context**             | Session memory not yet indexed.                         | Wait for background indexing to complete.<br>Check `openclaw memory status` for progress.                             |
-| **Permission denied errors**                      | Script run as root or workspace permissions incorrect.  | Never run as root. Fix permissions: `chown -R $USER:$USER ~/.openclaw`                                             |
-| **Cannot connect to Lemonade server**             | Server not running or wrong IP/port.                    | Verify Lemonade is running: `curl http://YOUR_IP:8000/v1/models`.<br>Check IP in config: `openclaw config get providers.lemonade.baseUrl` |
+### Script Fails During Installation
 
----
+**Problem**: `[ERROR] Missing required system tools`
 
-## 🍋 Advanced: Local AI with Lemonade Server
-
-*Skip this section unless you have a dedicated server with a powerful graphics card
-(12+ GB VRAM).*
-
-If you want 100% privacy and zero cloud usage, you can run the AI brains on your own hardware using
-**Lemonade Server**. We provide a helper script to automate the installation:
-
+**Solution**:
 ```bash
-# Run the Lemonade installer
-./install-lemonade.sh
+sudo apt update
+sudo apt install -y curl git build-essential
+./oc-bootstrap.sh
 ```
 
-The script will:
+---
 
-1. Clone the Lemonade Server repository.
-2. Detect your GPU (AMD or NVIDIA) and install dependencies.
-3. Help you download recommended models (Qwen2.5 and Nomic Embed).
-4. Create a `start-lemonade.sh` script for you.
+### Telegram Token Validation Fails
 
-Once Lemonade is running, re-run `./oc-bootstrap.sh` and choose "Yes" for Local Inference.
+**Problem**: `[ERROR] Invalid token (401 Unauthorized)`
+
+**Causes**:
+- Token is typo'd or incomplete
+- Token was already revoked (copy a new one from @BotFather)
+- Internet connectivity issue
+
+**Solution**:
+1. Open Telegram → @BotFather
+2. Send `/mybots` and select your bot
+3. Choose "API Token" → "Regenerate token"
+4. Copy the new token and re-run the script
 
 ---
 
-*Happy bootstrapping! ✨*
+### Gateway Won't Start
+
+**Problem**: `openclaw gateway start` times out
+
+**Causes**:
+- API keys are misconfigured
+- Port 8080 is already in use
+- Firewall blocking localhost connections
+
+**Solution**:
+```bash
+# Check for port conflicts
+sudo lsof -i :8080
+
+# Reconfigure API keys
+openclaw onboarding
+
+# Check logs
+cat ~/.openclaw/logs/openclaw-setup.log
+
+# Try starting with verbose output
+openclaw gateway start --verbose
+```
+
+---
+
+### Agents Not Responding on Telegram
+
+**Problem**: Telegram bots receive messages but don't reply
+
+**Causes**:
+- Gateway is not running
+- Telegram tokens were not bound correctly
+- Agent workspace has no SOUL.md (personality instructions)
+
+**Solution**:
+```bash
+# Verify gateway is running
+openclaw gateway status
+
+# Re-bind Telegram channels
+openclaw agents unbind --agent assistant --all
+openclaw agents bind --agent assistant --bind "telegram:YOUR_TOKEN_HERE"
+
+# Check agent logs
+openclaw agents logs assistant
+```
+
+---
+
+## 🍋 Advanced Topics
+
+### Using Local Inference (Lemonade Server)
+
+For complete privacy, run OpenClaw with a local Lemonade Server instead of cloud APIs.
+
+**Requirements**:
+- NVIDIA GPU (RTX 4060 or better recommended)
+- 20+ GB disk space
+- 8+ GB VRAM
+
+**Setup**:
+```bash
+./install-lemonade.sh
+# Follow prompts to select model and GPU
+
+# Once server is running, bootstrap agents:
+./oc-bootstrap.sh --config .env
+# When prompted, set LOCAL_INFERENCE=true
+```
+
+See [Lemonade Server Documentation](https://lemonade.ai/docs) for details.
+
+---
+
+### Managing Agent Personalities
+
+Each agent's behavior is controlled by prompt files in its workspace:
+
+- **SOUL.md** — Agent's core instructions and personality
+- **USER.md** — Your preferences and context
+- **AGENTS.md** — Multi-agent collaboration rules
+
+To customize an agent:
+
+```bash
+nano ~/.openclaw/workspace-assistant/SOUL.md
+# Edit and save
+
+# Reload configuration
+openclaw agents reload assistant
+```
+
+---
+
+### Accessing Agent Memories
+
+Vector memories are stored in SQLite with embeddings:
+
+```bash
+# View memory statistics
+openclaw memory status
+
+# Search agent memory
+openclaw memory search --agent assistant --query "previous conversations about Python"
+
+# Export memory for backup
+openclaw memory export --agent assistant > assistant-memory.json
+```
+
+---
+
+### Systemd Service (Optional)
+
+To auto-start the gateway on boot:
+
+```bash
+sudo tee /etc/systemd/system/openclaw.service > /dev/null <<EOF
+[Unit]
+Description=OpenClaw Gateway
+After=network.target
+
+[Service]
+Type=simple
+User=$(whoami)
+ExecStart=$(which openclaw) gateway start
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable openclaw
+sudo systemctl start openclaw
+```
+
+Check status:
+```bash
+sudo systemctl status openclaw
+```
+
+---
+
+### Backing Up Your Configuration
+
+Your agents' memories and settings are stored locally:
+
+```bash
+# Backup everything
+tar -czf openclaw-backup.tar.gz ~/.openclaw/
+
+# Restore from backup
+tar -xzf openclaw-backup.tar.gz -C ~/
+```
+
+> ⚠️ **Important**: The `secrets.env` file contains credentials. Keep it secure and never commit it to version control.
+
+---
+
+### Monitoring Agent Activity
+
+View real-time logs:
+
+```bash
+# Overall gateway logs
+tail -f ~/.openclaw/logs/openclaw-setup.log
+
+# Agent-specific logs
+openclaw agents logs assistant --follow
+openclaw agents logs research --follow
+openclaw agents logs developer --follow
+```
+
+---
+
+## 📁 Project Structure
+
+```
+oc-bootstrap/
+├── README.md                    # This file
+├── oc-bootstrap.sh              # Main installation script (refactored)
+├── install-lemonade.sh          # Optional: Local LLM setup
+├── lib/
+│   └── helpers.sh               # Reusable bash functions library
+├── assistant/
+│   ├── SOUL.md                  # Assistant personality template
+│   ├── USER.md                  # User preferences template
+│   └── AGENTS.md                # Collaboration rules template
+├── research/
+│   ├── SOUL.md
+│   ├── USER.md
+│   └── AGENTS.md
+├── developer/
+│   ├── SOUL.md
+│   ├── USER.md
+│   └── AGENTS.md
+├── .env.template                # Config file template
+├── .gitignore                   # Don't commit .env or logs
+├── LICENSE                      # MIT License
+└── CHANGELOG                    # Version history
+```
+
+---
+
+## 🤝 Contributing
+
+Found a bug? Have a suggestion? We'd love your help!
+
+1. Check [open issues](https://github.com/openclaw/oc-bootstrap/issues)
+2. Create a new issue with details
+3. Submit a pull request with improvements
+
+---
+
+## 📄 License
+
+MIT License — See [LICENSE](LICENSE) file for details.
+
+---
+
+## ❤️ Support
+
+- **Documentation**: [docs.openclaw.ai](https://docs.openclaw.ai)
+- **Discord Community**: [discord.gg/openclaw](https://discord.gg/openclaw)
+- **GitHub Issues**: [Report a bug](https://github.com/openclaw/oc-bootstrap/issues)
+
+---
+
+## 🗂️ Additional Resources
+
+- [Model Comparison Guide](https://docs.openclaw.ai/models)
+- [API Provider Setup (OpenAI, Anthropic, etc.)](https://docs.openclaw.ai/providers)
+- [Security & Privacy Best Practices](https://docs.openclaw.ai/security)
+- [Performance Tuning](https://docs.openclaw.ai/performance)
+
+---
+
+**Happy bootstrapping! 🚀**
