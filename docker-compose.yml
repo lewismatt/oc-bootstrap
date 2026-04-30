@@ -57,8 +57,25 @@ services:
     
     # Volume mounts for persistence
     volumes:
-      # Persist OpenClaw configuration, memory, and workspaces
-      - openclaw-data:/home/openclaw/.openclaw
+      # --------------------------------------------------------------------------
+      # STORAGE OPTIONS - Configure OPENCLAW_VOLUME in docker-config.env
+      # --------------------------------------------------------------------------
+      
+      # Option 1: Docker Named Volume (Recommended for production)
+      #   Set in docker-config.env: OPENCLAW_VOLUME=openclaw-data:/home/openclaw/.openclaw
+      #   - Portable across OS (Linux/Windows/macOS)
+      #   - Docker manages the storage location
+      #   - Harder to access files directly from host
+      
+      # Option 2: Bind Mount (Easier file access from host)
+      #   Set in docker-config.env: OPENCLAW_VOLUME=/home/youruser/.openclaw:/home/openclaw/.openclaw
+      #   - Example Linux: /home/youruser/.openclaw:/home/openclaw/.openclaw
+      #   - Example Windows: /c/Users/YourUsername/.openclaw:/home/openclaw/.openclaw
+      #   - Example macOS: /Users/youruser/.openclaw:/home/openclaw/.openclaw
+      #   - Note: Ensure host directory exists and has correct permissions
+      
+      - ${OPENCLAW_VOLUME:-openclaw-data:/home/openclaw/.openclaw}
+      
       # Optional: Mount host oc-bootstrap scripts for development
       # - ./:/home/openclaw/oc-bootstrap:ro
     

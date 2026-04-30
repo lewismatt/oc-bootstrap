@@ -296,21 +296,116 @@ nano ~/.openclaw/secrets.env
 
 **Run OpenClaw in a containerized environment** - perfect for testing, isolation, or users who prefer Docker.
 
-### Quick Start with Docker Compose
+> **📢 Non-Root User**: The container runs as `openclaw` user (not root) for security. This works on both Linux and Windows (Docker Desktop).
+
+### Storage Options: Docker Volume vs Bind Mount
+
+You have two options for persisting data (`/home/openclaw/.openclaw` inside container). Configure using `OPENCLAW_VOLUME` in `docker-config.env`.
+
+| Option | Type | Pros | Cons |
+|--------|------|------|------|
+| **Named Volume** (default) | Docker managed | Easy to backup, portable across OS | Harder to access files directly |
+| **Bind Mount** | Host directory | Easy to edit files, see logs directly | Path must exist, permissions matter |
+
+#### Option 1: Named Volume (Default - Recommended)
+
+Uses Docker's named volume `openclaw-data`. Best for production/long-term use.
 
 ```bash
 # 1. Create and configure environment file
 cp docker-config.env.template docker-config.env
 nano docker-config.env  # Add your Telegram bot tokens
+# Ensure OPENCLAW_VOLUME is set to: openclaw-data:/home/openclaw/.openclaw
 
-# 2. Build and start the container
+# 2. Start with named volume
 docker compose up -d
 
 # 3. View logs
 docker compose logs -f
+```
 
-# 4. Stop when done
+**Data location**: Docker manages this volume. To inspect:
+```bash
+# List volumes
+docker volume ls | grep openclaw
+
+# Inspect volume location (Linux)
+docker volume inspect oc-bootstrap_openclaw-data
+```
+
+#### Option 2: Bind Mount (Easier File Access)
+
+Mount a directory from your host machine directly into the container. Great for development or easy file access.
+
+**Step 1: Create host directory**
+
+Linux/macOS:
+```bash
+mkdir -p ~/.openclaw
+```
+
+Windows (Docker Desktop) - PowerShell:
+```powershell
+New-Item -Path "$env:USERPROFILE\.openclaw" -ItemType Directory -Force
+```
+
+**Step 2: Configure `docker-config.env`**
+
+Edit `docker-config.env` and set `OPENCLAW_VOLUME` to your host path:
+
+Linux example:
+```
+OPENCLAW_VOLUME=/home/youruser/.openclaw:/home/openclaw/.openclaw
+```
+
+macOS example:
+```
+OPENCLAW_VOLUME=/Users/youruser/.openclaw:/home/openclaw/.openclaw
+```
+
+Windows example:
+```
+OPENCLAW_VOLUME=/c/Users/YourUsername/.openclaw:/home/openclaw/.openclaw
+```
+
+**Step 3: Fix permissions (Linux only)**
+
+The container runs as `openclaw` user (UID 1000). Ensure the host directory is writable:
+```bash
+sudo chown -R 1000:1000 ~/.openclaw
+```
+
+**Step 4: Start with bind mount**
+```bash
+docker compose up -d
+```
+
+> **⚠️ Permissions**: On Linux, the container user (`openclaw`, UID 1000) must be able to write to the host directory.
+> Windows (Docker Desktop) handles permissions automatically.
+
+### Quick Reference Commands
+
+```bash
+# Start services
+docker compose up -d
+
+# Stop services (keeps volumes)
 docker compose down
+
+# Stop and REMOVE volumes (DESTRUCTIVE - deletes data)
+docker compose down -v
+
+# View logs
+docker compose logs -f
+
+# Check status
+docker compose ps
+
+# Shell access (as non-root openclaw user)
+docker compose exec openclaw bash
+
+# Restart services
+docker compose restart
 ```
 
 ### Docker Management Quick Reference
