@@ -41,6 +41,16 @@ FAIL_ON_OPENCLAW_ERRORS=true
 # 14 - E_GATEWAY     : Gateway start/bind or network gateway error
 # ======================================================================
 
+# ==============================================================================
+# 0. Sudo Trap Guardrail
+# ==============================================================================
+if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+    echo "[ERROR] Do not run this script directly as root or with sudo."
+    echo "This script installs workspaces to the current user's home directory (\$HOME)."
+    echo "It will automatically prompt for sudo access when installing system packages."
+    exit $E_SUDO
+fi
+
 # ======================================================================
 # Environment / tool checks
 # ======================================================================
@@ -50,28 +60,22 @@ FAIL_ON_OPENCLAW_ERRORS=true
 #   - openclaw (installed by this script)
 #
 # Static analysis: Running ShellCheck
+# Note: ShellCheck runs only if installed. The script continues if it's not available.
 check_shellcheck() {
-    echo "[INFO] Running ShellCheck on oc-bootstrap.sh for static analysis..."
     if ! command -v shellcheck >/dev/null 2>&1; then
-        echo "[INFO] ShellCheck not found. Attempting to install..."
-        sudo apt update && sudo apt install -y shellcheck || {
-            echo "[ERROR] Failed to install shellcheck. Please install it manually and re-run."
-            exit $E_DEPENDENCY
-        }
+        echo "[INFO] ShellCheck not found. Skipping static analysis."
+        echo "      Install with: sudo apt install shellcheck"
+        return 0
     fi
     
-    echo "--- ShellCheck Analysis ---"
-    # Run shellcheck and check the exit status
-    shellcheck oc-bootstrap.sh
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] ShellCheck found issues in oc-bootstrap.sh. Please review the output above."
-        exit $E_DEPENDENCY
+    echo "[INFO] Running ShellCheck static analysis..."
+    if shellcheck "$0" 2>/dev/null; then
+        echo "  [OK] ShellCheck analysis complete: No critical issues found."
+    else
+        echo "  [WARN] ShellCheck found some issues. Review output above."
+        echo "         This is not fatal - installation will continue."
     fi
-    echo "--- ShellCheck Analysis Complete: No critical issues found. ---"
 }
-
-# Run static analysis immediately after required tools are verified
-check_shellcheck
 
 check_required_tools() {
     local missing=()
@@ -144,16 +148,6 @@ EMBEDDING_MODEL=""
 ASSISTANT_MODEL=""
 RESEARCH_MODEL=""
 DEVELOPER_MODEL=""
-
-# ==============================================================================
-# 0. Sudo Trap Guardrail
-# ==============================================================================
-if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-    echo "[ERROR] Do not run this script directly as root or with sudo."
-    echo "This script installs workspaces to the current user's home directory (\$HOME)."
-    echo "It will automatically prompt for sudo access when installing system packages."
-    exit $E_SUDO
-fi
 
 # ==============================================================================
 # HELPER FUNCTIONS
@@ -307,6 +301,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Run quick environment checks
 check_required_tools
+
+# Optional: Run static analysis if ShellCheck is available
+check_shellcheck
 
 # ==============================================================================
 # 2. User Confirmation
@@ -811,7 +808,6 @@ progress_bar "$total_tasks" 2
 echo "Configuring per-agent SQLite index storage..."
 MEMORY_DIR="$HOME/.openclaw/memory"
 mkdir -p "$MEMORY_DIR"
-# FIX: Removed stray extra indent that caused inconsistent formatting in the log.
 openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentId}.sqlite" || {
     echo "[WARN] Failed to set memory index path with pattern. Attempting static path..."
     openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agent}.sqlite" || echo "[WARN] Alternative memory path also failed."

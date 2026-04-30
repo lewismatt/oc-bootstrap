@@ -11,7 +11,8 @@ If you are new to self-hosted AI, don't worry. This guide is designed for anyone
 - [🧠 AI Concepts (Jargon Buster)](#-ai-concepts-jargon-buster)
 - [📋 Checklist: What You Need Before Starting](#-checklist-what-you-need-before-starting)
 - [⚡ Quick-Start and Installation](#-quick-start-and-installation)
-- [🛠️ What the Script Actually Does](#️-what-the-script-actually-does)
+- [🛠️ What the Script Actually Does](#%EF%B8%8F-what-the-script-actually-does)
+- [🎯 Next Steps: Using Your Agents](#-next-steps-using-your-agents)
 - [❓ Troubleshooting](#-troubleshooting)
 - [🍋 Advanced: Local AI with Lemonade Server](#-advanced-local-ai-with-lemonade-server)
 
@@ -101,12 +102,80 @@ Behind the scenes, the installer handles the complicated parts for you:
 
 ---
 
+## 🎯 Next Steps: Using Your Agents
+
+Congratulations! Your OpenClaw agents are now set up. Here's how to start using them:
+
+### 1. Start Chatting on Telegram
+
+Open Telegram and find the three bots you created earlier. Each bot represents one of your agents:
+- **Assistant Bot** - Your general-purpose helper for daily tasks
+- **Research Bot** - Your web research specialist
+- **Developer Bot** - Your coding and technical expert
+
+Just send a message to any bot to start! Try:
+- "What can you help me with?"
+- "Search for the latest news about AI"
+- "Help me write a Python script to..."
+
+### 2. Customize Agent Personalities
+
+You can personalize each agent by editing their prompt files:
+
+```bash
+# Edit the Assistant's personality
+nano ~/.openclaw/workspace-assistant/SOUL.md
+
+# Add your personal context
+nano ~/.openclaw/workspace-assistant/USER.md
+```
+
+See the example files in this repository's subdirectories (assistant/, research/, developer/) for ideas.
+
+### 3. Monitor Agent Activity
+
+Check what your agents are doing:
+```bash
+# View gateway status
+openclaw gateway status
+
+# View agent logs
+openclaw logs --agent assistant
+
+# Check memory indexing progress
+openclaw memory status
+```
+
+### 4. Manage Your Setup
+
+```bash
+# Restart the gateway
+openclaw gateway restart
+
+# Stop the gateway
+openclaw gateway stop
+
+# Update agent configuration
+openclaw config set agents.list.assistant.model "anthropic/claude-3-5-sonnet-latest"
+
+# Re-run onboarding to update API keys
+openclaw onboarding
+```
+
+---
+
 ## ❓ Troubleshooting
 
 | Problem | Likely Cause | How to Fix |
 |:---|:---|:---|
-| **Agents won't reply on Telegram** | Missing API keys or gateway isn't running. | Run `openclaw onboarding`, then `openclaw gateway start`. |
-| **"Conflict: terminated by other getUpdates request"** | You gave the exact same Telegram token to multiple agents. | Re-run `./oc-bootstrap.sh` and make sure you use three *unique* bot tokens. |
+| **Agents won't reply on Telegram** | Missing API keys or gateway isn't running. | Run `openclaw onboarding` to add API keys, then `openclaw gateway start`. Check status with `openclaw gateway status`. |
+| **"Conflict: terminated by other getUpdates request"** | You gave the exact same Telegram token to multiple agents. | Each agent needs a unique bot token. Re-run `./oc-bootstrap.sh` and create three different bots in @BotFather. |
+| **"Model not found" error** | Invalid model tag or missing API key for that provider. | Check your model tags with `openclaw config get agents.list.<agent>.model`. Ensure API keys are set with `openclaw onboarding`. |
+| **Slow or no responses** | Memory indexing still in progress, or local model overloaded. | Check `openclaw memory status`. For local inference, reduce concurrent requests or upgrade model. |
+| **Gateway won't start** | Port conflict or configuration error. | Check logs at `~/.openclaw/logs/`. Try `openclaw gateway stop` then restart. Verify config with `openclaw config list`. |
+| **Agent forgot conversation context** | Session memory not yet indexed. | Wait for background indexing to complete. Check `openclaw memory status` for progress. |
+| **Permission denied errors** | Script run as root or workspace permissions incorrect. | Never run as root. Fix permissions: `chown -R $USER:$USER ~/.openclaw` |
+| **Cannot connect to Lemonade server** | Server not running or wrong IP/port. | Verify Lemonade is running: `curl http://YOUR_IP:8000/v1/models`. Check IP in config: `openclaw config get providers.lemonade.baseUrl` |
 
 ---
 
