@@ -59,7 +59,7 @@ Use the included installation script:
 ```bash
 cd /path/to/oc-bootstrap
 ./scripts/install-lemonade.sh
-```
+```text
 
 The script will:
 1. Verify Python3 and pip3 are installed
@@ -81,7 +81,7 @@ pip3 install -r requirements.txt
 
 # 3. Verify installation
 python3 -m lemonade --version
-```
+```text
 
 ---
 
@@ -108,7 +108,7 @@ ASSISTANT_MODEL=lemonade/user.Qwen3.5-4B-GGUF
 RESEARCH_MODEL=lemonade/user.Qwen3.5-4B-GGUF
 DEVELOPER_MODEL=lemonade/user.Qwen3.5-4B-GGUF
 EMBEDDING_MODEL=lemonade/user.Qwen3.5-4B-GGUF
-```
+```text
 
 **For Bare Metal Installation** (`.env` or config file):
 
@@ -116,7 +116,7 @@ EMBEDDING_MODEL=lemonade/user.Qwen3.5-4B-GGUF
 export LOCAL_INFERENCE=true
 export LEMONADE_KEY=local-dummy-key
 export ASSISTANT_MODEL=lemonade/user.Qwen3.5-4B-GGUF
-```
+```text
 
 ### Advanced Configuration
 
@@ -143,7 +143,7 @@ inference:
   threads: 8
   batch_size: 512
   temperature: 0.7
-```
+```text
 
 ---
 
@@ -169,7 +169,7 @@ huggingface-cli download Qwen/Qwen3.5-4B-GGUF \
   --local-dir-use-symlinks False
 
 # Or manually place .gguf files in the models/ directory
-```
+```text
 
 ### Verifying Model Availability
 
@@ -179,7 +179,7 @@ python3 -m lemonade list-models
 
 # Test a specific model
 python3 -m lemonade run --model user.Qwen3.5-4B-GGUF --prompt "Hello, world!"
-```
+```text
 
 ---
 
@@ -200,7 +200,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
     "model": "user.Qwen3.5-4B-GGUF",
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
-```
+```text
 
 ### Test OpenClaw Integration
 
@@ -211,7 +211,7 @@ docker compose logs -f openclaw
 
 # For Bare Metal
 openclaw --test-connection
-```
+```text
 
 ---
 
@@ -228,7 +228,7 @@ openclaw --test-connection
 models:
   - name: user.Qwen3.5-4B-GGUF
     gpu_layers: 20  # Reduce from 32 to 20
-```
+```text
 
 #### 2. "Model not found" Error
 
@@ -237,7 +237,7 @@ models:
 ```bash
 ls -la ~/lemonade-server/models/
 # Ensure .gguf file exists and path is correct in config.yaml
-```
+```text
 
 #### 3. Slow Inference Speed
 
@@ -258,7 +258,7 @@ ss -tlnp | grep 8000
 # Check firewall
 sudo ufw status
 sudo ufw allow 8000/tcp  # If needed
-```
+```text
 
 #### 5. AMD GPU Not Detected
 
@@ -272,7 +272,7 @@ sudo reboot
 
 # Verify
 rocm-smi
-```
+```text
 
 ---
 
@@ -302,7 +302,7 @@ services:
 
 volumes:
   lemonade-data:
-```
+```text
 
 ---
 
@@ -318,7 +318,7 @@ watch -n 1 nvidia-smi
 watch -n 1 rocm-smi
 
 # Adjust batch size and threads based on hardware
-```
+```text
 
 ### Model Quantization
 
@@ -343,7 +343,7 @@ Use quantized models (Q4_K_M, Q5_K_S) for better performance:
 # Restrict access to models
 chmod 700 ~/lemonade-server/models
 chown -R $USER:$USER ~/lemonade-server/models
-```
+```text
 
 ---
 

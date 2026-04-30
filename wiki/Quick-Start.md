@@ -34,7 +34,7 @@ git --version
 
 # Check internet connectivity
 ping -c 3 github.com
-```
+```text
 
 ---
 
@@ -45,7 +45,7 @@ ping -c 3 github.com
 ```bash
 git clone https://github.com/openclaw/oc-bootstrap.git
 cd oc-bootstrap
-```
+```text
 
 ### Step 2: Configure Environment
 
@@ -55,7 +55,7 @@ cp docker-config.env.template docker-config.env
 
 # Edit with your values
 nano docker-config.env
-```
+```text
 
 **Minimum configuration needed:**
 
@@ -69,7 +69,7 @@ TELEGRAM_DEVELOPER_BOT_TOKEN=your_token_here
 ASSISTANT_MODEL=openai/gpt-4o
 RESEARCH_MODEL=openai/gpt-4o
 DEVELOPER_MODEL=anthropic/claude-3-5-sonnet-latest
-```
+```text
 
 ### Step 3: Start the Container
 
@@ -79,7 +79,7 @@ docker compose up -d
 
 # View logs
 docker compose logs -f
-```
+```text
 
 ### Step 4: Test the Bots
 
@@ -98,13 +98,13 @@ docker compose logs -f
 git clone https://github.com/openclaw/oc-bootstrap.git
 cd oc-bootstrap
 chmod +x *.sh
-```
+```text
 
 ### Step 2: Run the Installer
 
 ```bash
 ./oc-bootstrap.sh
-```
+```text
 
 The interactive installer will:
 1. Detect your system configuration
@@ -121,7 +121,7 @@ openclaw gateway start
 
 # Verify it's running
 openclaw status
-```
+```text
 
 ---
 
@@ -134,33 +134,33 @@ openclaw status
 ```bash
 docker compose ps
 # Should show "oc-bootstrap" as "Up"
-```
+```text
 
 **Bare Metal:**
 
 ```bash
 openclaw status
 # Should show all agents as "Running"
-```
+```text
 
 ### Test Agent Responses
 
 Send these test messages in Telegram:
 
 **To Assistant Bot:**
-```
+```text
 Hello! Can you tell me what you can do?
-```
+```text
 
 **To Research Bot:**
-```
+```text
 Research the latest news about AI agents.
-```
+```text
 
 **To Developer Bot:**
-```
+```text
 Write a simple Python script to list files in a directory.
-```
+```text
 
 ### Check Logs
 
@@ -168,13 +168,13 @@ Write a simple Python script to list files in a directory.
 
 ```bash
 docker compose logs -f openclaw
-```
+```text
 
 **Bare Metal:**
 
 ```bash
 tail -f ~/.openclaw/logs/gateway.log
-```
+```text
 
 ---
 
@@ -195,7 +195,7 @@ tail -f ~/.openclaw/logs/gateway.log
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs
 node --version  # Should be v22.x
-```
+```text
 
 ### Issue: Docker compose not found
 
@@ -205,7 +205,7 @@ node --version  # Should be v22.x
 sudo apt update
 sudo apt install -y docker-compose-plugin
 docker compose version
-```
+```text
 
 ---
 
@@ -226,7 +226,7 @@ Now that you have OpenClaw running, explore these topics:
 nano assistant/SOUL.md
 # Edit the persona, then restart
 docker compose restart
-```
+```text
 
 **Switch to Local Inference:**
 
@@ -240,7 +240,7 @@ ASSISTANT_MODEL=lemonade/user.Qwen3.5-4B-GGUF
 
 # Restart
 docker compose up -d --force-recreate
-```
+```text
 
 ---
 
@@ -272,7 +272,7 @@ docker compose restart openclaw
 
 # Update to latest version
 git pull && docker compose up -d --build
-```
+```text
 
 ### Essential Commands (Bare Metal)
 
@@ -291,7 +291,7 @@ openclaw logs
 
 # Update
 git pull && ./oc-bootstrap.sh --update
-```
+```text
 
 ---
 

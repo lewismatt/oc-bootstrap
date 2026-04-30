@@ -36,7 +36,7 @@ openclaw logs --tail 50  # or: docker compose logs --tail=50
 free -h   # Memory
 df -h     # Disk space
 nproc     # CPU cores
-```
+```text
 
 ### Log Locations
 
@@ -57,14 +57,14 @@ LOG_LEVEL=debug
 
 # Restart
 docker compose restart openclaw
-```
+```text
 
 **Bare Metal:**
 
 ```bash
 export LOG_LEVEL=debug
 openclaw gateway restart
-```
+```text
 
 ---
 
@@ -73,9 +73,9 @@ openclaw gateway restart
 ### Issue: "Node.js version not supported"
 
 **Symptoms:**
-```
+```text
 Error: OpenClaw requires Node.js 22.x or higher
-```
+```text
 
 **Solution:**
 
@@ -89,14 +89,14 @@ sudo apt install -y nodejs
 
 # Verify
 node --version  # Should be v22.x
-```
+```text
 
 ### Issue: "Permission denied" during installation
 
 **Symptoms:**
-```
+```text
 Error: EACCES: permission denied, mkdir '/home/openclaw'
-```
+```text
 
 **Solution:**
 
@@ -109,14 +109,14 @@ sudo useradd -m -s /bin/bash openclaw
 sudo chown -R openclaw:openclaw /path/to/oc-bootstrap
 su - openclaw
 ./oc-bootstrap.sh
-```
+```text
 
 ### Issue: "Git clone fails"
 
 **Symptoms:**
-```
+```text
 fatal: unable to access 'https://github.com/...': Failed to connect
-```
+```text
 
 **Solution:**
 
@@ -130,7 +130,7 @@ echo $https_proxy
 
 # Try with SSH instead
 git clone git@github.com:openclaw/oc-bootstrap.git
-```
+```text
 
 ---
 
@@ -148,7 +148,7 @@ sudo sh get-docker.sh
 # Add user to docker group
 sudo usermod -aG docker $USER
 newgrp docker
-```
+```text
 
 ### Issue: "docker compose not found"
 
@@ -161,7 +161,7 @@ sudo apt install -y docker-compose-plugin
 
 # Verify
 docker compose version
-```
+```text
 
 ### Issue: Container keeps restarting
 
@@ -173,7 +173,7 @@ docker compose logs openclaw
 
 # Check container status
 docker inspect oc-bootstrap | grep -A 10 "State"
-```
+```text
 
 **Common Causes:**
 1. Invalid environment variables
@@ -192,7 +192,7 @@ sudo lsof -i :3000
 # Fix and restart
 nano docker-config.env
 docker compose up -d --force-recreate
-```
+```text
 
 ### Issue: "No space left on device"
 
@@ -208,7 +208,7 @@ df -h
 
 # Remove old images
 docker images | grep "none" | awk '{print $3}' | xargs docker rmi
-```
+```text
 
 ---
 
@@ -224,7 +224,7 @@ docker compose logs openclaw | grep -i "assistant"
 
 # Check Telegram connection
 docker compose logs openclaw | grep -i "telegram\|bot"
-```
+```text
 
 **Solution:**
 
@@ -240,7 +240,7 @@ docker compose logs openclaw | grep -i "telegram\|bot"
 ```bash
 # Check environment variables
 docker compose exec openclaw env | grep MODEL
-```
+```text
 
 **Solution:**
 
@@ -250,7 +250,7 @@ ASSISTANT_MODEL=correct_model_name
 
 # Restart
 docker compose up -d --force-recreate
-```
+```text
 
 ### Issue: Agent memory not persisting
 
@@ -262,7 +262,7 @@ docker inspect oc-bootstrap | grep -A 5 "Mounts"
 
 # Check directory permissions (Bare Metal)
 ls -la ~/.openclaw/agents/
-```
+```text
 
 **Solution:**
 
@@ -274,7 +274,7 @@ volumes:
 
 # Bare Metal: Fix permissions
 chmod -R u+w ~/.openclaw/agents/
-```
+```text
 
 ---
 
@@ -283,9 +283,9 @@ chmod -R u+w ~/.openclaw/agents/
 ### Issue: "Bot token invalid"
 
 **Symptoms:**
-```
+```text
 Error: 401 Unauthorized - Invalid bot token
-```
+```text
 
 **Solution:**
 
@@ -309,7 +309,7 @@ docker compose logs openclaw | grep "bot initialized"
 
 # Test bot token manually
 curl "https://api.telegram.org/bot<YOUR_TOKEN>/getMe"
-```
+```text
 
 **Solution:**
 
@@ -330,7 +330,7 @@ TELEGRAM_ASSISTANT_CHANNEL_ID=-1001234567890
 # 1. Add bot to channel as admin
 # 2. Send a message in channel
 # 3. Check logs: docker compose logs openclaw | grep "chat_id"
-```
+```text
 
 ---
 
@@ -353,7 +353,7 @@ OPENAI_API_KEY=sk-new_key_here
 
 # Restart
 docker compose restart openclaw
-```
+```text
 
 ### Issue: "Rate limit exceeded"
 
@@ -368,7 +368,7 @@ ASSISTANT_MODEL=anthropic/claude-3-5-sonnet-latest
 
 # Add rate limit settings
 export RATE_LIMIT_PER_MINUTE=10
-```
+```text
 
 ### Issue: "Model not found" error
 
@@ -383,7 +383,7 @@ ASSISTANT_MODEL=gpt-4o          # ✗ Wrong
 # List available models (OpenAI example)
 curl https://api.openai.com/v1/models \
   -H "Authorization: Bearer $OPENAI_API_KEY"
-```
+```text
 
 ---
 
@@ -400,7 +400,7 @@ docker compose logs lemonade
 
 # Test connection
 curl http://localhost:8000/v1/models
-```
+```text
 
 **Solution:**
 
@@ -414,7 +414,7 @@ LEMONADE_KEY=local-dummy-key
 
 # Restart OpenClaw
 docker compose restart openclaw
-```
+```text
 
 ### Issue: "CUDA out of memory"
 
@@ -428,7 +428,7 @@ ASSISTANT_MODEL=lemonade/user.Qwen3.5-4B-GGUF  # Smaller model
 # Or reduce GPU layers in Lemonade config
 # Edit ~/lemonade-server/config.yaml:
 # gpu_layers: 20  # Reduce from 32
-```
+```text
 
 ### Issue: Slow inference speed
 
@@ -466,7 +466,7 @@ echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
 sudo nano /etc/docker/daemon.json
 # Add: { "dns": ["8.8.8.8", "1.1.1.1"] }
 sudo systemctl restart docker
-```
+```text
 
 ### Issue: Firewall blocking connections
 
@@ -482,7 +482,7 @@ sudo ufw allow 8000/tcp  # Lemonade Server (if needed externally)
 sudo ufw allow 22/tcp    # SSH
 
 # For Docker, ensure Docker network is not blocked
-```
+```text
 
 ---
 
@@ -496,7 +496,7 @@ sudo ufw allow 22/tcp    # SSH
 # Check memory usage
 free -h
 docker stats
-```
+```text
 
 **Solutions:**
 
@@ -552,7 +552,7 @@ docker compose logs --tail=100 openclaw > debug.log
 
 # Bare Metal
 tail -n 100 ~/.openclaw/logs/gateway.log > debug.log
-```
+```text
 
 ### 2. Search Existing Issues
 
@@ -581,13 +581,13 @@ When creating an issue, include:
 **Actual Behavior:**
 
 **Logs:**
-```
+```text
 [paste relevant log excerpts]
-```
+```text
 
 **Screenshots:**
 [if applicable]
-```
+```text
 
 ### 4. Community Support
 

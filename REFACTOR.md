@@ -97,7 +97,7 @@ The refactored repository emphasizes:
 
 ### 1. Single OpenClaw Gateway + Multiple Isolated Agents
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │         Your Linux Server (Ubuntu 24.04)       │
 ├─────────────────────────────────────────────────┤
@@ -118,7 +118,7 @@ The refactored repository emphasizes:
          ↕                         ↕
     Telegram Bots          AI Model Providers
     (1 per agent)       (Local: Lemonade / Cloud)
-```
+```text
 
 ### 2. Agent Isolation via Telegram
 
@@ -167,7 +167,7 @@ chmod +x *.sh
 
 # 3. Run the interactive installer
 ./oc-bootstrap.sh
-```
+```text
 
 The script will guide you through:
 1. Choosing local (Lemonade) or cloud AI models
@@ -187,7 +187,7 @@ docker compose up -d
 
 # 3. View logs
 docker compose logs -f
-```
+```text
 
 ### Customizing Your Agents
 
@@ -206,7 +206,7 @@ nano ~/.openclaw/workspace-developer/SOUL.md
 
 # Reload configuration
 openclaw agents reload assistant
-```
+```text
 
 ---
 

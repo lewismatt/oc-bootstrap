@@ -62,20 +62,20 @@ This project builds upon these excellent open source projects:
 | [Project Name](https://link) | What it does | [License](link) | v1.0.0 |
 
 Special thanks to [Contributor/Project] for [specific contribution].
-```
+```text
 
 ### Badge Examples
 ```markdown
 [![License](https://img.shields.io/github/license/user/repo)](LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/user/repo/ci.yml)](link)
 [![Version](https://img.shields.io/github/v/release/user/repo)](releases)
-```
+```text
 
 ## Output Format
 
 When improving documentation or repository structure, provide:
 
-```
+```text
 ## Summary
 {Brief description of documentation improvements made}
 
@@ -98,4 +98,4 @@ When improving documentation or repository structure, provide:
 
 ## Recommendations
 - {Further improvements suggested}
-```
+```text

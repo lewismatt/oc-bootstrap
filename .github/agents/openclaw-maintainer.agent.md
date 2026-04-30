@@ -50,7 +50,7 @@ You are an OpenClaw Bootstrap Project Maintainer. Your role is to ensure the pro
 
 When reporting issues or completing tasks, use this format:
 
-```
+```text
 ## Summary
 {Brief description of what was done}
 
@@ -67,4 +67,4 @@ When reporting issues or completing tasks, use this format:
 
 ## Status
 {Completed/Needs more work}
-```
+```text

@@ -20,7 +20,7 @@ Understanding the OpenClaw Multi-Agent system architecture helps with configurat
 
 ### High-Level Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     User Interface Layer                     │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
@@ -70,7 +70,7 @@ Understanding the OpenClaw Multi-Agent system architecture helps with configurat
 │  │   Database  │  │   API       │  │   API       │       │
 │  └─────────────┘  └─────────────┘  └─────────────┘       │
 └─────────────────────────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -133,11 +133,11 @@ Understanding the OpenClaw Multi-Agent system architecture helps with configurat
 
 ### Agent Hierarchy
 
-```
+```text
 Assistant Agent (Team Lead)
     ├── Research Agent (Subordinate - Web Research)
     └── Developer Agent (Subordinate - Code & Infrastructure)
-```
+```text
 
 ### Agent Specializations
 
@@ -149,13 +149,13 @@ Assistant Agent (Team Lead)
 
 ### Inter-Agent Communication
 
-```
+```text
 User → Assistant Bot → Assistant Agent
                               │
                               ├─→ Delegates to Research Agent (web research)
                               │
                               └─→ Delegates to Developer Agent (code tasks)
-```
+```text
 
 **Delegation Criteria**:
 - Task complexity
@@ -169,7 +169,7 @@ User → Assistant Bot → Assistant Agent
 
 ### Incoming Message Flow
 
-```
+```text
 1. User sends message in Telegram
    │
 2. Telegram Bot API receives message
@@ -187,11 +187,11 @@ User → Assistant Bot → Assistant Agent
 8. Gateway sends response via Telegram API
    │
 9. User receives response in Telegram
-```
+```text
 
 ### Outgoing Request Flow (Agent to API)
 
-```
+```text
 1. Agent needs to call external API (e.g., OpenAI)
    │
 2. Agent checks configuration for API key
@@ -209,7 +209,7 @@ User → Assistant Bot → Assistant Agent
 8. Agent updates memory (if needed)
    │
 9. Agent prepares user response
-```
+```text
 
 ---
 
@@ -217,7 +217,7 @@ User → Assistant Bot → Assistant Agent
 
 ### Memory Write Path
 
-```
+```text
 Agent generates response
     │
     ├─→ Short-term: Conversation history (session)
@@ -227,11 +227,11 @@ Agent generates response
             ├─→ Create embedding (using embedding model)
             │
             └─→ Store in vector DB with metadata
-```
+```text
 
 ### Memory Read Path (Retrieval)
 
-```
+```text
 User asks question
     │
 Agent needs context
@@ -243,11 +243,11 @@ Agent needs context
     ├─→ Retrieve top-k relevant memories
     │
     └─→ Include in agent prompt context
-```
+```text
 
 ### Configuration Data Flow
 
-```
+```text
 docker-config.env (or .env)
     │
     ▼
@@ -258,7 +258,7 @@ OpenClaw Gateway loads environment
     ├─→ Configures API clients
     │
     └─→ Sets agent parameters (model, temperature, etc.)
-```
+```text
 
 ---
 
@@ -266,7 +266,7 @@ OpenClaw Gateway loads environment
 
 ### Authentication Layers
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │         Telegram Bot Token               │  ← Layer 1: Bot Authentication
 │  (Validates bot-to-Gateway communication)│
@@ -289,7 +289,7 @@ OpenClaw Gateway loads environment
 │         Agent Permissions (AGENTS.md)    │  ← Layer 4: Agent Capability Restrictions
 │  (What each agent can read/write)       │
 └─────────────────────────────────────────┘
-```
+```text
 
 ### Data Isolation
 
@@ -330,12 +330,12 @@ OpenClaw Gateway loads environment
 - Easy maintenance
 
 **Architecture**:
-```
+```text
 Docker Host
 ├── oc-bootstrap container (Gateway + Agents)
 ├── lemonade-server container (optional)
 └── Shared volumes for persistence
-```
+```text
 
 ### Model 2: Bare Metal Installation
 
@@ -351,12 +351,12 @@ Docker Host
 - Maximum performance requirements
 
 **Architecture**:
-```
+```text
 Ubuntu 24.04 Host
 ├── OpenClaw Gateway (systemd service)
 ├── Agent processes
 └── Local file system storage
-```
+```text
 
 ### Model 3: Hybrid (Development)
 
@@ -376,13 +376,13 @@ Ubuntu 24.04 Host
 
 ### Horizontal Scaling
 
-```
+```text
 Load Balancer
     │
     ├─→ Gateway Instance 1 (with Agent subset)
     ├─→ Gateway Instance 2 (with Agent subset)
     └─→ Gateway Instance 3 (with Agent subset)
-```
+```text
 
 **Note**: Current implementation is vertical scaling (single instance).
 

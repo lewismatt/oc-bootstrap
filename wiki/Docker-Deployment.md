@@ -33,7 +33,7 @@ Complete guide to running OpenClaw Multi-Agent system using Docker containers. D
 
 ### Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │              Docker Host                         │
 ├─────────────────────────────────────────────────┤
@@ -53,7 +53,7 @@ Complete guide to running OpenClaw Multi-Agent system using Docker containers. D
 │  └─────────────────────────────────────────┘   │
 │                                                 │
 └─────────────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -73,7 +73,7 @@ newgrp docker
 # Verify installation
 docker --version
 docker compose version
-```
+```text
 
 ### Verify Docker is Running
 
@@ -83,7 +83,7 @@ sudo systemctl status docker
 
 # Test with hello-world
 docker run hello-world
-```
+```text
 
 ---
 
@@ -94,7 +94,7 @@ docker run hello-world
 ```bash
 git clone https://github.com/openclaw/oc-bootstrap.git
 cd oc-bootstrap
-```
+```text
 
 ### 2. Configure Environment
 
@@ -104,7 +104,7 @@ cp docker-config.env.template docker-config.env
 
 # Edit configuration
 nano docker-config.env
-```
+```text
 
 **Minimum configuration:**
 
@@ -117,20 +117,20 @@ TELEGRAM_DEVELOPER_BOT_TOKEN=your_token_here
 # Model selection
 ASSISTANT_MODEL=openai/gpt-4o
 EMBEDDING_MODEL=openai/text-embedding-3-small
-```
+```text
 
 ### 3. Start Services
 
 ```bash
 docker compose up -d
-```
+```text
 
 ### 4. Verify
 
 ```bash
 docker compose ps
 docker compose logs -f
-```
+```text
 
 ---
 
@@ -153,7 +153,7 @@ RUN_BOOTSTRAP=false
 NODE_ENV=production
 OPENCLAW_HOME=/home/openclaw/.openclaw
 NON_INTERACTIVE=true
-```
+```text
 
 #### Inference Backend
 
@@ -166,7 +166,7 @@ LEMONADE_KEY=local-dummy-key
 
 # Lemonade Server IP (if external)
 # LEMONADE_IP=192.168.12.50
-```
+```text
 
 #### Model Selection
 
@@ -178,7 +178,7 @@ EMBEDDING_MODEL=openai/text-embedding-3-small
 ASSISTANT_MODEL=openai/gpt-4o
 RESEARCH_MODEL=openai/gpt-4o
 DEVELOPER_MODEL=anthropic/claude-3-5-sonnet-latest
-```
+```text
 
 #### API Keys
 
@@ -194,7 +194,7 @@ BRAVE_SEARCH_API_KEY=...
 
 # GitHub (for Developer agent)
 GITHUB_PAT=ghp_...
-```
+```text
 
 ---
 
@@ -204,13 +204,13 @@ GITHUB_PAT=ghp_...
 
 ```bash
 docker compose build
-```
+```text
 
 ### Build with Docker CLI
 
 ```bash
 docker build -t oc-bootstrap:latest .
-```
+```text
 
 ### Build Arguments
 
@@ -221,7 +221,7 @@ docker build \
   --build-arg NODE_VERSION=22 \
   --build-arg USER_HOME=/home/openclaw \
   -t oc-bootstrap:custom .
-```
+```text
 
 ### Multi-Architecture Build
 
@@ -234,7 +234,7 @@ docker buildx build \
   --platform linux/amd64,linux/arm64 \
   -t oc-bootstrap:latest \
   --push .
-```
+```text
 
 ---
 
@@ -244,7 +244,7 @@ docker buildx build \
 
 ```bash
 docker compose up -d
-```
+```text
 
 ### View Logs
 
@@ -257,26 +257,26 @@ docker compose logs -f openclaw
 
 # Last 50 lines
 docker compose logs --tail=50 openclaw
-```
+```text
 
 ### Stop Services
 
 ```bash
 docker compose down
-```
+```text
 
 ### Restart Services
 
 ```bash
 docker compose restart
-```
+```text
 
 ### Update and Restart
 
 ```bash
 git pull
 docker compose up -d --force-recreate --build
-```
+```text
 
 ---
 
@@ -290,7 +290,7 @@ The `docker-compose.yml` uses named volumes for persistence:
 volumes:
   openclaw-data:
     driver: local
-```
+```text
 
 Data is stored in:
 - **OpenClaw config**: `/var/lib/docker/volumes/oc-bootstrap_openclaw-data/_data`
@@ -305,7 +305,7 @@ services:
     volumes:
       - ./:/home/openclaw/oc-bootstrap:ro
       - openclaw-data:/home/openclaw/.openclaw
-```
+```text
 
 ### Backup Volumes
 
@@ -319,7 +319,7 @@ docker run --rm -v oc-bootstrap_openclaw-data:/data \
 docker run --rm -v oc-bootstrap_openclaw-data:/data \
   -v $(pwd):/backup ubuntu \
   tar xzf /backup/openclaw-backup.tar.gz -C /
-```
+```text
 
 ---
 
@@ -339,7 +339,7 @@ services:
       - NODE_ENV=development
       - OPENCLAW_DEV_MODE=true
     command: npm run dev
-```
+```text
 
 ### Debugging
 
@@ -352,7 +352,7 @@ docker compose exec openclaw openclaw --version
 
 # View process list
 docker compose exec openclaw ps aux
-```
+```text
 
 ---
 
@@ -375,7 +375,7 @@ docker compose up -d --force-recreate openclaw
 
 # Remove containers
 docker compose down
-```
+```text
 
 ### Image Management
 
@@ -392,7 +392,7 @@ docker tag oc-bootstrap:latest oc-bootstrap:v1.0
 # Push to registry
 docker tag oc-bootstrap:latest myregistry.com/oc-bootstrap:latest
 docker push myregistry.com/oc-bootstrap:latest
-```
+```text
 
 ### Network Inspection
 
@@ -405,7 +405,7 @@ docker network inspect oc-bootstrap_openclaw-network
 
 # Connect container to network
 docker network connect oc-bootstrap_openclaw-network container_name
-```
+```text
 
 ---
 
@@ -424,13 +424,13 @@ services:
         reservations:
           cpus: '2'
           memory: 4G
-```
+```text
 
 ### Apply Limits
 
 ```bash
 docker compose up -d --force-recreate
-```
+```text
 
 ---
 
@@ -458,7 +458,7 @@ services:
                python -m lemonade serve --host 0.0.0.0"
     networks:
       - openclaw-network
-```
+```text
 
 ### Configure OpenClaw to Use Lemonade
 
@@ -468,7 +468,7 @@ In `docker-config.env`:
 LOCAL_INFERENCE=true
 LEMONADE_KEY=local-dummy-key
 ASSISTANT_MODEL=lemonade/user.Qwen3.5-4B-GGUF
-```
+```text
 
 ---
 
@@ -485,7 +485,7 @@ docker inspect oc-bootstrap
 
 # Check resource usage
 docker stats
-```
+```text
 
 ### Permission Denied Errors
 
@@ -496,7 +496,7 @@ sudo chown -R 1000:1000 /var/lib/docker/volumes/oc-bootstrap_openclaw-data/_data
 # Or run container as root (not recommended for production)
 # In docker-compose.yml, add:
 # user: root
-```
+```text
 
 ### Port Already in Use
 
@@ -507,7 +507,7 @@ sudo lsof -i :3000
 # Change port in docker-compose.yml
 ports:
   - "3001:3000"
-```
+```text
 
 ### Out of Disk Space
 
@@ -515,7 +515,7 @@ ports:
 # Clean up Docker
 docker system df
 docker system prune -a --volumes
-```
+```text
 
 ### Network Connectivity Issues
 
@@ -530,7 +530,7 @@ docker compose exec openclaw nslookup github.com
 docker compose down
 docker network prune
 docker compose up -d
-```
+```text
 
 ---
 
