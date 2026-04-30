@@ -791,26 +791,53 @@ openclaw agents logs developer --follow
 ```
 oc-bootstrap/
 ├── README.md                    # This file
-├── oc-bootstrap.sh              # Main installation script (refactored)
-├── install-lemonade.sh          # Optional: Local LLM setup
-├── lib/
-│   └── helpers.sh               # Reusable bash functions library
-├── assistant/
-│   ├── SOUL.md                  # Assistant personality template
-│   ├── USER.md                  # User preferences template
-│   └── AGENTS.md                # Collaboration rules template
-├── research/
-│   ├── SOUL.md
-│   ├── USER.md
-│   └── AGENTS.md
-├── developer/
-│   ├── SOUL.md
-│   ├── USER.md
-│   └── AGENTS.md
+├── CHANGELOG                    # Version history
+├── LICENSE                      # MIT License
+├── CODE_OF_CONDUCT.md           # Community standards
+├── CONTRIBUTING.md              # Contribution guidelines
+├── DOCKER.md                    # Docker documentation
+├── Makefile                     # Docker convenience commands
+├── docker-compose.yml           # Docker Compose configuration
+├── Dockerfile                   # Docker image definition
 ├── .env.template                # Config file template
 ├── .gitignore                   # Don't commit .env or logs
-├── LICENSE                      # MIT License
-└── CHANGELOG                    # Version history
+│
+├── oc-bootstrap.sh              # Main installation script
+├── lib/
+│   └── helpers.sh               # Reusable bash functions library
+│
+├── scripts/                     # Utility scripts
+│   ├── docker-entrypoint.sh     # Docker container entrypoint
+│   ├── docker-cleanup.sh        # Docker cleanup utilities
+│   ├── install-lemonade.sh      # Local LLM setup
+│   └── uninstall-oc-bootstrap.sh # Safe removal script
+│
+├── assistant/                   # Assistant agent templates
+│   ├── SOUL.md                  # Personality & instructions
+│   ├── USER.md                  # User preferences
+│   └── AGENTS.md                # Collaboration rules
+├── research/                    # Research agent templates
+│   ├── SOUL.md
+│   ├── USER.md
+│   └── AGENTS.md
+├── developer/                   # Developer agent templates
+│   ├── SOUL.md
+│   ├── USER.md
+│   └── AGENTS.md
+│
+├── tests/                       # Test suite
+│   └── docker-test.sh           # Docker test script
+│
+└── .github/                     # GitHub configuration
+    ├── agents/                   # Custom agent definitions
+    │   ├── documentation-specialist.agent.md
+    │   └── openclaw-maintainer.agent.md
+    ├── workflows/                # CI/CD pipelines
+    │   └── lint-and-test.yml
+    ├── instructions/             # (reserved for file instructions)
+    ├── prompts/                  # (reserved for prompt templates)
+    ├── hooks/                    # (reserved for lifecycle hooks)
+    └── skills/                   # (reserved for skill definitions)
 ```
 
 ---
@@ -894,13 +921,13 @@ If you want to remove OpenClaw and all its data, use the provided uninstall scri
 
 ```bash
 # Basic uninstall (interactive - will ask for confirmation)
-./uninstall-oc-bootstrap.sh
+./scripts/uninstall-oc-bootstrap.sh
 
 # Skip all confirmations (use with caution!)
-./uninstall-oc-bootstrap.sh --yes
+./scripts/uninstall-oc-bootstrap.sh --yes
 
 # Keep agent workspaces (SOUL.md, AGENTS.md, etc.)
-./uninstall-oc-bootstrap.sh --preserve-workspaces
+./scripts/uninstall-oc-bootstrap.sh --preserve-workspaces
 ```
 
 **What the uninstall script removes:**
@@ -919,5 +946,22 @@ If you want to remove OpenClaw and all its data, use the provided uninstall scri
 > ⚠️ **Warning**: The uninstall script will ask before deleting each component. Use `--yes` to skip confirmations, but be careful—this will delete all your agent data and configurations!
 
 > 💡 **Tip**: If you just want to reset the configuration but keep your workspaces, use `--preserve-workspaces`.
+
+To run the uninstall script:
+
+```bash
+# Basic uninstall (interactive)
+./scripts/uninstall-oc-bootstrap.sh
+
+# Skip confirmations (use with caution!)
+./scripts/uninstall-oc-bootstrap.sh --yes
+
+# Keep agent workspaces
+./scripts/uninstall-oc-bootstrap.sh --preserve-workspaces
+```
+
+---
+
+## 🗂️ Additional Resources
 
 ---

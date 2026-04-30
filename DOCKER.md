@@ -439,13 +439,13 @@ Use the provided cleanup script:
 
 ```bash
 # Stop containers (keep volumes)
-./docker-cleanup.sh
+./scripts/docker-cleanup.sh
 
 # Stop containers and remove volumes (DESTRUCTIVE)
-./docker-cleanup.sh --prune
+./scripts/docker-cleanup.sh --prune
 
 # Full cleanup (containers, volumes, images)
-./docker-cleanup.sh --all
+./scripts/docker-cleanup.sh --all
 ```
 
 Or use Docker Compose:
