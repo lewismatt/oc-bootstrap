@@ -10,11 +10,12 @@ Automated setup for OpenClaw AI agents on Ubuntu 24.04. Deploy three specialized
 2. [Architecture](#%EF%B8%8F-architecture)
 3. [Prerequisites Checklist](#-prerequisites-checklist)
 4. [Installation](#-installation)
-5. [Configuration](#-configuration)
-6. [After Installation](#-after-installation)
-7. [Troubleshooting](#-troubleshooting)
-8. [Advanced Topics](#-advanced-topics)
-9. [Project Structure](#-project-structure)
+5. [Docker Setup](#-docker-setup)
+6. [Configuration](#-configuration)
+7. [After Installation](#-after-installation)
+8. [Troubleshooting](#-troubleshooting)
+9. [Advanced Topics](#-advanced-topics)
+10. [Project Structure](#-project-structure)
 
 ---
 
@@ -175,7 +176,102 @@ nano .env
 
 ---
 
-## 🛠️ Configuration
+## � Docker Setup
+
+**Run OpenClaw in a containerized environment** - perfect for testing, isolation, or users who prefer Docker.
+
+### Quick Start with Docker Compose
+
+```bash
+# 1. Create and configure environment file
+cp docker-config.env.template docker-config.env
+nano docker-config.env  # Add your Telegram bot tokens
+
+# 2. Build and start the container
+docker-compose up -d
+
+# 3. View logs
+docker-compose logs -f
+
+# 4. Stop when done
+docker-compose down
+```
+
+### Building the Docker Image
+
+```bash
+# Build with Docker Compose (recommended)
+docker-compose build
+
+# Or build with Docker CLI
+docker build -t oc-bootstrap:latest .
+```
+
+### Running with Docker CLI
+
+```bash
+# Basic run with environment variables
+docker run -d \
+  --name oc-bootstrap \
+  --env-file docker-config.env \
+  -v openclaw-data:/home/openclaw/.openclaw \
+  oc-bootstrap:latest
+
+# Interactive shell (for debugging)
+docker run -it --rm \
+  --env-file docker-config.env \
+  oc-bootstrap:latest \
+  shell
+```
+
+### Configuration
+
+Edit `docker-config.env` (created from template) with your settings:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ASSISTANT_TOKEN` | ✅ | Telegram bot token for Assistant agent |
+| `RESEARCH_TOKEN` | ✅ | Telegram bot token for Research agent |
+| `DEVELOPER_TOKEN` | ✅ | Telegram bot token for Developer agent |
+| `ASSISTANT_MODEL` | No | Model for Assistant (default: `openai/gpt-4o`) |
+| `RESEARCH_MODEL` | No | Model for Research (default: `openai/gpt-4o`) |
+| `DEVELOPER_MODEL` | No | Model for Developer (default: `anthropic/claude-3-5-sonnet-latest`) |
+| `LOCAL_INFERENCE` | No | Use local Lemonade Server (`true`/`false`) |
+| `GITHUB_PAT` | No | GitHub Personal Access Token |
+| `BRAVE_API_KEY` | No | Brave Search API Key |
+
+### Volume Persistence
+
+OpenClaw data persists in Docker volumes:
+
+```bash
+# List volumes
+docker volume ls | grep openclaw
+
+# Data location in container: /home/openclaw/.openclaw
+# Contains: config, memory (SQLite), agent workspaces
+```
+
+### Local Inference with Lemonade Server
+
+Enable the optional Lemonade Server service in `docker-compose.yml` for local LLM inference (no cloud APIs needed):
+
+1. Uncomment the `lemonade` service section in `docker-compose.yml`
+2. Set `LOCAL_INFERENCE=true` in `docker-config.env`
+3. Start services: `docker-compose up -d`
+
+### Documentation
+
+For detailed Docker documentation, see [DOCKER.md](DOCKER.md) which covers:
+- Building and running containers
+- Volume management and backups
+- Development mode with hot-reload
+- Troubleshooting common issues
+- Advanced configuration options
+
+---
+
+## �🛠️ Configuration
 
 ### Configuration File Format (.env)
 
