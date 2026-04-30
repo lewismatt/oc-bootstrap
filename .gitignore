@@ -1,5 +1,4 @@
 *.recommends.md
-.github/*
 .env
 .secrets
 secrets.env

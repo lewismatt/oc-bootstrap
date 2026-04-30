@@ -1,0 +1,46 @@
+name: Lint and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          additional_files: 'oc-bootstrap.sh install-lemonade.sh'
+
+      - name: shfmt
+        uses: mfinelli/setup-shfmt@v3
+      - run: shfmt -d -i 4 -ci oc-bootstrap.sh install-lemonade.sh
+
+      - name: Markdownlint
+        uses: DavidAnson/github-lint-action@v1
+        with:
+          glob: '**/*.md'
+
+      - name: Yamllint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: '.github/workflows/'
+          config_file: .yamllint.yaml
+        continue-on-error: true # Create a default config if not present or skip if missing
+
+  secret-detection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Secret Detection
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
