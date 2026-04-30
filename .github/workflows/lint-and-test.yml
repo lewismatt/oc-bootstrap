@@ -29,6 +29,7 @@ jobs:
       - name: Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v14
         with:
+          config: '.markdownlint.json'
           glob: '**/*.md'
 
       - name: Yamllint
