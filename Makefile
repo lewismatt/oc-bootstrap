@@ -20,34 +20,34 @@ IMAGE_TAG := latest
 CONTAINER_NAME := oc-bootstrap
 
 # ==============================================================================
-# DOCKER COMPOSE COMMANDS
+# DOCKER COMPOSE COMMANDS (using modern 'docker compose' V2 syntax)
 # ==============================================================================
 
-.PHONY: build up down restart logs shell test clean help
+.PHONY: build up down restart logs shell test clean clean-all help
 
 ## Build Docker image
 build:
-	docker-compose -f $(COMPOSE_FILE) build
+	docker compose -f $(COMPOSE_FILE) build
 
 ## Start services in background
 up:
-	docker-compose -f $(COMPOSE_FILE) up -d
+	docker compose -f $(COMPOSE_FILE) up -d
 	@echo "Services started. Use 'make logs' to view logs."
 
 ## Stop services
 down:
-	docker-compose -f $(COMPOSE_FILE) down
+	docker compose -f $(COMPOSE_FILE) down
 
 ## Restart services
 restart: down up
 
 ## View logs (follow mode)
 logs:
-	docker-compose -f $(COMPOSE_FILE) logs -f
+	docker compose -f $(COMPOSE_FILE) logs -f
 
 ## View last N lines of logs
 logs-%:
-	docker-compose -f $(COMPOSE_FILE) logs --tail=$* $(CONTAINER_NAME)
+	docker compose -f $(COMPOSE_FILE) logs --tail=$* $(CONTAINER_NAME)
 
 # ==============================================================================
 # DOCKER CLI COMMANDS
@@ -98,24 +98,12 @@ test-quick:
 
 ## Stop and remove containers (keep volumes)
 clean:
-	docker-compose -f $(COMPOSE_FILE) down
+	docker compose -f $(COMPOSE_FILE) down
 
 ## Stop and remove containers AND volumes (DESTRUCTIVE)
 clean-all:
-	docker-compose -f $(COMPOSE_FILE) down -v
+	docker compose -f $(COMPOSE_FILE) down -v
 	rm -rf scripts/*.bak *.bak
-
-## Run docker cleanup script
-clean-docker:
-	./scripts/docker-cleanup.sh
-
-## Prune unused Docker resources
-prune:
-	./scripts/docker-cleanup.sh --prune
-
-## Full cleanup (containers, volumes, images, networks)
-clean-full:
-	./scripts/docker-cleanup.sh --all
 
 ## Remove test images
 clean-images:
@@ -137,44 +125,3 @@ help:
 	@echo "  make clean         - Stop and remove containers"
 	@echo "  make clean-all     - Stop, remove containers AND volumes"
 	@echo "  make help          - Show this help message"
-
-# ==============================================================================
-# CLEANUP
-# ==============================================================================
-
-## Stop and remove containers (keep volumes)
-clean:
-	./docker-cleanup.sh
-
-## Stop and remove containers + volumes (DESTRUCTIVE)
-clean-all:
-	./docker-cleanup.sh --prune
-
-## Full cleanup (containers, volumes, images)
-clean-images:
-	./docker-cleanup.sh --all
-
-# ==============================================================================
-# HELP
-# ==============================================================================
-
-## Show this help message
-help:
-	@echo "OpenClaw Docker Makefile"
-	@echo ""
-	@echo "Commands:"
-	@echo "  build        - Build Docker image"
-	@echo "  up           - Start services in background"
-	@echo "  down         - Stop services"
-	@echo "  restart      - Restart services"
-	@echo "  logs         - View logs (follow mode)"
-	@echo "  shell        - Open shell in running container"
-	@echo "  shell-new    - Open shell (new container)"
-	@echo "  bootstrap    - Run bootstrap in container"
-	@echo "  gateway      - Start gateway in foreground"
-	@echo "  test         - Run all Docker tests"
-	@echo "  test-quick   - Run quick tests (skip build)"
-	@echo "  clean        - Stop and remove containers (keep volumes)"
-	@echo "  clean-all    - Stop and remove containers + volumes"
-	@echo "  clean-images - Full cleanup (containers, volumes, images)"
-	@echo "  help         - Show this help message"

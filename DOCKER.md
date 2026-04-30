@@ -32,13 +32,13 @@ cp docker-config.env.template docker-config.env
 # Edit docker-config.env and add your Telegram bot tokens
 
 # Build and start the container
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop the container
-docker-compose down
+docker compose down
 ```
 
 ---
@@ -46,7 +46,7 @@ docker-compose down
 ## Prerequisites
 
 - **Docker**: Version 20.10+ installed and running
-- **Docker Compose**: Version 1.29+ or Docker Compose V2
+- **Docker Compose**: Version 2.x (V2) installed
 - **Telegram Bot Tokens**: Create three bots via [@BotFather](https://t.me/BotFather)
 - **API Keys** (optional): OpenAI, Anthropic, Brave Search, GitHub PAT, etc.
 
@@ -61,8 +61,8 @@ sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 newgrp docker
 
-# Install Docker Compose
-sudo apt install -y docker-compose-plugin
+# Install Docker Compose V2 (usually included with modern Docker installations)
+# If needed: sudo apt install -y docker-compose-plugin
 ```
 
 ---
@@ -72,7 +72,7 @@ sudo apt install -y docker-compose-plugin
 ### Build with Docker Compose (Recommended)
 
 ```bash
-docker-compose build
+docker compose build
 ```
 
 ### Build with Docker CLI
@@ -83,11 +83,11 @@ docker build -t oc-bootstrap:latest .
 
 ### Build Arguments (Optional)
 
-Currently, the Dockerfile uses defaults. To customize:
+Currently, the Dockerfile uses Node.js 22.x by default. To customize:
 
 ```bash
 docker build \
-  --build-arg NODE_VERSION=20 \
+  --build-arg NODE_VERSION=22 \
   -t oc-bootstrap:custom .
 ```
 
@@ -141,45 +141,45 @@ LEMONADE_KEY=local-dummy-key
 
 ```bash
 # Start in background
-docker-compose up -d
+docker compose up -d
 
 # Start with build (first time or after changes)
-docker-compose up -d --build
+docker compose up -d --build
 
 # Start with local inference (uncomment lemonade service first)
-docker-compose up -d --profile lemonade
+docker compose up -d --profile lemonade
 ```
 
 ### View Logs
 
 ```bash
 # All services
-docker-compose logs -f
+docker compose logs -f
 
 # Specific service
-docker-compose logs -f openclaw
+docker compose logs -f openclaw
 
 # Last 50 lines
-docker-compose logs --tail=50 openclaw
+docker compose logs --tail=50 openclaw
 ```
 
 ### Stop Services
 
 ```bash
 # Stop and remove containers
-docker-compose down
+docker compose down
 
 # Stop and remove containers + volumes (DESTRUCTIVE)
-docker-compose down -v
+docker compose down -v
 
 # Stop and remove everything (containers, volumes, images)
-docker-compose down -v --rmi all
+docker compose down -v --rmi all
 ```
 
 ### Check Status
 
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 ---
@@ -292,7 +292,7 @@ docker-compose up -d
 ```env
 LOCAL_INFERENCE=true
 LEMONADE_KEY=local-dummy-key
-LEMONADE_IP=lemonade  # Service name in docker-compose
+LEMONADE_IP=lemonade  # Service name in docker-compose.yml
 ```
 
 ---
@@ -333,7 +333,7 @@ vim oc-bootstrap.sh
 
 ```bash
 # Check logs
-docker-compose logs openclaw
+docker compose logs openclaw
 
 # Inspect container
 docker inspect oc-bootstrap
@@ -362,7 +362,7 @@ docker exec oc-bootstrap sudo chown -R openclaw:openclaw /home/openclaw/.opencla
 
 ```bash
 # Rebuild image
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # Check installation
 docker exec oc-bootstrap which openclaw

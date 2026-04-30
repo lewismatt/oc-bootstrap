@@ -38,10 +38,10 @@ cp docker-config.env.template docker-config.env
 nano docker-config.env  # Add your Telegram bot tokens
 
 # 2. Start with Docker Compose
-docker-compose up -d
+docker compose up -d
 
 # 3. View logs
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ---
@@ -210,14 +210,28 @@ The script will interactively prompt you for:
 **For advanced users or CI/CD pipelines.**
 
 ```bash
-# 1. Prepare your configuration
-cp .env.template .env
-nano .env
-# Fill in your tokens, models, and API keys
+# 1. Create your configuration file
+nano ~/.openclaw/secrets.env
+# Add your tokens, models, and API keys in the format:
+# ASSISTANT_TOKEN=your_token_here
+# RESEARCH_TOKEN=your_token_here
+# DEVELOPER_TOKEN=your_token_here
+# ASSISTANT_MODEL=openai/gpt-4o
+# RESEARCH_MODEL=openai/gpt-4o
+# DEVELOPER_MODEL=anthropic/claude-3-5-sonnet-latest
+# EMBEDDING_MODEL=openai/text-embedding-3-small
 
 # 2. Run non-interactively
-./oc-bootstrap.sh --config .env --non-interactive
+./oc-bootstrap.sh --config ~/.openclaw/secrets.env --non-interactive
 ```
+
+> **Note**: The script also supports reading from a custom config file location:
+> ```bash
+> # Create custom config
+> nano /path/to/your/config.env
+> # Run with custom config
+> ./oc-bootstrap.sh --config /path/to/your/config.env --non-interactive
+> ```
 
 ---
 
@@ -233,27 +247,27 @@ cp docker-config.env.template docker-config.env
 nano docker-config.env  # Add your Telegram bot tokens
 
 # 2. Build and start the container
-docker-compose up -d
+docker compose up -d
 
 # 3. View logs
-docker-compose logs -f
+docker compose logs -f
 
 # 4. Stop when done
-docker-compose down
+docker compose down
 ```
 
 ### Docker Management Quick Reference
 
 | Operation | Command |
 |-----------|---------|
-| Start services | `docker-compose up -d` |
-| Stop services | `docker-compose down` |
-| View logs (follow) | `docker-compose logs -f` |
-| Check status | `docker-compose ps` |
-| Restart services | `docker-compose restart` |
-| Shell access | `docker-compose exec openclaw bash` |
-| Rebuild images | `docker-compose build` |
-| Stop & remove volumes | `docker-compose down -v` |
+| Start services | `docker compose up -d` |
+| Stop services | `docker compose down` |
+| View logs (follow) | `docker compose logs -f` |
+| Check status | `docker compose ps` |
+| Restart services | `docker compose restart` |
+| Shell access | `docker compose exec openclaw bash` |
+| Rebuild images | `docker compose build` |
+| Stop & remove volumes | `docker compose down -v` |
 
 > 📌 For complete Docker documentation including advanced configuration, volume management, and troubleshooting, see [DOCKER.md](DOCKER.md).
 
@@ -261,7 +275,7 @@ docker-compose down
 
 ```bash
 # Build with Docker Compose (recommended)
-docker-compose build
+docker compose build
 
 # Or build with Docker CLI
 docker build -t oc-bootstrap:latest .
@@ -317,6 +331,8 @@ docker volume ls | grep openclaw
 Enable the optional Lemonade Server service in `docker-compose.yml` for local LLM inference (no cloud APIs needed):
 
 1. Uncomment the `lemonade` service section in `docker-compose.yml`
+
+**Note:** The project uses modern `docker compose` (V2) syntax. If you're using an older version, the command may be `docker-compose` instead.
 2. Set `LOCAL_INFERENCE=true` in `docker-config.env`
 3. Start services: `docker-compose up -d`
 
@@ -446,33 +462,33 @@ If you installed using Docker, here are the essential management commands:
 
 ```bash
 # Start all services in background
-docker-compose up -d
+docker compose up -d
 
 # Stop services (keeps volumes)
-docker-compose down
+docker compose down
 
 # Stop services and remove volumes (DESTRUCTIVE - deletes data)
-docker-compose down -v
+docker compose down -v
 ```
 
 #### Viewing Logs
 
 ```bash
 # Follow logs in real-time
-docker-compose logs -f
+docker compose logs -f
 
 # View last 50 lines
-docker-compose logs --tail=50 openclaw
+docker compose logs --tail=50 openclaw
 
 # View specific service logs
-docker-compose logs -f openclaw
+docker compose logs -f openclaw
 ```
 
 #### Checking Status
 
 ```bash
 # List running containers
-docker-compose ps
+docker compose ps
 
 # Check OpenClaw health in container
 docker exec oc-bootstrap openclaw doctor
@@ -485,17 +501,17 @@ docker inspect oc-bootstrap
 
 ```bash
 # Restart all services
-docker-compose restart
+docker compose restart
 
 # Restart specific service
-docker-compose restart openclaw
+docker compose restart openclaw
 ```
 
 #### Accessing the Container Shell
 
 ```bash
 # Open interactive shell in running container
-docker-compose exec openclaw bash
+docker compose exec openclaw bash
 
 # Run new temporary container with shell
 docker run -it --rm --env-file docker-config.env oc-bootstrap:latest shell
@@ -597,7 +613,7 @@ openclaw agents logs assistant
 
 #### Container Won't Start
 
-**Problem**: `docker-compose up -d` fails or container exits immediately
+**Problem**: `docker compose up -d` fails or container exits immediately
 
 **Causes**:
 - Port 3000 (or configured port) already in use
@@ -613,7 +629,7 @@ sudo lsof -i :3000
 cat docker-config.env | grep TOKEN
 
 # Check container logs
-docker-compose logs openclaw
+docker compose logs openclaw
 
 # Inspect container for errors
 docker inspect oc-bootstrap
@@ -791,53 +807,26 @@ openclaw agents logs developer --follow
 ```
 oc-bootstrap/
 ├── README.md                    # This file
-├── CHANGELOG                    # Version history
-├── LICENSE                      # MIT License
-├── CODE_OF_CONDUCT.md           # Community standards
-├── CONTRIBUTING.md              # Contribution guidelines
-├── DOCKER.md                    # Docker documentation
-├── Makefile                     # Docker convenience commands
-├── docker-compose.yml           # Docker Compose configuration
-├── Dockerfile                   # Docker image definition
-├── .env.template                # Config file template
-├── .gitignore                   # Don't commit .env or logs
-│
-├── oc-bootstrap.sh              # Main installation script
+├── oc-bootstrap.sh              # Main installation script (refactored)
+├── install-lemonade.sh          # Optional: Local LLM setup
 ├── lib/
 │   └── helpers.sh               # Reusable bash functions library
-│
-├── scripts/                     # Utility scripts
-│   ├── docker-entrypoint.sh     # Docker container entrypoint
-│   ├── docker-cleanup.sh        # Docker cleanup utilities
-│   ├── install-lemonade.sh      # Local LLM setup
-│   └── uninstall-oc-bootstrap.sh # Safe removal script
-│
-├── assistant/                   # Assistant agent templates
-│   ├── SOUL.md                  # Personality & instructions
-│   ├── USER.md                  # User preferences
-│   └── AGENTS.md                # Collaboration rules
-├── research/                    # Research agent templates
+├── assistant/
+│   ├── SOUL.md                  # Assistant personality template
+│   ├── USER.md                  # User preferences template
+│   └── AGENTS.md                # Collaboration rules template
+├── research/
 │   ├── SOUL.md
 │   ├── USER.md
 │   └── AGENTS.md
-├── developer/                   # Developer agent templates
+├── developer/
 │   ├── SOUL.md
 │   ├── USER.md
 │   └── AGENTS.md
-│
-├── tests/                       # Test suite
-│   └── docker-test.sh           # Docker test script
-│
-└── .github/                     # GitHub configuration
-    ├── agents/                   # Custom agent definitions
-    │   ├── documentation-specialist.agent.md
-    │   └── openclaw-maintainer.agent.md
-    ├── workflows/                # CI/CD pipelines
-    │   └── lint-and-test.yml
-    ├── instructions/             # (reserved for file instructions)
-    ├── prompts/                  # (reserved for prompt templates)
-    ├── hooks/                    # (reserved for lifecycle hooks)
-    └── skills/                   # (reserved for skill definitions)
+├── .env.template                # Config file template
+├── .gitignore                   # Don't commit .env or logs
+├── LICENSE                      # MIT License
+└── CHANGELOG                    # Version history
 ```
 
 ---
@@ -921,13 +910,13 @@ If you want to remove OpenClaw and all its data, use the provided uninstall scri
 
 ```bash
 # Basic uninstall (interactive - will ask for confirmation)
-./scripts/uninstall-oc-bootstrap.sh
+./uninstall-oc-bootstrap.sh
 
 # Skip all confirmations (use with caution!)
-./scripts/uninstall-oc-bootstrap.sh --yes
+./uninstall-oc-bootstrap.sh --yes
 
 # Keep agent workspaces (SOUL.md, AGENTS.md, etc.)
-./scripts/uninstall-oc-bootstrap.sh --preserve-workspaces
+./uninstall-oc-bootstrap.sh --preserve-workspaces
 ```
 
 **What the uninstall script removes:**
@@ -946,22 +935,5 @@ If you want to remove OpenClaw and all its data, use the provided uninstall scri
 > ⚠️ **Warning**: The uninstall script will ask before deleting each component. Use `--yes` to skip confirmations, but be careful—this will delete all your agent data and configurations!
 
 > 💡 **Tip**: If you just want to reset the configuration but keep your workspaces, use `--preserve-workspaces`.
-
-To run the uninstall script:
-
-```bash
-# Basic uninstall (interactive)
-./scripts/uninstall-oc-bootstrap.sh
-
-# Skip confirmations (use with caution!)
-./scripts/uninstall-oc-bootstrap.sh --yes
-
-# Keep agent workspaces
-./scripts/uninstall-oc-bootstrap.sh --preserve-workspaces
-```
-
----
-
-## �️ Uninstallation
 
 ---
