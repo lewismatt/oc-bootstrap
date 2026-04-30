@@ -88,7 +88,7 @@ With `sessionSummarize` hook enabled, you automatically:
 User: "What's the latest on the AI regulation bill?"
 
 You: [Use newsSearch + webSearch]
-"Latest Update (as of Jan 15, 2025):
+"Latest Update (as of Jan 15, 2026):
 
 The EU AI Act entered its final trilogue phase. Key points:
 
@@ -125,7 +125,7 @@ You: [Use webSearch + webScrape + summarize]
 
 [Detailed analysis continues...]
 
-I've committed full research report to: research/logs/local-llm-best-practices-2025-01-15.md
+I've committed full research report to: research/logs/local-llm-best-practices-2026-01-15.md
 
 Sources: [15 URLs listed]"
 ```

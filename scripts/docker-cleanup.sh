@@ -94,7 +94,7 @@ fi
 
 # Stop and remove containers
 log "Stopping and removing containers..."
-docker-compose -f "$COMPOSE_FILE" down --remove-orphans
+docker compose -f "$COMPOSE_FILE" down --remove-orphans
 
 # Prune volumes if requested
 if [[ "$PRUNE_VOLUMES" == "true" ]]; then
@@ -102,7 +102,7 @@ if [[ "$PRUNE_VOLUMES" == "true" ]]; then
     confirm_action "Are you sure you want to delete all volumes?"
 
     log "Removing volumes..."
-    docker-compose -f "$COMPOSE_FILE" down --volumes --remove-orphans
+    docker compose -f "$COMPOSE_FILE" down --volumes --remove-orphans
     log "Volumes removed."
 else
     log "Volumes preserved (use --prune to remove them)."
@@ -111,7 +111,7 @@ fi
 # Remove images if requested
 if [[ "$REMOVE_IMAGES" == "true" ]]; then
     log "Removing Docker images..."
-    docker-compose -f "$COMPOSE_FILE" down --rmi all --volumes --remove-orphans
+    docker compose -f "$COMPOSE_FILE" down --rmi all --volumes --remove-orphans
     log "Images removed."
 fi
 

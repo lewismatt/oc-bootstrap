@@ -24,7 +24,7 @@ Complete guide to running OpenClaw Multi-Agent system in Docker containers.
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/openclaw/oc-bootstrap.git
 cd oc-bootstrap
 
 # Create and configure environment file
