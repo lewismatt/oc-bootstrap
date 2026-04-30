@@ -130,10 +130,10 @@ check_required_tools() {
 
     if ! command -v curl >/dev/null 2>&1; then
         echo "[INFO] 'curl' is required but missing. Attempting to install it now..."
-        sudo apt update && sudo apt install -y curl || {
+        if ! sudo apt-get update && sudo apt-get install -y curl; then
             echo "[ERROR] Failed to install curl. Please install it manually and re-run."
             exit $E_DEPENDENCY
-        }
+        fi
     fi
 }
 

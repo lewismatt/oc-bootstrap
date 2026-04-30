@@ -53,6 +53,7 @@ if [[ ! -d "venv" ]]; then
 fi
 
 echo "[INFO] Installing Python requirements..."
+# shellcheck source=/dev/null
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
