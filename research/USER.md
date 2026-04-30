@@ -1,30 +1,27 @@
 # User Context - Research Agent
 
-This file helps the Research Agent tailor its investigations to your specific
-interests, industries, and information needs.
+This file helps the Research Agent tailor its investigations to your specific interests, industries, and information needs.
 
 ## Research Interests
 
 ### Technology Topics
 
-- **AI/Machine Learning:** Local LLM deployment, open-source models,
-  AMD GPU optimization
-- **Software Development:** Python automation, bash scripting, GitOps workflows
-- **Infrastructure:** Self-hosted services, privacy-focused tools, local-first
-  software
+- [ ] **AI/Machine Learning:** Local LLM deployment, open-source models, GPU optimization
+- [ ] **Software Development:** Python automation, bash scripting, GitOps workflows
+- [ ] **Infrastructure:** Self-hosted services, privacy-focused tools, local-first software
+- [ ] [Add your technology interests]
 
 ### Industry Focus
 
-- Open-source software trends
-- AI regulation and policy developments
-- Privacy and data security news
-- AMD graphics card updates (VRAM optimization, ROCm releases)
+- [ ] Open-source software trends
+- [ ] AI regulation and policy developments
+- [ ] Privacy and data security news
+- [ ] [Add your industry focus areas]
 
 ### Personal Interests
 
-- [Add your hobbies, sports teams, music artists, etc.]
-- Example: "Colorado Avalanche hockey, Tyler Childers tour dates, ski
-  conditions in Summit County"
+- [ ] [Add your hobbies, sports teams, music artists, etc.]
+- Example: "Colorado Avalanche hockey, Tyler Childers tour dates, ski conditions"
 
 ## Research Preferences
 
@@ -53,17 +50,16 @@ interests, industries, and information needs.
 
 **Active Alerts:** (Topics you want regular updates on)
 
-1. **OpenClaw Updates:**
-   - New releases and changelogs
-   - Community discussions and issues
-   - Integration guides and tutorials
+1. **[Topic 1]:**
+   - [ ] New releases and changelogs
+   - [ ] Community discussions and issues
+   - [ ] Integration guides and tutorials
 
-2. **AI Model Releases:**
-   - New open-source models (especially <7B parameters)
-   - AMD ROCm-compatible models
-   - Quantized model releases (GGUF format)
+2. **[Topic 2]:**
+   - [ ] [Add specific aspects to monitor]
+   - [ ] [Add more aspects]
 
-3. **[Add your own]:**
+3. **[Add your own topics]:**
    - Example: "Linux kernel security updates"
    - Example: "Raspberry Pi new product announcements"
 
@@ -84,30 +80,29 @@ interests, industries, and information needs.
 
 **Archival:**
 
-- Commit important research to `research/logs/` via GitLab MCP
+- If Git integration is configured, commit important research to `research/logs/`
 - Use descriptive filenames: `YYYY-MM-DD-topic-slug.md`
 - Tag research by category in commit messages
 
 ## Example Research Requests
 
 **Quick Factual:**
+
 > "What's the current stable version of Python?"
->
+
 > Expected: Brief answer with link to Python.org release page
 
 **Standard Investigation:**
+
 > "What are the best practices for securing a self-hosted web server?"
->
-> Expected: 5-7 recommendations with sources, security audit checklist,
-> links to hardening guides
+
+> Expected: 5-7 recommendations with sources, security audit checklist, links to hardening guides
 
 **Deep Research:**
-> "Research the pros and cons of different vector databases for local AI
-> memory systems."
->
-> Expected: Comparison table, performance benchmarks, integration
-> complexity analysis, recommendation based on 12GB VRAM constraint, full
-> report committed to research/logs/
+
+> "Research the pros and cons of different vector databases for local AI memory systems."
+
+> Expected: Comparison table, performance benchmarks, integration complexity analysis, recommendation based on your constraints, full report committed to research/logs/
 
 ## Sentiment Analysis Guidelines
 
@@ -149,16 +144,14 @@ When analyzing social media or community sentiment:
 
 ## Time Zones & Scheduling
 
-**Primary Time Zone:** Mountain Time (MT)
+**Primary Time Zone:** [Your Time Zone - e.g., Mountain Time (MT)]
 
 **Best Times for Real-Time Research:**
 
-- Breaking news: Monitor between 6 AM - 10 PM MT
+- Breaking news: Monitor between [time range]
 - Stock/crypto updates: Market hours + after-hours
-- Social trends: Peak activity 11 AM - 9 PM MT
+- Social trends: Peak activity [time range]
 
 ---
 
-*Note: The Research Agent can update this file via GitLab MCP as it learns
-your interests and preferences. You can also edit manually: `nano
-~/.openclaw/workspace-research/USER.md`*
+*Note: The Research Agent can update this file as it learns your interests and preferences. You can also edit manually: `nano ~/.openclaw/workspace-research/USER.md`*

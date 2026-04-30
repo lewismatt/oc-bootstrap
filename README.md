@@ -2,26 +2,46 @@
 
 <div align="center">
 
-Automated setup for OpenClaw AI agents on Ubuntu 24.04. Deploy three specialized AI assistants that work securely on your server and communicate with you privately through Telegram.
+Automated setup for [OpenClaw](https://openclaw.ai) multi-agent AI system. Deploy three specialized AI agents that run on your own server and communicate privately through Telegram.
+
+> **📢 Refactored for Public Use (April 2026):** This repository has been refactored from a personal bootstrap tool into a public-friendly project. All personal references have been removed, agent templates are now generic, and the interactive setup is designed for users with basic Linux/command-line skills. See [REFACTOR.md](REFACTOR.md) for details.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: Ubuntu 24.04](https://img.shields.io/badge/Platform-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/download/server)
 [![Node.js 22.x](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
 [![Docker Ready](https://img.shields.io/badge/Docker-Ready-blue.svg)](DOCKER.md)
 [![Telegram Bots](https://img.shields.io/badge/Telegram-Bots-2CA5E0.svg)](https://core.telegram.org/bots)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/lewismatt/oc-bootstrap/ci.yml)](https://github.com/lewismatt/oc-bootstrap/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/openclaw/oc-bootstrap/ci.yml)](https://github.com/openclaw/oc-bootstrap/actions)
 
 </div>
 
 ---
 
-## � Quick Start
+## 🎯 Who Is This For?
+
+This project is designed for:
+
+- **Self-hosting enthusiasts** who want to run AI agents on their own hardware
+- **Privacy-conscious users** who prefer local inference over cloud APIs
+- **Developers and researchers** needing isolated agent workspaces for different tasks
+- **Anyone with basic Linux/command-line skills** who wants to set up a multi-agent AI system
+
+**What you'll need:**
+- A Linux server, VM, or Docker host (Ubuntu 24.04 recommended)
+- Three Telegram bot tokens (free to create via [@BotFather](https://t.me/BotFather))
+- Basic familiarity with terminal commands
+
+---
+
+## 🚀 Quick Start
 
 Get OpenClaw running in under 5 minutes:
 
+### Option 1: Interactive Script (Bare Metal)
+
 ```bash
 # 1. Clone the repository
-git clone https://github.com/lewismatt/oc-bootstrap.git
+git clone https://github.com/openclaw/oc-bootstrap.git
 cd oc-bootstrap
 
 # 2. Make scripts executable
@@ -31,7 +51,13 @@ chmod +x *.sh
 ./oc-bootstrap.sh
 ```
 
-For Docker deployment:
+The script will guide you through:
+- Choosing between local (Lemonade) or cloud-based AI models
+- Entering your Telegram bot tokens
+- Selecting models for each agent
+- Optionally adding API keys for enhanced features
+
+### Option 2: Docker Deployment (Recommended for Beginners)
 
 ```bash
 # 1. Configure your environment
@@ -47,10 +73,10 @@ docker compose logs -f
 
 ---
 
-## �📖 Table of Contents
+## 📖 Table of Contents
 
 1. [Overview](#-overview)
-2. [Architecture](#%EF%B8%8F-architecture)
+2. [Architecture](#️-architecture)
 3. [Prerequisites Checklist](#-prerequisites-checklist)
 4. [Installation](#-installation)
 5. [Docker Setup](#-docker-setup)
@@ -67,7 +93,7 @@ docker compose logs -f
 
 ## 🎯 Overview
 
-**OpenClaw** is a self-hosted multi-agent AI platform. This bootstrap script automates the complex setup process so you can get started in minutes.
+**OpenClaw** is a self-hosted multi-agent AI platform. This bootstrap project automates the complex setup process so you can get started in minutes.
 
 ### What You Get
 
@@ -77,11 +103,23 @@ docker compose logs -f
 | **Research** | Web research specialist | Search the internet, scrape news, analyze trends |
 | **Developer** | Coding expert | Write code, debug, read repositories |
 
+### Key Features
+
 All three agents:
-- Run securely on your own server (no data sent to external services unless you configure APIs)
-- Communicate privately via Telegram
-- Use isolated workspaces with separate memories
-- Support both local and cloud-based AI models
+- **Run on your own server** (you control your data)
+- **Communicate privately via Telegram** (one bot per agent)
+- **Use isolated workspaces** with separate memories and configurations
+- **Support local AI models** (no cloud APIs required)
+- **Can use cloud APIs** (OpenAI, Anthropic) if preferred
+
+### 🍋 Local Inference Focus
+
+This project emphasizes **self-hosting with local models** using [Lemonade Server](https://lemonade.ai):
+- **Privacy**: No data sent to external services
+- **Cost**: No per-token fees for local models
+- **Control**: You choose which models to run
+
+Cloud APIs (OpenAI, Anthropic) are also supported for convenience.
 
 ---
 
@@ -91,19 +129,24 @@ All three agents:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│         Your Ubuntu 24.04 Server                         │
+│         Your Linux Server (Ubuntu 24.04)               │
 ├─────────────────────────────────────────────────────────┤
 │                                                           │
 │  ┌────────────────────────────────────────────────────┐  │
-│  │         OpenClaw Gateway                           │  │
-│  │  (Central routing, memory indexing, config)        │  │
+│  │         OpenClaw Gateway (Single Instance)         │  │
+│  │  • Central routing                                │  │
+│  │  • Memory indexing                                │  │
+│  │  • Configuration management                        │  │
 │  └────────────────────────────────────────────────────┘  │
 │           ↓            ↓            ↓                     │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐      │
 │  │ Assistant    │ │ Research     │ │ Developer    │      │
 │  │ Agent        │ │ Agent        │ │ Agent        │      │
 │  │              │ │              │ │              │      │
-│  │ Model: GPT4o │ │ Model: GPT4o │ │ Claude 3.5   │      │
+│  │ Isolated     │ │ Isolated     │ │ Isolated     │      │
+│  │ Workspace    │ │ Workspace    │ │ Workspace    │      │
+│  │ Separate     │ │ Separate     │ │ Separate     │      │
+│  │ Memory       │ │ Memory       │ │ Memory       │      │
 │  └──────────────┘ └──────────────┘ └──────────────┘      │
 │           ↓            ↓            ↓                     │
 │  ┌──────────────────────────────────────────────────┐    │
@@ -112,9 +155,23 @@ All three agents:
 │  └──────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────┘
          ↕                                    ↕
-    Telegram Bot                         API Providers
-    (You)                           (OpenAI, Anthropic, etc.)
+    Telegram Bots                      AI Model Providers
+    (1 per agent)                 (Local: Lemonade / Cloud: OpenAI, etc.)
 ```
+
+### Agent Isolation via Telegram
+
+Each agent has its own:
+- **Telegram bot** (unique token from @BotFather)
+- **Workspace directory** (`~/.openclaw/workspace-{agent}/`)
+- **Memory index** (separate SQLite database)
+- **Configuration** (model, skills, hooks)
+
+This isolation ensures:
+- Clean separation of concerns
+- No cross-contamination of memories
+- Independent model selection per agent
+- Specialized personalities and capabilities
 
 ### Directory Structure
 
@@ -122,7 +179,7 @@ All three agents:
 ~/.openclaw/
 ├── logs/                          # Installation and runtime logs
 │   └── openclaw-setup.log
-├── secrets.env                    # Encrypted credentials (chmod 600)
+├── secrets.env                    # Credentials (chmod 600)
 ├── memory/                        # SQLite vector indexes
 │   ├── assistant.sqlite
 │   ├── research.sqlite
@@ -140,9 +197,10 @@ All three agents:
 
 ### 1. System Requirements
 
-- **OS**: Ubuntu 24.04 (bare-metal or WSL2)
+- **OS**: Ubuntu 24.04 (bare-metal, VM, or WSL2)
 - **User**: Non-root user with `sudo` access
 - **Network**: Stable internet connection (required for setup; agents can work offline after)
+- **For local inference**: NVIDIA GPU with 8GB+ VRAM (optional but recommended)
 
 ### 2. Telegram Bots (Required)
 
@@ -155,17 +213,15 @@ You need **three unique Telegram bot tokens** (one for each agent).
 3. Copy the **HTTP API Token** (looks like: `110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`)
 4. Repeat 2 more times for total of 3 unique tokens
 
-### 3. Choose Your AI Models (Required)
+### 3. Choose Your AI Models
 
-For beginners, we recommend **Remote APIs** (cloud-based, no GPU needed):
+| Type | Provider | Example Model | Cost | Requirements |
+|------|----------|---------------|------|-------------|
+| **Local** | Lemonade Server | `lemonade/user.Qwen3.5-4B-GGUF` | Free | GPU recommended |
+| **Cloud** | OpenAI | `openai/gpt-4o` | Pay per use | API key |
+| **Cloud** | Anthropic | `anthropic/claude-3-5-sonnet-latest` | Pay per use | API key |
 
-| Provider | Recommended Model | Cost | Setup Time |
-|----------|-------------------|------|------------|
-| **OpenAI** | `openai/gpt-4o` | ~$0.03 per 1K tokens | 5 min (get API key) |
-| **Anthropic** | `anthropic/claude-3-5-sonnet-latest` | ~$0.003 per 1K tokens | 5 min (get API key) |
-| **Local (Lemonade)** | `lemonade/user.Qwen3.5-4B-GGUF` | Free (but needs GPU) | 30 min (setup server) |
-
-> 📌 **Default Configuration**: Assistant and Research use OpenAI GPT-4o; Developer uses Anthropic Claude 3.5 Sonnet (`anthropic/claude-3-5-sonnet-latest`). You can change these during setup.
+> 📌 **Recommendation for beginners**: Start with cloud APIs (easier setup, no GPU needed). Switch to local inference later for privacy and cost savings.
 
 ### 4. Optional API Keys
 
@@ -188,11 +244,11 @@ These unlock additional features:
 
 ```bash
 # 1. Clone this repository
-git clone https://github.com/lewismatt/oc-bootstrap.git openclaw-setup
-cd openclaw-setup
+git clone https://github.com/openclaw/oc-bootstrap.git
+cd oc-bootstrap
 
 # 2. Make scripts executable
-chmod +x oc-bootstrap.sh install-lemonade.sh
+chmod +x oc-bootstrap.sh
 
 # 3. Run the installer
 ./oc-bootstrap.sh
@@ -200,11 +256,11 @@ chmod +x oc-bootstrap.sh install-lemonade.sh
 
 The script will interactively prompt you for:
 - Whether to use local or remote inference
-- Telegram bot tokens
-- Model preferences
+- Telegram bot tokens (you can paste them when prompted)
+- Model preferences for each agent
 - Optional API keys
 
-**Installation time**: ~5–10 minutes (depending on internet speed)
+**Installation time**: ~5-10 minutes (depending on internet speed)
 
 ### Automated Setup (Non-Interactive Mode)
 
@@ -236,7 +292,7 @@ nano ~/.openclaw/secrets.env
 
 ---
 
-## � Docker Setup
+## 🐳 Docker Setup
 
 **Run OpenClaw in a containerized environment** - perfect for testing, isolation, or users who prefer Docker.
 
@@ -332,10 +388,10 @@ docker volume ls | grep openclaw
 Enable the optional Lemonade Server service in `docker-compose.yml` for local LLM inference (no cloud APIs needed):
 
 1. Uncomment the `lemonade` service section in `docker-compose.yml`
-
-**Note:** The project uses modern `docker compose` (V2) syntax. If you're using an older version, the command may be `docker-compose` instead.
 2. Set `LOCAL_INFERENCE=true` in `docker-config.env`
-3. Start services: `docker-compose up -d`
+3. Start services: `docker compose up -d`
+
+> **Note:** The project uses modern `docker compose` (V2) syntax. If you're using an older version, the command may be `docker-compose` instead.
 
 ### Documentation
 
@@ -348,7 +404,7 @@ For detailed Docker documentation, see [DOCKER.md](DOCKER.md) which covers:
 
 ---
 
-## �🛠️ Configuration
+## 🛠️ Configuration
 
 ### Configuration File Format (.env)
 
@@ -689,7 +745,7 @@ For complete privacy, run OpenClaw with a local Lemonade Server instead of cloud
 
 **Setup**:
 ```bash
-./install-lemonade.sh
+./scripts/install-lemonade.sh
 # Follow prompts to select model and GPU
 
 # Once server is running, bootstrap agents:
@@ -808,7 +864,7 @@ openclaw agents logs developer --follow
 ```
 oc-bootstrap/
 ├── README.md                    # This file
-├── oc-bootstrap.sh              # Main installation script (refactored)
+├── oc-bootstrap.sh              # Main installation script
 ├── install-lemonade.sh          # Optional: Local LLM setup
 ├── lib/
 │   └── helpers.sh               # Reusable bash functions library
@@ -824,10 +880,26 @@ oc-bootstrap/
 │   ├── SOUL.md
 │   ├── USER.md
 │   └── AGENTS.md
-├── docker-config.env.template                # Config file template
+├── docker-config.env.template   # Config file template
+├── docker-compose.yml           # Docker Compose configuration
+├── Dockerfile                   # Docker image definition
 ├── .gitignore                   # Don't commit .env or logs
 ├── LICENSE                      # MIT License
-└── CHANGELOG                    # Version history
+├── CHANGELOG                    # Version history
+├── CONTRIBUTING.md              # Contribution guidelines
+├── CODE_OF_CONDUCT.md           # Code of conduct
+├── DOCKER.md                    # Docker documentation
+├── Makefile                     # Build automation
+├── scripts/                     # Utility scripts
+│   ├── docker-entrypoint.sh
+│   ├── docker-cleanup.sh
+│   └── uninstall-oc-bootstrap.sh
+├── tests/                       # Test scripts
+│   └── docker-test.sh
+└── wiki/                        # Documentation wiki
+    ├── Home.md
+    ├── Quick-Start.md
+    └── ... (additional guides)
 ```
 
 ---
@@ -874,9 +946,11 @@ This project builds upon these excellent open source projects:
 
 Found a bug? Have a suggestion? We'd love your help!
 
-1. Check [open issues](https://github.com/lewismatt/oc-bootstrap/issues)
+1. Check [open issues](https://github.com/openclaw/oc-bootstrap/issues)
 2. Create a new issue with details
 3. Submit a pull request with improvements
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
@@ -890,7 +964,7 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 - **Documentation**: [docs.openclaw.ai](https://docs.openclaw.ai)
 - **Discord Community**: [discord.gg/openclaw](https://discord.gg/openclaw)
-- **GitHub Issues**: [Report a bug](https://github.com/lewismatt/oc-bootstrap/issues)
+- **GitHub Issues**: [Report a bug](https://github.com/openclaw/oc-bootstrap/issues)
 
 ---
 
@@ -905,19 +979,21 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 **Happy bootstrapping! 🚀**
 
+---
+
 ### Uninstalling OpenClaw
 
 If you want to remove OpenClaw and all its data, use the provided uninstall script:
 
 ```bash
 # Basic uninstall (interactive - will ask for confirmation)
-./uninstall-oc-bootstrap.sh
+./scripts/uninstall-oc-bootstrap.sh
 
 # Skip all confirmations (use with caution!)
-./uninstall-oc-bootstrap.sh --yes
+./scripts/uninstall-oc-bootstrap.sh --yes
 
 # Keep agent workspaces (SOUL.md, AGENTS.md, etc.)
-./uninstall-oc-bootstrap.sh --preserve-workspaces
+./scripts/uninstall-oc-bootstrap.sh --preserve-workspaces
 ```
 
 **What the uninstall script removes:**
