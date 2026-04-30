@@ -206,7 +206,7 @@ without relying on cloud services.
 
 ```bash
 # 1. Clone the repo
-git clone <your-repo-url> openclaw-setup
+git clone https://github.com/openclaw/oc-bootstrap.git openclaw-setup
 cd openclaw-setup
 
 # 2. Make the script executable
@@ -214,6 +214,20 @@ chmod +x oc-bootstrap.sh
 
 # 3. Run the installer (follow the prompts)
 ./oc-bootstrap.sh
+```
+
+### 🌍 After Installation: Remote API Providers
+
+If you chose to use Remote API providers (OpenAI, Anthropic) instead of local inference during setup, you'll need to provide your API keys before starting the gateway.
+
+Run the OpenClaw onboarding wizard to enter your keys:
+```bash
+openclaw onboarding
+```
+
+Once configured, start the gateway:
+```bash
+openclaw gateway start
 ```
 
 ---

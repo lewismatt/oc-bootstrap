@@ -58,7 +58,7 @@ FAIL_ON_OPENCLAW_ERRORS=true
 
 check_required_tools() {
     local missing=()
-    local tools=(curl sed diff cp mkdir chmod chown printf)
+    local tools=(sed diff cp mkdir chmod chown printf)
     # Note: `openclaw`, `apt`, and `sudo` are used later but may be installed by this script.
     # Keep the core utilities listed here; the script will check for `openclaw` after install step.
     for t in "${tools[@]}"; do
@@ -71,6 +71,14 @@ check_required_tools() {
         echo "[ERROR] Missing required system tools: ${missing[*]}"
         echo "Please install the above tools and re-run this script."
         exit $E_DEPENDENCY
+    fi
+
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "[INFO] 'curl' is required but missing. Attempting to install it now..."
+        sudo apt update && sudo apt install -y curl || {
+            echo "[ERROR] Failed to install curl. Please install it manually and re-run."
+            exit $E_DEPENDENCY
+        }
     fi
 }
 
@@ -298,7 +306,9 @@ read -r -p "Proceed with installation? (Y/n) " CONFIRM </dev/tty
 # ==============================================================================
 echo ""
 echo "=== Inference Backend ==="
-read -r -p "Will you use local inference via Lemonade Server or remote API providers (e.g., OpenAI, Anthropic)? [L/r]: " USE_REMOTE </dev/tty
+echo "If you are new to self-hosting AI, we recommend using Remote API providers (e.g., OpenAI, Anthropic) for a smoother start."
+echo "If you have a server with a dedicated GPU and want maximum privacy, choose Local inference via Lemonade Server."
+read -r -p "Will you use local inference via Lemonade Server or remote API providers? [L/r]: " USE_REMOTE </dev/tty
 if [[ "${USE_REMOTE^^}" == "R" ]]; then
     LOCAL_INFERENCE=false
     LEMONADE_KEY=""
@@ -314,27 +324,48 @@ echo "=== Model Selection ==="
 if [[ "$LOCAL_INFERENCE" == true ]]; then
     echo "Paste the Lemonade tags for your local models (e.g., lemonade/user.Qwen3.5-4B-GGUF)."
 else
-    echo "Paste the provider tags for your remote models (e.g., openai/gpt-4o, anthropic/claude-3-sonnet)."
+    echo "Paste the provider tags for your remote models."
+    echo "Defaults are provided for convenience (OpenAI/Anthropic)."
 fi
 echo ""
 
 while [[ -z "$EMBEDDING_MODEL" ]]; do
-    read -r -p "Enter Embedding Model tag (used for memory vector search): " EMBEDDING_MODEL </dev/tty
+    if [[ "$LOCAL_INFERENCE" == false ]]; then
+        read -r -p "Enter Embedding Model tag [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL </dev/tty
+        EMBEDDING_MODEL="${EMBEDDING_MODEL:-openai/text-embedding-3-small}"
+    else
+        read -r -p "Enter Embedding Model tag (used for memory vector search): " EMBEDDING_MODEL </dev/tty
+    fi
     [[ -z "$EMBEDDING_MODEL" ]] && echo "  [ERROR] Embedding model is required."
 done
 
 while [[ -z "$ASSISTANT_MODEL" ]]; do
-    read -r -p "Enter Assistant Agent LLM tag: " ASSISTANT_MODEL </dev/tty
+    if [[ "$LOCAL_INFERENCE" == false ]]; then
+        read -r -p "Enter Assistant Agent LLM tag [Default: openai/gpt-4o]: " ASSISTANT_MODEL </dev/tty
+        ASSISTANT_MODEL="${ASSISTANT_MODEL:-openai/gpt-4o}"
+    else
+        read -r -p "Enter Assistant Agent LLM tag: " ASSISTANT_MODEL </dev/tty
+    fi
     [[ -z "$ASSISTANT_MODEL" ]] && echo "  [ERROR] Assistant model is required."
 done
 
 while [[ -z "$RESEARCH_MODEL" ]]; do
-    read -r -p "Enter Research Agent LLM tag: " RESEARCH_MODEL </dev/tty
+    if [[ "$LOCAL_INFERENCE" == false ]]; then
+        read -r -p "Enter Research Agent LLM tag [Default: openai/gpt-4o]: " RESEARCH_MODEL </dev/tty
+        RESEARCH_MODEL="${RESEARCH_MODEL:-openai/gpt-4o}"
+    else
+        read -r -p "Enter Research Agent LLM tag: " RESEARCH_MODEL </dev/tty
+    fi
     [[ -z "$RESEARCH_MODEL" ]] && echo "  [ERROR] Research model is required."
 done
 
 while [[ -z "$DEVELOPER_MODEL" ]]; do
-    read -r -p "Enter Developer Agent LLM tag: " DEVELOPER_MODEL </dev/tty
+    if [[ "$LOCAL_INFERENCE" == false ]]; then
+        read -r -p "Enter Developer Agent LLM tag [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL </dev/tty
+        DEVELOPER_MODEL="${DEVELOPER_MODEL:-anthropic/claude-3-5-sonnet-latest}"
+    else
+        read -r -p "Enter Developer Agent LLM tag: " DEVELOPER_MODEL </dev/tty
+    fi
     [[ -z "$DEVELOPER_MODEL" ]] && echo "  [ERROR] Developer model is required."
 done
 
