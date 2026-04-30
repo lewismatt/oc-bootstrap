@@ -17,9 +17,9 @@ set -euo pipefail
 # ==============================================================================
 
 OPENCLAW_USER="openclaw"
-OPENCLAW_HOME="/home/openclaw"
-OPENCLAW_CONFIG="${OPENCLAW_HOME}/.openclaw/secrets.env"
-BOOTSTRAP_SCRIPT="${OPENCLAW_HOME}/oc-bootstrap/oc-bootstrap.sh"
+OPENCLAW_HOME="/home/openclaw/.openclaw"
+OPENCLAW_CONFIG="${OPENCLAW_HOME}/secrets.env"
+BOOTSTRAP_SCRIPT="/home/openclaw/oc-bootstrap/oc-bootstrap.sh"
 
 # ==============================================================================
 # FUNCTIONS
