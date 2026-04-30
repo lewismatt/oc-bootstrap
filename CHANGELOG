@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Documentation Specialist Agent**: Created `.github/agents/documentation-specialist.agent.md` for improving repository documentation
+- **CONTRIBUTING.md**: Comprehensive contributing guidelines with coding standards and testing instructions
+- **CODE_OF_CONDUCT.md**: Contributor Covenant Code of Conduct for community standards
+- **Dependencies & Attributions Section**: Added to README.md with proper citation of open source projects
+- **README Badges**: Added license, platform, Node.js, Docker, and Telegram badges
+- **Quick Start Section**: Added concise 5-minute setup guide at the top of README
+
+### Changed
+
+- **README.md**: Improved structure with better section organization and visual enhancements
+- **Documentation**: Enhanced formatting and clarity across all documentation files
+
+### Improved
+
+- **Repository Organization**: Better structure for both seasoned developers and new users
+- **Dependency Citations**: Clear attribution of open source projects with license information
+
+---
+
+## [Previous]
+
+### Added
+
 - **Uninstall Script**: Created `uninstall-oc-bootstrap.sh` for safe removal of OpenClaw installations
   - Interactive confirmation for each major deletion (workspaces, secrets, memory, config)
   - Supports `--yes` flag for automated uninstalls (use with caution)
