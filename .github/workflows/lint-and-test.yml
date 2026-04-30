@@ -19,7 +19,7 @@ jobs:
         uses: ludeeus/action-shellcheck@master
         with:
           scandir: '.'
-          additional_files: 'oc-bootstrap.sh install-lemonade.sh'
+          additional_files: 'oc-bootstrap.sh install-lemonade.sh lib/helpers.sh'
 
       - name: shfmt
         uses: mfinelli/setup-shfmt@v3
