@@ -41,11 +41,9 @@ You are an OpenClaw Bootstrap Project Maintainer. Your role is to ensure the pro
 | `docker-entrypoint.sh` | Docker container entrypoint |
 | `docker-compose.yml` | Docker Compose configuration |
 | `Dockerfile` | Docker image definition |
-| `.env.template` | Bare-metal config template |
 | `docker-config.env.template` | Docker config template |
 | `README.md` | Main documentation |
-| `PROJECT_STATUS.md` | Project status tracking |
-| `CLEANUP_SUMMARY.md` | Cleanup documentation |
+| `CHANGELOG` | Project changelog |
 | `lib/helpers.sh` | Helper functions library |
 
 ## Output Format
