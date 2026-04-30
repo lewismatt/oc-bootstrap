@@ -1,41 +1,52 @@
 #!/bin/bash
+# ==============================================================================
+# OpenClaw Multi-Agent Bootstrap Script
+# ==============================================================================
+# Automated setup for OpenClaw AI agents on Ubuntu 24.04
+#
+# Usage:
+#   ./oc-bootstrap.sh                                 # Interactive mode
+#   ./oc-bootstrap.sh --config .env --non-interactive # Automated mode
+#
+# See README.md for full documentation.
+# ==============================================================================
+
 set -euo pipefail
-set +o histexpand # Disable history expansion to prevent issues with '!' characters in secrets
+set +o histexpand # Disable history expansion to prevent issues with '!' characters
 
 # ==============================================================================
-# OPENCLAW MULTI-AGENT ARCHITECTURE SETUP
+# CONSTANTS & EXIT CODES
 # ==============================================================================
-#
-# HOST ENVIRONMENT:
-#   - OS: Ubuntu 24.04 (Bare-metal, standard user execution)
-#   - Storage: Standard home directories (~/.openclaw/workspace-*)
-#   - Execution: Native process daemon (no Docker overhead)
-#
-# INFERENCE BACKEND (Local Lemonade Server):
-#   - Embedding Model: (User-defined)
-#   - Assistant Model: (User-defined)
-#   - Research Model:  (User-defined)
-#   - Developer Model: (User-defined)
-#
-# ==============================================================================
-# EXIT CODES
-# ==============================================================================
-E_SUDO=10
-E_DEPENDENCY=11
-E_OPENCLAW=12
-E_CONFIG=13
-E_GATEWAY=14
 
-STABILITY_DELAY=5 # Configurable start-up wait time
-# Config: control whether OpenClaw-related failures are fatal (true) or warnings (false)
-# Set to 'false' for best-effort installations where OpenClaw may be configured later.
-FAIL_ON_OPENCLAW_ERRORS=true
-NON_INTERACTIVE=false
-CONFIG_FILE=""
+# Exit code constants (for error classification)
+E_SUDO=10        # Script run as root or sudo unavailable
+E_DEPENDENCY=11  # System package installation failure
+E_OPENCLAW=12    # OpenClaw installation or runtime error
+E_CONFIG=13      # Configuration operation failed
+E_GATEWAY=14     # Gateway start/bind error
 
-# ======================================================================
-# Argument Parsing
-# ----------------------------------------------------------------------
+# Execution settings
+STABILITY_DELAY=5                # Wait time for gateway to stabilize (seconds)
+FAIL_ON_OPENCLAW_ERRORS=true    # Treat OpenClaw errors as fatal (not just warnings)
+NON_INTERACTIVE=false            # Interactive prompts mode
+CONFIG_FILE=""                   # Configuration file path (optional)
+
+# ==============================================================================
+# SCRIPT INITIALIZATION
+# ==============================================================================
+
+# Get script directory (for sourcing helpers and accessing agent templates)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source helper functions library
+if [[ ! -f "$SCRIPT_DIR/lib/helpers.sh" ]]; then
+    echo "[ERROR] Helper library not found: $SCRIPT_DIR/lib/helpers.sh"
+    exit 1
+fi
+# shellcheck disable=SC1090
+source "$SCRIPT_DIR/lib/helpers.sh"
+
+# Parse command-line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         --non-interactive | -y)
@@ -48,133 +59,63 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo "Unknown option: $1"
+            echo "Usage: $0 [--config FILE] [--non-interactive]"
             exit 1
             ;;
     esac
 done
 
-# Load config if provided
+# Load configuration file if provided
 if [[ -n "$CONFIG_FILE" ]]; then
     if [[ -f "$CONFIG_FILE" ]]; then
         echo "[INFO] Loading configuration from $CONFIG_FILE"
         # shellcheck disable=SC1090
         source "$CONFIG_FILE"
     else
-        echo "[ERROR] Config file $CONFIG_FILE not found."
+        echo "[ERROR] Config file not found: $CONFIG_FILE"
         exit $E_CONFIG
     fi
 fi
 
-# ======================================================================
-# Exit Code Table
-# ----------------------------------------------------------------------
-# 10 - E_SUDO        : Script run as root or sudo required but unavailable
-# 11 - E_DEPENDENCY  : System package installation or dependency failure
-# 12 - E_OPENCLAW    : OpenClaw installation or runtime error
-# 13 - E_CONFIG      : Configuration operation failed (openclaw config set)
-# 14 - E_GATEWAY     : Gateway start/bind or network gateway error
-# ======================================================================
+# ==============================================================================
+# VARIABLE INITIALIZATION
+# ==============================================================================
+# Initialize all credential variables to empty strings (prevent unset errors)
 
 # ==============================================================================
-# 0. Sudo Trap Guardrail
+# RUNTIME CHECKS
 # ==============================================================================
+
+# 1. Check that script is not run as root
 if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-    echo "[ERROR] Do not run this script directly as root or with sudo."
-    echo "This script installs workspaces to the current user's home directory (\$HOME)."
-    echo "It will automatically prompt for sudo access when installing system packages."
+    echo "[ERROR] Do not run this script as root or with sudo."
+    echo "        This script installs to \$HOME and will prompt for sudo when needed."
     exit $E_SUDO
 fi
 
-# ======================================================================
-# Environment / tool checks
-# ======================================================================
-# Required external tools (minimum):
-#   - curl, sed, diff, cp, mkdir, chmod, chown, printf
-#   - sudo, apt (for package installation)
-#   - openclaw (installed by this script)
-#
-# Static analysis: Running ShellCheck
-# Note: ShellCheck runs only if installed. The script continues if it's not available.
-check_shellcheck() {
-    if ! command -v shellcheck >/dev/null 2>&1; then
-        echo "[INFO] ShellCheck not found. Skipping static analysis."
-        echo "      Install with: sudo apt install shellcheck"
-        return 0
-    fi
+# 2. Check required system tools
+check_required_tools sed diff cp mkdir chmod chown printf
 
-    echo "[INFO] Running ShellCheck static analysis..."
-    if shellcheck "$0" 2>/dev/null; then
-        echo "  [OK] ShellCheck analysis complete: No critical issues found."
-    else
-        echo "  [WARN] ShellCheck found some issues. Review output above."
-        echo "         This is not fatal - installation will continue."
-    fi
-}
-
-check_required_tools() {
-    local missing=()
-    local tools=(sed diff cp mkdir chmod chown printf)
-    # Note: `openclaw`, `apt`, and `sudo` are used later but may be installed by this script.
-    # Keep the core utilities listed here; the script will check for `openclaw` after install step.
-    for t in "${tools[@]}"; do
-        if ! command -v "$t" >/dev/null 2>&1; then
-            missing+=("$t")
-        fi
-    done
-
-    if [[ ${#missing[@]} -gt 0 ]]; then
-        echo "[ERROR] Missing required system tools: ${missing[*]}"
-        echo "Please install the above tools and re-run this script."
+# 3. Attempt to install curl if missing (required for API calls)
+if ! require_tool "curl"; then
+    echo "[INFO] 'curl' is required but missing. Attempting to install..."
+    if ! install_if_missing "curl"; then
         exit $E_DEPENDENCY
     fi
+fi
 
-    if ! command -v curl >/dev/null 2>&1; then
-        echo "[INFO] 'curl' is required but missing. Attempting to install it now..."
-        if ! sudo apt-get update && sudo apt-get install -y curl; then
-            echo "[ERROR] Failed to install curl. Please install it manually and re-run."
-            exit $E_DEPENDENCY
-        fi
-    fi
-}
+# 4. Run static analysis (optional, if ShellCheck available)
+check_shellcheck
 
-# Unified handler to control whether errors (especially OpenClaw/config errors)
-# should abort the script or be treated as warnings. Call like:
-#   some_command || handle_error_or_warn "Failed to do X" $E_CONFIG
-handle_error_or_warn() {
-    local msg=$1
-    local code=${2-1}
-    if [[ "${FAIL_ON_OPENCLAW_ERRORS,,}" == "true" ]]; then
-        echo "[ERROR] $msg"
-        exit "$code"
-    else
-        echo "[WARN] $msg"
-    fi
-}
+# ==============================================================================
+# AGENT & CREDENTIAL CONFIGURATION
+# ==============================================================================
 
-# Simple IPv4 validator — checks each octet is 0-255
-valid_ipv4() {
-    local ip=$1
-    local IFS=.
-    read -r -a octets <<<"$ip"
-    [[ ${#octets[@]} -eq 4 ]] || return 1
-    for o in "${octets[@]}"; do
-        if [[ ! "$o" =~ ^[0-9]+$ ]]; then
-            return 1
-        fi
-        if ((o < 0 || o > 255)); then
-            return 1
-        fi
-    done
-    return 0
-}
-
-# Constants
-# List of managed agents (single source of truth)
+# Agent definitions (single source of truth)
 AGENTS=("assistant" "research" "developer")
-# Human-friendly prefixes used during interactive prompts
 AGENT_PREFIXES=("General" "Deep Research" "Developer")
 
-# FIX: Initialize variables to empty strings before use.
+# Initialize all credential variables (prevents unset variable errors)
 ASSISTANT_TOKEN=""
 RESEARCH_TOKEN=""
 DEVELOPER_TOKEN=""
@@ -184,165 +125,39 @@ RESEARCH_MODEL=""
 DEVELOPER_MODEL=""
 GITHUB_PAT=""
 GITLAB_PAT=""
+BRAVE_API_KEY=""
+X_API_KEY=""
 
 # ==============================================================================
-# HELPER FUNCTIONS
+# LOGGING & SIGNAL HANDLING
 # ==============================================================================
 
-# Progress bar indicator
-##
-# progress_bar(total, current)
-# Render a simple ASCII progress bar to stdout.
-# - total: integer total number of steps
-# - current: integer current step (1-based)
-##
-progress_bar() {
-    local total=$1
-    local current=$2
-    local bar_width=40
-    if [[ -z "$total" || "$total" -le 0 ]]; then
-        return 0
-    fi
-    local percent=$((current * 100 / total))
-    local filled=$((current * bar_width / total))
-    local empty=$((bar_width - filled))
-    local filled_str=""
-    local empty_str=""
-    local i
-    for ((i = 0; i < filled; i++)); do filled_str+="#"; done
-    for ((i = 0; i < empty; i++)); do empty_str+=" "; done
-    printf "\rProgress: [%-${bar_width}s] %d%%" "${filled_str}${empty_str}" "$percent"
-}
-
-# Section summary function
-##
-# print_section_summary(title, ...items)
-# Print a compact summary block for a completed section.
-# - title: short section name
-# - items: list of status strings
-##
-print_section_summary() {
-    local section_title=$1
-    shift
-    local items=("$@")
-    echo ""
-    echo "=== ${section_title^^} Summary ==="
-    for item in "${items[@]}"; do
-        echo "[OK] $item"
-    done
-    echo ""
-}
-
-# Telegram token validation function
-##
-# validate_telegram_token(token)
-# Performs a format check then attempts an API `getMe` request to Telegram
-# to confirm the token is live. Returns 0 on success, 1 on failure.
-#
-# Token format: {8-10 digit bot ID}:{35-char alphanumeric+underscore string}
-# Example:      110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw
-##
-validate_telegram_token() {
-    local token=$1
-    local timeout=5
-
-    # FIX: Previous regex ^[a-zA-Z0-9_-]{14,}$ matched no colon, so every
-    # valid Telegram token (which always contains ':') was incorrectly rejected.
-    # Corrected to match the actual Telegram token format.
-    if [[ ! "$token" =~ ^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$ ]]; then
-        echo "  [WARN] Token format validation failed. Expected format: {8-10 digits}:{35 alphanumeric chars}"
-        return 1
-    fi
-
-    # Try to validate with Telegram API (returns HTTP status code)
-    local http_code
-    http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time "$timeout" \
-        "https://api.telegram.org/bot$token/getMe" 2>/dev/null)
-
-    if [[ "$http_code" == "200" ]]; then
-        echo "  [OK] Token validated successfully"
-        return 0
-    elif [[ "$http_code" == "401" ]]; then
-        echo "  [ERROR] Invalid token (401 Unauthorized)"
-        return 1
-    elif [[ "$http_code" == "404" ]]; then
-        echo "  [ERROR] Bot not found (404 Not Found)"
-        return 1
-    else
-        echo "  [WARN] Token format valid but API validation failed with HTTP $http_code"
-        return 0 # Don't fail the script, just warn
-    fi
-}
-
-# Parallel operation runner (reserved for future use — not currently called)
-##
-# run_parallel("cmd1", "cmd2", ...)
-# Run each provided command string in a subshell concurrently and
-# wait for all to complete. Commands are executed with background
-# jobs; errors inside individual subshells do not abort the caller.
-##
-run_parallel() {
-    # run_parallel supports two calling conventions:
-    # 1) run_parallel "cmd1" "cmd2" ...  (each command is executed via bash -c)
-    # 2) Provide the name of an array variable that holds commands:
-    #      cmds=("cmd1" "cmd2"); run_parallel cmds
-    local pids=()
-
-    # If a single argument is provided and it's the name of an array variable,
-    # iterate its elements using nameref (bash 4.3+).
-    if [[ $# -eq 1 ]] && declare -p "$1" 2>/dev/null | grep -q "declare -a"; then
-        local arr_name=$1
-        local -n cmds_ref="$arr_name"
-        for cmd in "${cmds_ref[@]}"; do
-            bash -c -- "$cmd" &
-            pids+=($!)
-        done
-    else
-        local commands=("$@")
-        for cmd in "${commands[@]}"; do
-            bash -c -- "$cmd" &
-            pids+=($!)
-        done
-    fi
-
-    local pid
-    for pid in "${pids[@]}"; do
-        wait "$pid"
-    done
-}
-
-# ==============================================================================
-# 1. Logging & Trap Setup
-# ==============================================================================
 SCRIPT_NAME="openclaw-setup"
 LOG_FILE="$HOME/.openclaw/logs/${SCRIPT_NAME}.log"
 
-mkdir -p "$(dirname "$LOG_FILE")"
-exec > >(tee -a "$LOG_FILE") 2>&1
+# Initialize logging (output goes to both console and log file)
+init_logging "$LOG_FILE"
+log_timestamp "Starting OpenClaw Multi-Agent Setup"
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting OpenClaw Multi-Agent Setup"
-
-cleanup() {
-    local exit_code=$?
+# Setup cleanup handler for graceful shutdown
+cleanup_on_exit() {
+    local exit_code=$1
     if [[ $exit_code -ne 0 ]]; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setup aborted or interrupted with code $exit_code. Check log: $LOG_FILE"
+        log_timestamp "Setup aborted or interrupted with code $exit_code. Check: $LOG_FILE"
     else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setup completed or intentionally halted."
+        log_timestamp "Setup completed or intentionally halted."
     fi
     exit "$exit_code"
 }
-trap cleanup EXIT INT TERM
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Run quick environment checks
-check_required_tools
-
-# Optional: Run static analysis if ShellCheck is available
-check_shellcheck
+setup_cleanup_trap cleanup_on_exit
 
 # ==============================================================================
-# 2. User Confirmation
+# SECTION 1: USER CONFIRMATION & ENVIRONMENT CHECK
+# ==============================================================================
+
+# ==============================================================================
+# SECTION 2: USER CONFIRMATION
 # ==============================================================================
 echo ""
 echo "OpenClaw Multi-Agent Setup"
@@ -354,7 +169,7 @@ if [[ "$NON_INTERACTIVE" == "false" ]]; then
 fi
 
 # ==============================================================================
-# 3. Credential Collection
+# SECTION 3: CREDENTIAL COLLECTION & VALIDATION
 # ==============================================================================
 echo ""
 echo "=== Inference Backend ==="
@@ -541,7 +356,7 @@ echo "[OK] Research Model: $RESEARCH_MODEL"
 echo "[OK] Developer Model: $DEVELOPER_MODEL"
 
 # ==============================================================================
-# 4. Save Credentials to Secure .env File
+# SECTION 4: SAVE CREDENTIALS TO SECURE .env FILE
 # ==============================================================================
 if [[ -z "$ASSISTANT_TOKEN" || -z "$RESEARCH_TOKEN" || -z "$DEVELOPER_TOKEN" ]]; then
     echo "[ERROR] One or more Telegram bot tokens are missing. These tokens are required to bind agents to Telegram."
@@ -551,37 +366,14 @@ fi
 
 echo ""
 echo "Saving credentials to secure environment file..."
-mkdir -p "$HOME/.openclaw"
+ensure_directory "$HOME/.openclaw" || exit 1
 
 SECRETS_FILE="$HOME/.openclaw/secrets.env"
 
-# Helper: write all secrets to the file using printf %q for safe quoting.
-# printf %q produces bash-compatible single-quoted output that survives
-# special characters (spaces, $, !, etc.) when the file is later sourced.
-write_secrets_file() {
-    {
-        printf 'LOCAL_INFERENCE=%q\n' "$LOCAL_INFERENCE"
-        printf 'LEMONADE_KEY=%q\n' "$LEMONADE_KEY"
-        printf 'EMBEDDING_MODEL=%q\n' "$EMBEDDING_MODEL"
-        printf 'ASSISTANT_MODEL=%q\n' "$ASSISTANT_MODEL"
-        printf 'RESEARCH_MODEL=%q\n' "$RESEARCH_MODEL"
-        printf 'DEVELOPER_MODEL=%q\n' "$DEVELOPER_MODEL"
-        printf 'ASSISTANT_TOKEN=%q\n' "$ASSISTANT_TOKEN"
-        printf 'RESEARCH_TOKEN=%q\n' "$RESEARCH_TOKEN"
-        printf 'DEVELOPER_TOKEN=%q\n' "$DEVELOPER_TOKEN"
-        printf 'GITHUB_PAT=%q\n' "$GITHUB_PAT"
-        printf 'GITLAB_PAT=%q\n' "$GITLAB_PAT"
-        printf 'BRAVE_API_KEY=%q\n' "$BRAVE_API_KEY"
-        printf 'X_API_KEY=%q\n' "$X_API_KEY"
-    } >"$SECRETS_FILE"
-    chmod 600 "$SECRETS_FILE" || true
-    chown "$(id -un):$(id -gn)" "$SECRETS_FILE" 2>/dev/null || true
-}
-
 if [[ -f "$SECRETS_FILE" ]]; then
     echo ""
-    echo "  [WARN] A secrets file already exists at $SECRETS_FILE"
-    echo "  Overwriting it will replace all previously stored credentials."
+    echo "  [WARN] Secrets file already exists at $SECRETS_FILE"
+    echo "  Overwriting will replace all previously stored credentials."
     echo ""
     read -r -p "  Overwrite existing secrets file? (y/N) " OVERWRITE_SECRETS </dev/tty
     if [[ "${OVERWRITE_SECRETS^^}" != "Y" ]]; then
@@ -589,16 +381,16 @@ if [[ -f "$SECRETS_FILE" ]]; then
         # shellcheck disable=SC1090
         source "$SECRETS_FILE"
     else
-        write_secrets_file
+        safe_write_secrets_file "$SECRETS_FILE"
         echo "[OK] Credentials updated at $SECRETS_FILE"
     fi
 else
-    write_secrets_file
+    safe_write_secrets_file "$SECRETS_FILE"
     echo "[OK] Credentials saved to $SECRETS_FILE"
 fi
 
 # ==============================================================================
-# 5. System Preparation & Core Install
+# SECTION 5: SYSTEM PREPARATION & CORE INSTALLATION
 # ==============================================================================
 echo ""
 echo "=== System Preparation ==="
@@ -684,7 +476,7 @@ print_section_summary "System Preparation" \
     "Health check completed"
 
 # ==============================================================================
-# 6. Configure Inference Backend
+# SECTION 6: CONFIGURE INFERENCE BACKEND
 # ==============================================================================
 echo ""
 if [[ "$LOCAL_INFERENCE" == true ]]; then
@@ -726,7 +518,7 @@ if [[ "$LOCAL_INFERENCE" == true ]]; then
 fi
 
 # ==============================================================================
-# 7. Provision Isolated Agent Workspaces
+# SECTION 7: PROVISION ISOLATED AGENT WORKSPACES
 # ==============================================================================
 echo ""
 echo "=== Provisioning Agent Workspaces ==="
@@ -756,7 +548,7 @@ print_section_summary "Agent Workspace Provisioning" \
     "User-defined models assigned to all agents"
 
 # ==============================================================================
-# 8. Inject Agent-Specific Secrets & Configure Providers
+# SECTION 8: INJECT AGENT-SPECIFIC SECRETS & MCP SERVERS
 # ==============================================================================
 echo ""
 echo "=== Injecting Isolated Agent Secrets & MCPs ==="
@@ -814,7 +606,7 @@ _summary_items=()
 print_section_summary "Agent Secrets & MCP Configuration" "${_summary_items[@]}"
 
 # ==============================================================================
-# 9. Assign Native Skills & Hooks
+# SECTION 9: ASSIGN NATIVE SKILLS & OPERATIONAL HOOKS
 # ==============================================================================
 echo ""
 echo "=== Assigning Native Skills & Hooks ==="
@@ -843,7 +635,7 @@ print_section_summary "Skills & Hooks Configuration" \
     "Developer toolValidation hook enabled"
 
 # ==============================================================================
-# 10. Bind Isolated Telegram Channels
+# SECTION 10: BIND TELEGRAM CHANNELS FOR AGENTS
 # ==============================================================================
 echo ""
 echo "=== Binding Telegram Channels ==="
@@ -875,7 +667,7 @@ print_section_summary "Telegram Channel Binding" \
     "Developer agent bound to Telegram"
 
 # ==============================================================================
-# 11. Configure Local Memory & Vector Search
+# SECTION 11: CONFIGURE LOCAL MEMORY & VECTOR SEARCH
 # ==============================================================================
 echo ""
 echo "=== Configuring Local Memory & Vector Search ==="
@@ -947,7 +739,7 @@ print_section_summary "Memory & Vector Search" \
     "Memory index directory created at $MEMORY_DIR"
 
 # ==============================================================================
-# 12. Seed Agent Prompt Files from Repository
+# SECTION 12: SEED AGENT PROMPT FILES FROM REPOSITORY
 # ==============================================================================
 echo ""
 echo "=== Agent Prompt File Seeding ==="
@@ -1080,7 +872,7 @@ else
 fi
 
 # ==============================================================================
-# 13. Start & Verify Gateway
+# SECTION 13: START & VERIFY GATEWAY
 # ==============================================================================
 echo ""
 echo "=== Gateway Startup ==="
@@ -1134,7 +926,7 @@ else
 fi
 
 # ==============================================================================
-# 14. Final Verification
+# SECTION 14: FINAL VERIFICATION & COMPLETION
 # ==============================================================================
 echo ""
 echo "=== Final Verification ==="
