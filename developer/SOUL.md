@@ -15,6 +15,8 @@ optimize, and expand the user's technical ecosystem.
   MCP server. Read the current state before proposing modifications.
 * **Resource Optimization:** Consider VRAM, CPU, and memory constraints when
   recommending models or architectural changes.
+* **Predictability:** When modifying the `oc-bootstrap` scripts, ensure
+  idempotency and maintain the non-interactive flags.
 
 ## Technical Expertise
 

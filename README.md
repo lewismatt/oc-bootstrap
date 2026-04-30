@@ -40,7 +40,7 @@ Each of your three agents needs its own Telegram bot so it can message you secur
 1. Open Telegram and search for [**@BotFather**](https://t.me/BotFather).
 2. Send the message `/newbot` and follow the prompts to create your first bot (e.g., "My Assistant").
 3. Copy the **HTTP API Token** it gives you.
-4. Repeat this two more times for your "Research Agent" and "Developer" bots. Keep these three unique tokens handy!
+4. Repeat this two more times for your "Research Agent" and "Developer" bots. Keep these three unique tokens handy! (You'll enter them during the script, or you can paste them into a `.env` file for an automated setup).
 
 ### 2. Choose Your AI "Brains" (Remote APIs)
 
@@ -68,35 +68,55 @@ For beginners, we highly recommend using Remote APIs. You will need an API key f
 > ⚠️ **Do not run the script as root.** The installer will request `sudo` only when
 > necessary.
 
-### 👣 Steps
+### 👣 Installation Methods
+
+#### Option A: Interactive Setup (Recommended for beginners)
+
+Follow the guided prompts to set up your agents and models.
 
 ```bash
 # 1. Clone the repo
 git clone https://github.com/openclaw/oc-bootstrap.git openclaw-setup
 cd openclaw-setup
 
-# 2. Make the script executable
-chmod +x oc-bootstrap.sh
+# 2. Make the scripts executable
+chmod +x oc-bootstrap.sh install-lemonade.sh
 
-# 3. Run the installer (follow the prompts)
+# 3. Run the installer
 ./oc-bootstrap.sh
 ```
 
-### 🌍 After Installation: Remote API Providers
+#### Option B: Fast/Automated Setup (For advanced users)
 
-If you chose to use Remote API providers (OpenAI, Anthropic) instead of local inference during setup, you'll need to provide your API keys before starting the gateway.
-
-Run the OpenClaw onboarding wizard to enter your keys:
+Pre-configure everything via a file to skip the interactive prompts.
 
 ```bash
-openclaw onboarding
+# 1. Prepare your configuration
+cp .env.template .env
+nano .env  # Fill in your tokens and model choices
+
+# 2. Run non-interactively
+./oc-bootstrap.sh --config .env --non-interactive
 ```
 
-Once configured, start the gateway:
+### 🌍 After Installation: Finalizing API Keys
 
-```bash
-openclaw gateway start
-```
+If you chose to use Remote API providers (OpenAI, Anthropic) and didn't start the gateway during the setup script, you'll need to provide your API keys first.
+
+1. **Run the onboarding wizard** to enter your keys:
+   ```bash
+   openclaw onboarding
+   ```
+
+2. **Start the gateway**:
+   ```bash
+   openclaw gateway start
+   ```
+
+3. **Check the status**:
+   ```bash
+   openclaw gateway status
+   ```
 
 ---
 
@@ -131,17 +151,17 @@ Just send a message to any bot to start! Try:
 
 ### 2. Customize Agent Personalities
 
-You can personalize each agent by editing their prompt files:
+You can personalize each agent by editing their prompt files. Your Assistant will even try to learn your preferences and update your `USER.md` automatically!
 
 ```bash
-# Edit the Assistant's personality
+# Edit the Assistant's core personality
 nano ~/.openclaw/workspace-assistant/SOUL.md
 
-# Add your personal context
+# Update your personal profile (Hardware, Schedule, Preferences)
 nano ~/.openclaw/workspace-assistant/USER.md
 ```
 
-See the example files in this repository's subdirectories (assistant/, research/, developer/) for ideas.
+See the example files in this repository's subdirectories (`assistant/`, `research/`, `developer/`) for inspiration.
 
 ### 3. Monitor Agent Activity
 
@@ -195,43 +215,20 @@ openclaw onboarding
 
 *Skip this section unless you have a dedicated server with a powerful graphics card (12+ GB VRAM).*
 
-If you want 100% privacy and zero cloud usage, you can run the AI brains on your own hardware using **Lemonade Server**. Lemonade Server is a tool that runs AI models on your own graphics card and provides an OpenAI-compatible API that your agents can use.
+If you want 100% privacy and zero cloud usage, you can run the AI brains on your own hardware using **Lemonade Server**. We provide a helper script to automate the installation:
 
-### Setup on Linux (Ubuntu 24.04)
+```bash
+# Run the Lemonade installer
+./install-lemonade.sh
+```
 
-1. **Clone the Lemonade repository:**
+The script will:
+1. Clone the Lemonade Server repository.
+2. Detect your GPU (AMD or NVIDIA) and install dependencies.
+3. Help you download recommended models (Qwen2.5 and Nomic Embed).
+4. Create a `start-lemonade.sh` script for you.
 
-   ```bash
-   git clone https://github.com/lemonade-ai/lemonade-server.git
-   cd lemonade-server
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   # For AMD ROCm support (adjust for NVIDIA if needed)
-   sudo apt install -y rocm-core rocm-libs
-   export HSA_OVERRIDE_GFX_VERSION=11.0  # Adjust based on your GPU
-   pip install -r requirements.txt
-   ```
-
-3. **Download a model:**
-
-   ```bash
-   mkdir -p models/huggingface.co/user.model-name/
-
-   # Example: Download Qwen3.5-4B
-   huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf \
-     --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
-   ```
-
-4. **Start the server:**
-
-   ```bash
-   HSA_OVERRIDE_GFX_VERSION=11.0 python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ./models
-   ```
-
-When you run `./oc-bootstrap.sh`, answer "Yes" when it asks if you want to use Local Inference, and provide your server's IP address and the tag `lemonade/user.Qwen3.5-4B-GGUF`.
+Once Lemonade is running, re-run `./oc-bootstrap.sh` and choose "Yes" for Local Inference.
 
 ---
 

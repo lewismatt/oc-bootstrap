@@ -1,2 +1,8 @@
 *.recommends.md
 .github/*
+.env
+.secrets
+secrets.env
+*.log
+venv/
+node_modules/

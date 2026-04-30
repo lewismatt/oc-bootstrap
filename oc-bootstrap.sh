@@ -30,6 +30,40 @@ STABILITY_DELAY=5 # Configurable start-up wait time
 # Config: control whether OpenClaw-related failures are fatal (true) or warnings (false)
 # Set to 'false' for best-effort installations where OpenClaw may be configured later.
 FAIL_ON_OPENCLAW_ERRORS=true
+NON_INTERACTIVE=false
+CONFIG_FILE=""
+
+# ======================================================================
+# Argument Parsing
+# ----------------------------------------------------------------------
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --non-interactive|-y)
+            NON_INTERACTIVE=true
+            shift
+            ;;
+        --config|-c)
+            CONFIG_FILE="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# Load config if provided
+if [[ -n "$CONFIG_FILE" ]]; then
+    if [[ -f "$CONFIG_FILE" ]]; then
+        echo "[INFO] Loading configuration from $CONFIG_FILE"
+        # shellcheck disable=SC1090
+        source "$CONFIG_FILE"
+    else
+        echo "[ERROR] Config file $CONFIG_FILE not found."
+        exit $E_CONFIG
+    fi
+fi
 
 # ======================================================================
 # Exit Code Table
@@ -312,125 +346,149 @@ echo ""
 echo "OpenClaw Multi-Agent Setup"
 echo "=============================================================================="
 echo ""
-read -r -p "Proceed with installation? (Y/n) " CONFIRM </dev/tty
-[[ "$CONFIRM" == "y" || "$CONFIRM" == "Y" || -z "$CONFIRM" ]] || exit 0
+if [[ "$NON_INTERACTIVE" == "false" ]]; then
+    read -r -p "Proceed with installation? (Y/n) " CONFIRM </dev/tty
+    [[ "$CONFIRM" == "y" || "$CONFIRM" == "Y" || -z "$CONFIRM" ]] || exit 0
+fi
 
 # ==============================================================================
 # 3. Credential Collection
 # ==============================================================================
 echo ""
 echo "=== Inference Backend ==="
-echo "You can use Local inference (Lemonade Server), Remote APIs (OpenAI, Anthropic), or a mix of both."
-echo "If you are new to self-hosting AI, we recommend using Remote API providers for a smoother start."
-read -r -p "Will you use local inference via Lemonade Server for any of your agents? [y/N]: " USE_LOCAL </dev/tty
-if [[ "${USE_LOCAL^^}" == "Y" ]]; then
-    LOCAL_INFERENCE=true
-    read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
-    LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
+if [[ -z "${LOCAL_INFERENCE:-}" ]]; then
+    echo "You can use Local inference (Lemonade Server), Remote APIs (OpenAI, Anthropic), or a mix of both."
+    echo "If you are new to self-hosting AI, we recommend using Remote API providers for a smoother start."
+    read -r -p "Will you use local inference via Lemonade Server for any of your agents? [y/N]: " USE_LOCAL </dev/tty
+    if [[ "${USE_LOCAL^^}" == "Y" ]]; then
+        LOCAL_INFERENCE=true
+        read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
+        LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
+    else
+        LOCAL_INFERENCE=false
+        LEMONADE_KEY=""
+        echo "  [OK] Remote API Providers exclusively selected."
+    fi
 else
-    LOCAL_INFERENCE=false
-    LEMONADE_KEY=""
-    echo "  [OK] Remote API Providers exclusively selected."
+    echo "[INFO] Local Inference: $LOCAL_INFERENCE (from config)"
 fi
 
 echo ""
 echo "=== Model Selection ==="
-echo "For each model, provide the appropriate provider tag:"
-echo "  - Local Lemonade: lemonade/user.Qwen3.5-4B-GGUF"
-echo "  - Remote OpenAI: openai/gpt-4o"
-echo "  - Remote Anthropic: anthropic/claude-3-5-sonnet-latest"
-echo ""
+if [[ -z "${EMBEDDING_MODEL:-}" ]]; then
+    echo "For each model, provide the appropriate provider tag:"
+    echo "  - Local Lemonade: lemonade/user.Qwen3.5-4B-GGUF"
+    echo "  - Remote OpenAI: openai/gpt-4o"
+    echo "  - Remote Anthropic: anthropic/claude-3-5-sonnet-latest"
+    echo ""
 
-while [[ -z "$EMBEDDING_MODEL" ]]; do
-    read -r -p "Enter Embedding Model tag [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL </dev/tty
-    EMBEDDING_MODEL="${EMBEDDING_MODEL:-openai/text-embedding-3-small}"
-done
+    while [[ -z "$EMBEDDING_MODEL" ]]; do
+        read -r -p "Enter Embedding Model tag [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL </dev/tty
+        EMBEDDING_MODEL="${EMBEDDING_MODEL:-openai/text-embedding-3-small}"
+    done
+fi
 
-while [[ -z "$ASSISTANT_MODEL" ]]; do
-    read -r -p "Enter Assistant Agent LLM tag [Default: openai/gpt-4o]: " ASSISTANT_MODEL </dev/tty
-    ASSISTANT_MODEL="${ASSISTANT_MODEL:-openai/gpt-4o}"
-done
+if [[ -z "${ASSISTANT_MODEL:-}" ]]; then
+    while [[ -z "$ASSISTANT_MODEL" ]]; do
+        read -r -p "Enter Assistant Agent LLM tag [Default: openai/gpt-4o]: " ASSISTANT_MODEL </dev/tty
+        ASSISTANT_MODEL="${ASSISTANT_MODEL:-openai/gpt-4o}"
+    done
+fi
 
-while [[ -z "$RESEARCH_MODEL" ]]; do
-    read -r -p "Enter Research Agent LLM tag [Default: openai/gpt-4o]: " RESEARCH_MODEL </dev/tty
-    RESEARCH_MODEL="${RESEARCH_MODEL:-openai/gpt-4o}"
-done
+if [[ -z "${RESEARCH_MODEL:-}" ]]; then
+    while [[ -z "$RESEARCH_MODEL" ]]; do
+        read -r -p "Enter Research Agent LLM tag [Default: openai/gpt-4o]: " RESEARCH_MODEL </dev/tty
+        RESEARCH_MODEL="${RESEARCH_MODEL:-openai/gpt-4o}"
+    done
+fi
 
-while [[ -z "$DEVELOPER_MODEL" ]]; do
-    read -r -p "Enter Developer Agent LLM tag [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL </dev/tty
-    DEVELOPER_MODEL="${DEVELOPER_MODEL:-anthropic/claude-3-5-sonnet-latest}"
-done
+if [[ -z "${DEVELOPER_MODEL:-}" ]]; then
+    while [[ -z "$DEVELOPER_MODEL" ]]; do
+        read -r -p "Enter Developer Agent LLM tag [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL </dev/tty
+        DEVELOPER_MODEL="${DEVELOPER_MODEL:-anthropic/claude-3-5-sonnet-latest}"
+    done
+fi
 
 echo ""
 echo "=== Telegram Bot Tokens ==="
-echo "You will need three unique Telegram Bot Tokens from @BotFather."
-echo ""
+if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_TOKEN:-}" ]]; then
+    echo "You will need three unique Telegram Bot Tokens from @BotFather."
+    echo ""
 
-TOTAL_TOKENS=${#AGENTS[@]}
-current_token=0
+    TOTAL_TOKENS=${#AGENTS[@]}
+    current_token=0
 
-while [[ $current_token -lt $TOTAL_TOKENS ]]; do
-    AGENT_PREFIX="${AGENT_PREFIXES[$current_token]}"
-
-    CURRENT_TOKEN=""
-    ATTEMPT=0
-
-    while [[ -z "$CURRENT_TOKEN" || "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ||
-        "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" || "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; do
-        ATTEMPT=$((ATTEMPT + 1))
-        if [[ $ATTEMPT -gt 3 ]]; then
-            echo "  [WARN] Failed to collect $AGENT_PREFIX token after 3 attempts."
-            break
-        fi
+    while [[ $current_token -lt $TOTAL_TOKENS ]]; do
+        AGENT_PREFIX="${AGENT_PREFIXES[$current_token]}"
 
         CURRENT_TOKEN=""
-        read -r -s -p "Enter Telegram Bot Token for the $AGENT_PREFIX Agent: " CURRENT_TOKEN </dev/tty
-        echo ""
+        ATTEMPT=0
 
-        if [[ -z "$CURRENT_TOKEN" ]]; then
-            echo "  [ERROR] $AGENT_PREFIX token is required. Please try again."
-        elif [[ "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ]]; then
-            echo "  [ERROR] Token must be unique. Do not reuse the Assistant token."
-        elif [[ "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" ]]; then
-            echo "  [ERROR] Token must be unique. Do not reuse the Research token."
-        elif [[ "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; then
-            echo "  [ERROR] Token must be unique. Do not reuse the Developer token."
-        else
-            break
-        fi
-    done
+        while [[ -z "$CURRENT_TOKEN" || "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ||
+            "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" || "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            if [[ $ATTEMPT -gt 3 ]]; then
+                echo "  [WARN] Failed to collect $AGENT_PREFIX token after 3 attempts."
+                break
+            fi
 
-    if [[ -n "$CURRENT_TOKEN" ]]; then
-        if ! validate_telegram_token "$CURRENT_TOKEN"; then
-            echo ""
-            echo "  [WARN] Token format invalid. Please try again."
             CURRENT_TOKEN=""
-        else
-            case $current_token in
-                0) ASSISTANT_TOKEN="$CURRENT_TOKEN" ;;
-                1) RESEARCH_TOKEN="$CURRENT_TOKEN" ;;
-                2) DEVELOPER_TOKEN="$CURRENT_TOKEN" ;;
-            esac
-            current_token=$((current_token + 1))
-        fi
-    fi
+            read -r -s -p "Enter Telegram Bot Token for the $AGENT_PREFIX Agent: " CURRENT_TOKEN </dev/tty
+            echo ""
 
-    echo ""
-done
+            if [[ -z "$CURRENT_TOKEN" ]]; then
+                echo "  [ERROR] $AGENT_PREFIX token is required. Please try again."
+            elif [[ "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ]]; then
+                echo "  [ERROR] Token must be unique. Do not reuse the Assistant token."
+            elif [[ "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" ]]; then
+                echo "  [ERROR] Token must be unique. Do not reuse the Research token."
+            elif [[ "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; then
+                echo "  [ERROR] Token must be unique. Do not reuse the Developer token."
+            else
+                break
+            fi
+        done
+
+        if [[ -n "$CURRENT_TOKEN" ]]; then
+            if ! validate_telegram_token "$CURRENT_TOKEN"; then
+                echo ""
+                echo "  [WARN] Token format invalid. Please try again."
+                CURRENT_TOKEN=""
+            else
+                case $current_token in
+                    0) ASSISTANT_TOKEN="$CURRENT_TOKEN" ;;
+                    1) RESEARCH_TOKEN="$CURRENT_TOKEN" ;;
+                    2) DEVELOPER_TOKEN="$CURRENT_TOKEN" ;;
+                esac
+                current_token=$((current_token + 1))
+            fi
+        fi
+
+        echo ""
+    done
+else
+    echo "[OK] Telegram tokens provided via config."
+fi
 
 echo ""
 echo "=== Agent-Specific External Secrets (optional) ==="
-read -r -s -p "Enter GitLab Personal Access Token (for local MCP, or press Enter to skip): " GITLAB_PAT </dev/tty
-echo ""
-GITLAB_PAT="${GITLAB_PAT:-}"
+if [[ -z "${GITLAB_PAT:-}" && "$NON_INTERACTIVE" == "false" ]]; then
+    read -r -s -p "Enter GitLab Personal Access Token (for local MCP, or press Enter to skip): " GITLAB_PAT </dev/tty
+    echo ""
+    GITLAB_PAT="${GITLAB_PAT:-}"
+fi
 
-read -r -s -p "Enter Brave Search API Key (for Research Agent, or press Enter to skip): " BRAVE_API_KEY </dev/tty
-echo ""
-BRAVE_API_KEY="${BRAVE_API_KEY:-}"
+if [[ -z "${BRAVE_API_KEY:-}" && "$NON_INTERACTIVE" == "false" ]]; then
+    read -r -s -p "Enter Brave Search API Key (for Research Agent, or press Enter to skip): " BRAVE_API_KEY </dev/tty
+    echo ""
+    BRAVE_API_KEY="${BRAVE_API_KEY:-}"
+fi
 
-read -r -s -p "Enter X/Twitter API Key or Auth Cookie (for xScraper, or press Enter to skip): " X_API_KEY </dev/tty
-echo ""
-X_API_KEY="${X_API_KEY:-}"
+if [[ -z "${X_API_KEY:-}" && "$NON_INTERACTIVE" == "false" ]]; then
+    read -r -s -p "Enter X/Twitter API Key or Auth Cookie (for xScraper, or press Enter to skip): " X_API_KEY </dev/tty
+    echo ""
+    X_API_KEY="${X_API_KEY:-}"
+fi
 
 [[ -z "$GITLAB_PAT" ]] && echo "[WARN] No GitLab PAT provided. Git workflow features will be unavailable."
 [[ -z "$BRAVE_API_KEY" ]] && echo "[WARN] No Brave Search API Key provided. Web search will be unavailable."
@@ -618,19 +676,25 @@ echo ""
 if [[ "$LOCAL_INFERENCE" == true ]]; then
     echo "=== Linking Lemonade Server Backend ==="
 
-    LEMONADE_IP=""
-    while true; do
-        read -r -p "Enter Lemonade server IP address (e.g., 192.168.12.50): " LEMONADE_IP </dev/tty
-        if valid_ipv4 "$LEMONADE_IP"; then
-            break
-        else
-            echo "[ERROR] Invalid IP address format. Please try again."
-        fi
-    done
+    if [[ -z "${LEMONADE_IP:-}" ]]; then
+        LEMONADE_IP=""
+        while true; do
+            read -r -p "Enter Lemonade server IP address (e.g., 192.168.12.50): " LEMONADE_IP </dev/tty
+            if valid_ipv4 "$LEMONADE_IP"; then
+                break
+            else
+                echo "[ERROR] Invalid IP address format. Please try again."
+            fi
+        done
+    else
+        echo "[INFO] Using Lemonade IP: $LEMONADE_IP (from config)"
+    fi
 
     BASE_URL="http://${LEMONADE_IP}:8000/v1"
-    read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL </dev/tty
-    [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
+    if [[ "$NON_INTERACTIVE" == "false" ]]; then
+        read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL </dev/tty
+        [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
+    fi
 
     openclaw config set providers.lemonade.baseUrl "$BASE_URL" || handle_error_or_warn "Failed to set Lemonade base URL." $E_CONFIG
     openclaw config set providers.lemonade.apiKey "$LEMONADE_KEY" || handle_error_or_warn "Failed to set Lemonade API key." $E_CONFIG
@@ -640,8 +704,8 @@ else
 fi
 
 echo "Configuring shared embedding and dreaming models..."
-openclaw config set memory.dreaming.model "$ASSISTANT_MODEL" || echo "[WARN] Failed to set dreaming model."
-openclaw config set memory.embeddingModel "$EMBEDDING_MODEL" || echo "[WARN] Failed to set embedding model."
+openclaw config set memory.dreaming.model "$ASSISTANT_MODEL" || handle_error_or_warn "Failed to set dreaming model." "$E_CONFIG"
+openclaw config set memory.embeddingModel "$EMBEDDING_MODEL" || handle_error_or_warn "Failed to set embedding model." "$E_CONFIG"
 
 if [[ "$LOCAL_INFERENCE" == true ]]; then
     echo "[OK] Lemonade Server backend configured"
@@ -662,14 +726,14 @@ for i in "${!agents_to_provision[@]}"; do
 
     echo "Provisioning agent: ${agent^^}..."
     openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive ||
-        echo "[WARN] Issue provisioning agent '$agent'. Continuing."
+        handle_error_or_warn "Issue provisioning agent '$agent'. Continuing." "$E_OPENCLAW"
 done
 echo "" # Newline after progress bar
 
 echo "Assigning LLM inference models to agents..."
-openclaw config set agents.list.assistant.model "$ASSISTANT_MODEL" || echo "[WARN] Failed to set model for assistant agent."
-openclaw config set agents.list.research.model "$RESEARCH_MODEL" || echo "[WARN] Failed to set model for research agent."
-openclaw config set agents.list.developer.model "$DEVELOPER_MODEL" || echo "[WARN] Failed to set model for developer agent."
+openclaw config set agents.list.assistant.model "$ASSISTANT_MODEL" || handle_error_or_warn "Failed to set model for assistant agent." "$E_CONFIG"
+openclaw config set agents.list.research.model "$RESEARCH_MODEL" || handle_error_or_warn "Failed to set model for research agent." "$E_CONFIG"
+openclaw config set agents.list.developer.model "$DEVELOPER_MODEL" || handle_error_or_warn "Failed to set model for developer agent." "$E_CONFIG"
 
 print_section_summary "Agent Workspace Provisioning" \
     "Assistant agent workspace created" \
@@ -689,11 +753,10 @@ if [[ -n "$GITLAB_PAT" ]]; then
         openclaw config set agents.list."${agent}".env.GITLAB_API_URL "https://gitlab.com" || handle_error_or_warn "Failed to set GitLab URL for $agent." $E_CONFIG
 
         echo "Binding local GitLab MCP server to ${agent^^} Agent..."
-        openclaw config set agents.list."${agent}".mcp.servers.gitlab.command "npx"
-        openclaw config set agents.list."${agent}".mcp.servers.gitlab.args "-y" "@zereight/mcp-gitlab" || {
-            echo "[WARN] Array args syntax may not be supported. Trying alternative method..."
-            openclaw config set agents.list."${agent}".mcp.servers.gitlab.args "-y" || echo "[WARN] Failed to set first MCP arg."
-            openclaw config set agents.list."${agent}".mcp.servers.gitlab.args "@zereight/mcp-gitlab" || echo "[WARN] Failed to set second MCP arg."
+        openclaw config set agents.list."${agent}".mcp.servers.gitlab.command "npx" || handle_error_or_warn "Failed to set MCP command for $agent."
+        openclaw config set agents.list."${agent}".mcp.servers.gitlab.args '["-y", "@zereight/mcp-gitlab"]' || {
+            echo "[WARN] Failed to set GitLab MCP args. Attempting legacy string format..."
+            openclaw config set agents.list."${agent}".mcp.servers.gitlab.args "-y @zereight/mcp-gitlab" || echo "[WARN] Failed to set legacy MCP args."
         }
     done
 else
@@ -728,21 +791,21 @@ echo ""
 echo "=== Assigning Native Skills & Hooks ==="
 
 echo "Enabling built-in data gathering skills for the Research Agent..."
-openclaw config set agents.list.research.skills.summarize true || echo "[WARN] Failed to enable summarize skill."
-openclaw config set agents.list.research.skills.webSearch true || echo "[WARN] Failed to enable webSearch skill."
-openclaw config set agents.list.research.skills.webScrape true || echo "[WARN] Failed to enable webScrape skill."
-openclaw config set agents.list.research.skills.newsSearch true || echo "[WARN] Failed to enable newsSearch skill."
-openclaw config set agents.list.research.skills.rssReader true || echo "[WARN] Failed to enable rssReader skill."
-openclaw config set agents.list.research.skills.trendsFinder true || echo "[WARN] Failed to enable trendsFinder skill."
-openclaw config set agents.list.research.skills.xScraper true || echo "[WARN] Failed to enable xScraper skill."
+openclaw config set agents.list.research.skills.summarize true || handle_error_or_warn "Failed to enable summarize skill." "$E_CONFIG"
+openclaw config set agents.list.research.skills.webSearch true || handle_error_or_warn "Failed to enable webSearch skill." "$E_CONFIG"
+openclaw config set agents.list.research.skills.webScrape true || handle_error_or_warn "Failed to enable webScrape skill." "$E_CONFIG"
+openclaw config set agents.list.research.skills.newsSearch true || handle_error_or_warn "Failed to enable newsSearch skill." "$E_CONFIG"
+openclaw config set agents.list.research.skills.rssReader true || handle_error_or_warn "Failed to enable rssReader skill." "$E_CONFIG"
+openclaw config set agents.list.research.skills.trendsFinder true || handle_error_or_warn "Failed to enable trendsFinder skill." "$E_CONFIG"
+openclaw config set agents.list.research.skills.xScraper true || handle_error_or_warn "Failed to enable xScraper skill." "$E_CONFIG"
 
 echo "Enabling operational hooks..."
 # Assistant: Automatically track evolving hardware/schedules
-openclaw config set agents.list.assistant.hooks.autoMemory true || echo "[WARN] Failed to enable autoMemory hook for assistant."
+openclaw config set agents.list.assistant.hooks.autoMemory true || handle_error_or_warn "Failed to enable autoMemory hook for assistant." "$E_CONFIG"
 # Research: Summarize sessions to prevent context bloat
-openclaw config set agents.list.research.hooks.sessionSummarize true || echo "[WARN] Failed to enable sessionSummarize hook for research."
+openclaw config set agents.list.research.hooks.sessionSummarize true || handle_error_or_warn "Failed to enable sessionSummarize hook for research." "$E_CONFIG"
 # Developer: Validate tool outputs for technical accuracy
-openclaw config set agents.list.developer.hooks.toolValidation true || echo "[WARN] Failed to enable toolValidation hook for developer."
+openclaw config set agents.list.developer.hooks.toolValidation true || handle_error_or_warn "Failed to enable toolValidation hook for developer." "$E_CONFIG"
 
 print_section_summary "Skills & Hooks Configuration" \
     "Research data gathering skills enabled (summarize, webSearch, webScrape, newsSearch, rssReader, trendsFinder, xScraper)" \
@@ -769,7 +832,7 @@ for agent in "${AGENTS[@]}"; do
     # undid the binding that had just been created.
     echo "Clearing existing bindings for ${agent^^}..."
     openclaw agents unbind --agent "$agent" --all ||
-        echo "[WARN] Failed to unbind defaults for agent '$agent'. Continuing."
+        handle_error_or_warn "Failed to unbind defaults for agent '$agent'. Continuing." "$E_GATEWAY"
 
     echo "Binding Telegram for ${agent^^}..."
     if ! openclaw agents bind --agent "$agent" --bind "telegram:$TOKEN"; then
@@ -788,8 +851,18 @@ print_section_summary "Telegram Channel Binding" \
 echo ""
 echo "=== Configuring Local Memory & Vector Search ==="
 
-memory_tasks=("Configuring memory search provider" "Configuring SQLite index storage" "Enabling sqlite-vec acceleration" "Enabling embedding cache" "Enabling session memory indexi        handle_error_or_warn "Failed to bind Telegram for agent '$agent'." "$E_GATEWAY"
-iguring memory search embedding provider..."
+memory_tasks=(
+    "Configuring memory search embedding provider"
+    "Configuring per-agent SQLite index storage"
+    "Enabling sqlite-vec vector search acceleration"
+    "Enabling embedding cache"
+    "Enabling session transcript indexing (experimental)"
+)
+total_tasks=${#memory_tasks[@]}
+
+# Task 1: Configure memory search embedding provider
+progress_bar "$total_tasks" 1
+echo "${memory_tasks[0]}..."
 MEM_PROVIDER="${EMBEDDING_MODEL%%/*}"
 CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
 
@@ -803,33 +876,36 @@ else
     openclaw config set agents.defaults.memorySearch.model "$CLEAN_EMBEDDING_MODEL" || handle_error_or_warn "Failed to set memory search model." $E_CONFIG
 fi
 
-# Task 2
+# Task 2: Configure per-agent SQLite index storage
 progress_bar "$total_tasks" 2
-echo "Configuring per-agent SQLite index storage..."
+echo "${memory_tasks[1]}..."
 MEMORY_DIR="$HOME/.openclaw/memory"
 mkdir -p "$MEMORY_DIR"
-openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentId}.sqlite" || {
-    echo "[WARN] Failed to set memory index path with pattern. Attempting static path..."
-    openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agent}.sqlite" || echo "[WARN] Alternative memory path also failed."
-}
+openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentId}.sqlite" ||
+    handle_error_or_warn "Failed to set memory index path." "$E_CONFIG"
 
-# Task 3
+# Task 3: Enable sqlite-vec vector search acceleration
 progress_bar "$total_tasks" 3
-echo "Enabling sqlite-vec vector search acceleration..."
-openclaw config set agents.defaults.memorySearch.store.vector.enabled true || echo "[WARN] Failed to enable sqlite-vec. OpenClaw will use JS fallback."
+echo "${memory_tasks[2]}..."
+openclaw config set agents.defaults.memorySearch.store.vector.enabled true ||
+    handle_error_or_warn "Failed to enable sqlite-vec. OpenClaw will use JS fallback." "$E_CONFIG"
 
-# Task 4
+# Task 4: Enable embedding cache
 progress_bar "$total_tasks" 4
-echo "Enabling embedding cache..."
-openclaw config set agents.defaults.memorySearch.cache.enabled true || echo "[WARN] Failed to enable embedding cache."
+echo "${memory_tasks[3]}..."
+openclaw config set agents.defaults.memorySearch.cache.enabled true ||
+    handle_error_or_warn "Failed to enable embedding cache." "$E_CONFIG"
 
-# Task 5
+# Task 5: Enable session transcript indexing
 progress_bar "$total_tasks" 5
-echo "Enabling session transcript indexing (experimental)..."
-openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true || echo "[WARN] Failed to enable session memory indexing."
+echo "${memory_tasks[4]}..."
+openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true ||
+    handle_error_or_warn "Failed to enable session memory indexing." "$E_CONFIG"
 
-openclaw config set agents.defaults.memorySearch.sources[0] "memory" || echo "[WARN] Failed to set memory source."
-openclaw config set agents.defaults.memorySearch.sources[1] "sessions" || echo "[WARN] Failed to set sessions source."
+openclaw config set agents.defaults.memorySearch.sources[0] "memory" ||
+    handle_error_or_warn "Failed to set memory source." "$E_CONFIG"
+openclaw config set agents.defaults.memorySearch.sources[1] "sessions" ||
+    handle_error_or_warn "Failed to set sessions source." "$E_CONFIG"
 
 echo "" # Newline after progress bar
 
@@ -893,12 +969,16 @@ else
 
     SEED_CHOICE=""
     while [[ -z "$SEED_CHOICE" ]]; do
-        echo "How would you like to proceed?"
-        echo "  [S] Seed     — copy the above files into each agent's workspace"
-        echo "  [D] Default  — skip seeding, let OpenClaw use its own defaults"
-        echo "  [H] Halt     — stop the installation to review files first"
-        echo ""
-        read -r -p "Enter choice [S/D/H]: " SEED_CHOICE </dev/tty
+        if [[ "$NON_INTERACTIVE" == "true" ]]; then
+            SEED_CHOICE="S"
+        else
+            echo "How would you like to proceed?"
+            echo "  [S] Seed     — copy the above files into each agent's workspace"
+            echo "  [D] Default  — skip seeding, let OpenClaw use its own defaults"
+            echo "  [H] Halt     — stop the installation to review files first"
+            echo ""
+            read -r -p "Enter choice [S/D/H]: " SEED_CHOICE </dev/tty
+        fi
 
         case "${SEED_CHOICE^^}" in
             S)
@@ -914,6 +994,10 @@ else
                         DEST="$WORKSPACE/$file"
 
                         if [[ -f "$DEST" ]]; then
+                            if [[ "$NON_INTERACTIVE" == "true" ]]; then
+                                echo "  [INFO] ${agent^^}: $file already exists. Skipping overwrite (non-interactive)."
+                                continue
+                            fi
                             echo ""
                             echo "  [WARN] ${agent^^}: $file already exists in workspace."
                             echo "  Diff (workspace → repository):"
@@ -977,7 +1061,9 @@ if [[ "$EMBEDDING_MODEL" != lemonade/* || "$ASSISTANT_MODEL" != lemonade/* || "$
     HAS_REMOTE_MODELS=true
 fi
 
-if [[ "$HAS_REMOTE_MODELS" == true ]]; then
+if [[ "$NON_INTERACTIVE" == "true" ]]; then
+    START_GATEWAY="Y"
+elif [[ "$HAS_REMOTE_MODELS" == true ]]; then
     echo "Notice: You have configured remote API provider tags. OpenClaw requires your API keys to function."
     echo "You can provide these keys by running: openclaw onboarding"
     echo ""
@@ -995,19 +1081,20 @@ if [[ "${START_GATEWAY^^}" == "Y" ]]; then
     echo ""
     echo "Starting OpenClaw Gateway..."
     if ! openclaw gateway start; then
-        handle_error_or_warn "Failed to start OpenClaw gateway." $E_GATEWAY
+        echo "[WARN] Failed to start OpenClaw gateway. This may be because API keys are not yet configured."
+        echo "Try running 'openclaw onboarding' first, then 'openclaw gateway start'."
+    else
+        echo "Waiting $STABILITY_DELAY seconds for gateway to stabilize..."
+        sleep "$STABILITY_DELAY"
+
+        if ! openclaw gateway status; then
+            handle_error_or_warn "Gateway status check failed after start." $E_GATEWAY
+        fi
+
+        print_section_summary "Gateway Startup" \
+            "OpenClaw gateway started successfully" \
+            "Gateway stability check passed"
     fi
-
-    echo "Waiting $STABILITY_DELAY seconds for gateway to stabilize..."
-    sleep "$STABILITY_DELAY"
-
-    if ! openclaw gateway status; then
-        handle_error_or_warn "Gateway status check failed after start." $E_GATEWAY
-    fi
-
-    print_section_summary "Gateway Startup" \
-        "OpenClaw gateway started successfully" \
-        "Gateway stability check passed"
 else
     echo ""
     echo "Gateway startup deferred."

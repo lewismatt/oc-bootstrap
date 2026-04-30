@@ -81,7 +81,7 @@ A: For general tasks, use gpt-4o. For coding, use claude-3-5-sonnet. For
 local/private tasks, use Qwen3.5-4B on Lemonade.
 
 **Q: How should file paths be formatted?**
-A: Always use absolute paths when possible. Home directory is `/home/lewis/`.
+A: Always use absolute paths when possible. Home directory is `/home/YOUR_USERNAME/`.
 
 ---
 
