@@ -1,194 +1,53 @@
 # 🚀 OpenClaw Multi-Agent Bootstrapper
 
-> An automated script (`oc-bootstrap.sh`) that provisions a **strictly isolated**,
-> multi-agent [OpenClaw](https://openclaw.ai) environment on a bare-metal Linux host.
+Welcome to OpenClaw! This tool automatically sets up a team of AI assistants on your computer. They will live securely on your server but communicate with you directly and privately through Telegram. 
+
+If you are new to self-hosted AI, don't worry. This guide is designed for anyone with basic command-line experience. The setup script does the heavy lifting for you!
 
 ---
 
 ## 🗺️ Table of Contents
 
-- [🏛️ Architecture Overview](#️-architecture-overview)
-- [🔑 Required Integrations and API Keys](#-required-integrations-and-api-keys)
-- [🍋 Lemonade Server Setup](#-lemonade-server-setup)
+- [🧠 AI Concepts (Jargon Buster)](#-ai-concepts-jargon-buster)
+- [📋 Checklist: What You Need Before Starting](#-checklist-what-you-need-before-starting)
 - [⚡ Quick-Start and Installation](#-quick-start-and-installation)
-- [🛠️ What the Script Does](#️-what-the-script-does)
+- [🛠️ What the Script Actually Does](#️-what-the-script-actually-does)
 - [❓ Troubleshooting](#-troubleshooting)
-- [🛡️ Privacy and Security](#-privacy-and-security)
+- [🍋 Advanced: Local AI with Lemonade Server](#-advanced-local-ai-with-lemonade-server)
 
 ---
 
-## 🏛️ Architecture Overview
+## 🧠 AI Concepts (Jargon Buster)
 
-| Component               | Description                                                                         |
-|:------------------------|:--------------------------------------------------------------------------------------|
-| **💻 Host**                | Ubuntu 24.04 (bare-metal)                                                             |
-| **🧠 Inference Backend**   | Local [Lemonade Server](https://lemonade.ai) OR Remote APIs (OpenAI, Anthropic)         |
-| **🤖 Agent: Assistant**    | User-defined LLM                                                                      |
-| **🔍 Agent: Research**     | User-defined LLM                                                                      |
-| **💻 Agent: Developer**    | User-defined LLM                                                                      |
-| **📝 Shared Memory Model** | User-defined embedding model                                                          |
-| **🗄️ Vector Store**        | Local SQLite-backed search with `sqlite-vec` acceleration using OpenAI-compatible API |
+Before we start, here are a few terms you'll see in the installer:
+- **Agents**: Think of these as your digital employees. You will have three: an **Assistant** (general tasks), a **Research Agent** (web searching), and a **Developer** (coding).
+- **LLM / Model**: The "brain" powering the agent. Examples are OpenAI's GPT-4o or Anthropic's Claude.
+- **Embedding Model**: A special AI tool that helps your agents search through their memory of your past conversations.
+- **Remote vs. Local**: 
+  - *Remote APIs*: Your agents use cloud services like OpenAI or Anthropic (**Recommended for beginners**).
+  - *Local Inference*: Your agents use a powerful graphics card (GPU) on your own server to run the AI completely privately (Advanced).
 
 ---
 
-## 🔑 Required Integrations and API Keys
+## 📋 Checklist: What You Need Before Starting
 
-| Integration                  | Why it's needed                                          | How to obtain                                                                                                                                                       |
-|:-----------------------------|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **💬 Telegram** (required)      | Three distinct bots keep each agent's context isolated.  | Message [**@BotFather**](https://t.me/BotFather) -> `/newbot` three times -> copy the HTTP API tokens.                                                                                        |
-| **🍋 Lemonade Server** (optional) | Provides local inference.                                | Run a [Lemonade instance](https://lemonade.ai). If using local inference, the script will prompt you for the server IP and model tags. If you select remote APIs (e.g. OpenAI), you will use the OpenClaw onboarding tool instead. |
-| **🦊 GitLab PAT** (optional)    | Allows all agents to read/write to a shared codebase.   | Create a [Personal Access Token](https://gitlab.com/-/profile/personal_access_tokens) with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
-| **🦁 Brave Search** (optional)  | Powers live web searches for the Research agent.         | Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).                                                                         |
-| **🐦 X/Twitter** (optional)     | Enables real-time trend scraping for the Research agent. | Obtain an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).                                                                 |
+### 1. Telegram Bots (Required)
+Each of your three agents needs its own Telegram bot so it can message you securely.
+1. Open Telegram and search for [**@BotFather**](https://t.me/BotFather).
+2. Send the message `/newbot` and follow the prompts to create your first bot (e.g., "My Assistant").
+3. Copy the **HTTP API Token** it gives you.
+4. Repeat this two more times for your "Research Agent" and "Developer" bots. Keep these three unique tokens handy!
 
----
+### 2. Choose Your AI "Brains" (Remote APIs)
+For beginners, we highly recommend using Remote APIs. You will need an API key from at least one of these providers:
+- **OpenAI** (platform.openai.com)
+- **Anthropic** (console.anthropic.com)
 
-## 🍋 Lemonade Server Setup
+*Note: The setup script will ask for model tags. We provide default tags (like `openai/gpt-4o`) that you can just accept by pressing Enter during the script.*
 
-### ❓ What is Lemonade Server?
-
-[**Lemonade Server**](https://lemonade.ai) is a local inference backend that runs GGUF quantized models (LLMs and embedding models)
-on your hardware. It provides an OpenAI-compatible REST API, allowing all three agents to perform inference
-without relying on cloud services.
-
-**✨ Key features:**
-
-- OpenAI-compatible `/v1` API endpoints for easy integration
-- Supports quantized GGUF models optimized for consumer GPUs (AMD ROCm, NVIDIA CUDA)
-- Runs entirely on-premises with zero cloud data leakage
-- Designed to run efficiently on systems with 12 GB VRAM minimum;
-  additional VRAM enables improved performance and larger models
-
-### 📋 Prerequisites
-
-- **💻 System:** AMD GPU with 12+ GB VRAM (tested with AMD ROCm) or NVIDIA GPU with CUDA support
-- **🧠 Memory:** At least 16 GB system RAM recommended
-- **💾 Disk Space:** ~15 GB for model storage (Qwen3.5-4B + nomic-embed-text)
-- **🌐 Network:** Accessible on local network at a fixed IP address
-
-### 🐧 Setup on Linux (Ubuntu 24.04)
-
-1. **Clone the Lemonade repository:**
-
-   ```bash
-   git clone https://github.com/lemonade-ai/lemonade-server.git
-   cd lemonade-server
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   # For AMD ROCm support
-   sudo apt install -y rocm-core rocm-libs
-   export HSA_OVERRIDE_GFX_VERSION=11.0  # Adjust based on your GPU
-
-   # For general Python environment
-   pip install -r requirements.txt
-   ```
-
-3. **Download required models:**
-
-   ```bash
-   # Create models directory
-   mkdir -p models/huggingface.co/user.model-name/
-
-   # Download your preferred LLM (quantized GGUF format)
-   # Example: Qwen3.5-4B
-   huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf \
-     --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
-
-   # Download your preferred embedding model (quantized GGUF format)
-   # Example: nomic-embed-text
-   huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF \
-     nomic-embed-text-v1.5.f16.gguf \
-     --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
-   ```
-
-4. **Start Lemonade Server:**
-
-   ```bash
-   # Run in foreground (or use systemd/screen for background)
-   HSA_OVERRIDE_GFX_VERSION=11.0 python -m lemonade.server \
-     --host 0.0.0.0 \
-     --port 8000 \
-     --models-path ./models
-   ```
-
-5. **Verify it's running:**
-
-   ```bash
-   curl http://localhost:8000/v1/models
-   ```
-
-### 🪟 Setup on Windows
-
-1. **Install prerequisites:**
-   - Download and install [Python 3.10+](https://www.python.org/downloads/)
-   - Install [Git for Windows](https://git-scm.com/)
-   - For AMD: Install [AMD ROCm for Windows](https://rocmdocs.amd.com/en/docs/deploy/windows/quick_start.html)
-   - For NVIDIA: Install [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit)
-
-2. **Clone and setup:**
-
-   ```powershell
-   git clone https://github.com/lemonade-ai/lemonade-server.git
-   cd lemonade-server
-   pip install -r requirements.txt
-   ```
-
-3. **Download models:**
-
-   ```powershell
-   # Create models directory
-   New-Item -Type Directory -Path "models\huggingface.co" -Force
-
-   # Download using Hugging Face CLI (Example models)
-   huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf `
-     --local-dir "models\huggingface.co\user.Qwen3.5-4B-GGUF"
-
-   huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF `
-     nomic-embed-text-v1.5.f16.gguf `
-     --local-dir "models\huggingface.co\user.nomic-embed-text-v1.5-GGUF"
-   ```
-
-4. **Start Lemonade Server:**
-
-   ```powershell
-   # For AMD ROCm (may need environment variable)
-   $env:HSA_OVERRIDE_GFX_VERSION = "11.0"  # Adjust for your GPU
-   python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ".\models"
-
-   # Or simply:
-   python -m lemonade.server
-   ```
-
-5. **Verify it's running:**
-
-   ```powershell
-   Invoke-WebRequest http://localhost:8000/v1/models
-   ```
-
-6. **Optional: Create a batch file for easy startup:**
-
-   ```batch
-   @echo off
-   cd /d %~dp0
-   set HSA_OVERRIDE_GFX_VERSION=11.0
-   python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ".\models"
-   pause
-   ```
-
-   Save as `start-lemonade.bat` and double-click to run.
-
-### 💡 Important Notes
-
-- **Model Paths:** Ensure model directory structure matches `models/huggingface.co/{model-namespace}/{model-name}/`.
-  The script looks for files in this exact format.
-- **Network Access:** Lemonade must be accessible from your OpenClaw host.
-  Note its IP address (e.g., `192.168.1.100`) for the bootstrap script.
-- **Port Mapping:** Default port is `8000`. If changed, remember to use
-  `http://<IP>:PORT/v1` when running `oc-bootstrap.sh`.
-- **Performance:** First inference request may be slow as models load into VRAM. Subsequent requests are faster.
+### 3. Optional Extras
+- **Brave Search API Key**: Lets your Research agent search the live internet (Free at brave.com/search/api).
+- **GitLab Token**: Lets your Developer agent read/write code from GitLab.
 
 ---
 
@@ -232,49 +91,62 @@ openclaw gateway start
 
 ---
 
-## 🛠️ What the Script Does
+## 🛠️ What the Script Actually Does
 
-1. **📦 Installs Dependencies & Runs Health Check** - Safely provisions Node 20.x,
-   `curl`, the OpenClaw core daemon, and runs `openclaw doctor --fix` to
-   auto-repair common issues.
-2. **🔐 Secures Credentials** - Stores API keys in a `chmod 600`-protected local env file,
-   validates Telegram tokens against the Telegram API, and prevents duplicate token usage.
-   Checks for existing secrets file and prompts before overwriting.
-3. **👥 Provisions Agents** - Creates isolated workspaces (`~/.openclaw/workspace-*`) for
-   Assistant, Research, and Developer agents, then prompts for your preferred model tags
-   (Lemonade or remote API providers). If you use local inference, it auto-configures Lemonade;
-   otherwise, it instructs you to run `openclaw onboarding`.
-4. **🔌 Binds Skills and Hooks**:
-    - Adds live-scraping skills to the Research agent (webSearch, webScrape, newsSearch,
-      rssReader, trendsFinder, xScraper).
-    - Enables `autoMemory` on the Assistant, `sessionSummarize` on the Research agent,
-      and `toolValidation` on the Developer agent.
-    - Binds the open-source `@zereight/mcp-gitlab` server to **all three agents**
-      for unified version-controlled project memory.
-5. **🌱 Seeds Context** - Discovers prompt files (`SOUL.md`, `USER.md`, `AGENTS.md`)
-   from agent subdirectories in the repository, then interactively prompts the user to
-   choose between [S]eed (copy files), [D]efault (skip seeding), or [H]alt (review first).
-   If files exist in the workspace, shows a diff before overwriting.
+Behind the scenes, the installer handles the complicated parts for you:
+1. **Installs Requirements**: Safely downloads Node.js, `curl`, and the OpenClaw software.
+2. **Secures Passwords**: Saves your Telegram tokens safely on your machine.
+3. **Builds Workspaces**: Creates isolated folders (`~/.openclaw/workspace-*`) so your agents don't accidentally mix up their files or memories.
+4. **Teaches Skills**: Gives your Research agent the ability to read websites and your Developer agent the ability to write code.
 
 ---
 
 ## ❓ Troubleshooting
 
-| Symptom | Likely Cause | Fix |
+| Problem | Likely Cause | How to Fix |
 |:---|:---|:---|
-| **Agents unresponsive via Telegram** | Missing models or unconfigured remote APIs. | Verify Lemonade is running with models, or run `openclaw onboarding` for remote APIs. |
-| **"Conflict: terminated by other getUpdates request"** | Same Telegram token used for multiple agents. | Re-run the setup and provide three **unique** bot tokens. |
-| **Ghost daemon processes** | Previous run left a PM2 daemon alive. | Run `openclaw gateway stop && npx pm2 kill`, then restart the installer. |
-| **MCP server errors** | Node version too old for `@zereight/mcp-gitlab`. | Ensure Node >= 18 (`node -v`). The script will try to install Node 20 automatically, but you may need to resolve version conflicts manually. |
+| **Agents won't reply on Telegram** | Missing API keys or gateway isn't running. | Run `openclaw onboarding`, then `openclaw gateway start`. |
+| **"Conflict: terminated by other getUpdates request"** | You gave the exact same Telegram token to multiple agents. | Re-run `./oc-bootstrap.sh` and make sure you use three *unique* bot tokens. |
 
 ---
 
-## 🛡️ Privacy and Security
+## 🍋 Advanced: Local AI with Lemonade Server
 
-- **🔒 Zero Cloud Data** - All embeddings and inference stay on-premises. Data leaves the
-  network only if you explicitly enable Brave, X, or GitLab integrations.
-- **🧊 Isolated State** - Each agent maintains its own `.sqlite` index, preventing
-  cross-agent data leakage.
+*Skip this section unless you have a dedicated server with a powerful graphics card (12+ GB VRAM).*
+
+If you want 100% privacy and zero cloud usage, you can run the AI brains on your own hardware using **Lemonade Server**. Lemonade Server is a tool that runs AI models on your own graphics card and provides an OpenAI-compatible API that your agents can use.
+
+### Setup on Linux (Ubuntu 24.04)
+
+1. **Clone the Lemonade repository:**
+   ```bash
+   git clone https://github.com/lemonade-ai/lemonade-server.git
+   cd lemonade-server
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   # For AMD ROCm support (adjust for NVIDIA if needed)
+   sudo apt install -y rocm-core rocm-libs
+   export HSA_OVERRIDE_GFX_VERSION=11.0  # Adjust based on your GPU
+   pip install -r requirements.txt
+   ```
+
+3. **Download a model:**
+   ```bash
+   mkdir -p models/huggingface.co/user.model-name/
+
+   # Example: Download Qwen3.5-4B
+   huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf \
+     --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
+   ```
+
+4. **Start the server:**
+   ```bash
+   HSA_OVERRIDE_GFX_VERSION=11.0 python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ./models
+   ```
+
+When you run `./oc-bootstrap.sh`, answer "Yes" when it asks if you want to use Local Inference, and provide your server's IP address and the tag `lemonade/user.Qwen3.5-4B-GGUF`.
 
 ---
 
