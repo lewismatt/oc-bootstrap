@@ -1,59 +1,71 @@
-# OpenClaw Multi-Agent Bootstrapper
+# 🚀 OpenClaw Multi-Agent Bootstrapper
 
 > An automated script (`oc-bootstrap.sh`) that provisions a **strictly isolated**,
-> multi-agent OpenClaw environment on a bare-metal Linux host.
+> multi-agent [OpenClaw](https://openclaw.ai) environment on a bare-metal Linux host.
 
 ---
 
-## Architecture Overview
+## 🗺️ Table of Contents
+
+- [🏛️ Architecture Overview](#️-architecture-overview)
+- [🔑 Required Integrations and API Keys](#-required-integrations-and-api-keys)
+- [🍋 Lemonade Server Setup](#-lemonade-server-setup)
+- [⚡ Quick-Start and Installation](#-quick-start-and-installation)
+- [🛠️ What the Script Does](#️-what-the-script-does)
+- [❓ Troubleshooting](#-troubleshooting)
+- [🛡️ Privacy and Security](#-privacy-and-security)
+
+---
+
+## 🏛️ Architecture Overview
 
 | Component               | Description                                                                         |
 |:------------------------|:--------------------------------------------------------------------------------------|
-| **Host**                | Ubuntu 24.04 (bare-metal)                                                             |
-| **Inference Backend**   | Local Lemonade server running GGUF models via AMD ROCm                                |
-| **Agent: Assistant**    | User-defined LLM                                                                      |
-| **Agent: Research**     | User-defined LLM                                                                      |
-| **Agent: Developer**    | User-defined LLM                                                                      |
-| **Shared Memory Model** | User-defined embedding model                                                          |
-| **Vector Store**        | Local SQLite-backed search with `sqlite-vec` acceleration using OpenAI-compatible API |
+| **💻 Host**                | Ubuntu 24.04 (bare-metal)                                                             |
+| **🧠 Inference Backend**   | Local [Lemonade Server](https://lemonade.ai) running GGUF models via AMD ROCm         |
+| **🤖 Agent: Assistant**    | User-defined LLM                                                                      |
+| **🔍 Agent: Research**     | User-defined LLM                                                                      |
+| **💻 Agent: Developer**    | User-defined LLM                                                                      |
+| **📝 Shared Memory Model** | User-defined embedding model                                                          |
+| **🗄️ Vector Store**        | Local SQLite-backed search with `sqlite-vec` acceleration using OpenAI-compatible API |
 
 ---
 
-## Required Integrations and API Keys
+## 🔑 Required Integrations and API Keys
 
 | Integration                  | Why it's needed                                          | How to obtain                                                                                                                                                       |
 |:-----------------------------|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Telegram** (required)      | Three distinct bots keep each agent's context isolated.  | Message **@BotFather** -> `/newbot` three times -> copy the HTTP API tokens.                                                                                        |
-| **Lemonade Server** (required) | Provides local inference.                                | Run a Lemonade instance. The script will prompt you for the server IP and the model tags you wish to use for each agent. **CRITICAL:** Ensure your chosen models are downloaded and staged on the server. |
-| **GitLab PAT** (optional)    | Allows all agents to read/write to a shared codebase.   | Create a Personal Access Token with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
-| **Brave Search** (optional)  | Powers live web searches for the Research agent.         | Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).                                                                         |
-| **X/Twitter** (optional)     | Enables real-time trend scraping for the Research agent. | Obtain an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).                                                                 |
+| **💬 Telegram** (required)      | Three distinct bots keep each agent's context isolated.  | Message [**@BotFather**](https://t.me/BotFather) -> `/newbot` three times -> copy the HTTP API tokens.                                                                                        |
+| **🍋 Lemonade Server** (required) | Provides local inference.                                | Run a [Lemonade instance](https://lemonade.ai). The script will prompt you for the server IP and the model tags you wish to use for each agent. **CRITICAL:** Ensure your chosen models are downloaded and staged on the server. |
+| **🦊 GitLab PAT** (optional)    | Allows all agents to read/write to a shared codebase.   | Create a [Personal Access Token](https://gitlab.com/-/profile/personal_access_tokens) with `api` + `read_repository` scopes in GitLab under *User Settings -> Access Tokens*.                                                 |
+| **🦁 Brave Search** (optional)  | Powers live web searches for the Research agent.         | Get a free API key from the [Brave Search Developer Portal](https://brave.com/search/api/).                                                                         |
+| **🐦 X/Twitter** (optional)     | Enables real-time trend scraping for the Research agent. | Obtain an API key from the [X Developer Portal](https://developer.twitter.com/en/portal/dashboard).                                                                 |
 
 ---
 
-## Lemonade Server Setup
+## 🍋 Lemonade Server Setup
 
-### What is Lemonade Server?
+### ❓ What is Lemonade Server?
 
-**Lemonade Server** is a local inference backend that runs GGUF quantized models (LLMs and embedding models)
+[**Lemonade Server**](https://lemonade.ai) is a local inference backend that runs GGUF quantized models (LLMs and embedding models)
 on your hardware. It provides an OpenAI-compatible REST API, allowing all three agents to perform inference
 without relying on cloud services.
 
-**Key features:**
+**✨ Key features:**
 - OpenAI-compatible `/v1` API endpoints for easy integration
 - Supports quantized GGUF models optimized for consumer GPUs (AMD ROCm, NVIDIA CUDA)
 - Runs entirely on-premises with zero cloud data leakage
 - Designed to run efficiently on systems with 12 GB VRAM minimum;
   additional VRAM enables improved performance and larger models
 
-### Prerequisites
+### 📋 Prerequisites
 
-- **System:** AMD GPU with 12+ GB VRAM (tested with AMD ROCm) or NVIDIA GPU with CUDA support
-- **Memory:** At least 16 GB system RAM recommended
-- **Disk Space:** ~15 GB for model storage (Qwen3.5-4B + nomic-embed-text)
-- **Network:** Accessible on local network at a fixed IP address
+- **💻 System:** AMD GPU with 12+ GB VRAM (tested with AMD ROCm) or NVIDIA GPU with CUDA support
+- **🧠 Memory:** At least 16 GB system RAM recommended
+- **💾 Disk Space:** ~15 GB for model storage (Qwen3.5-4B + nomic-embed-text)
+- **🌐 Network:** Accessible on local network at a fixed IP address
 
-### Setup on Linux (Ubuntu 24.04)
+### 🐧 Setup on Linux (Ubuntu 24.04)
 
 1. **Clone the Lemonade repository:**
    ```bash
@@ -102,7 +114,7 @@ without relying on cloud services.
    curl http://localhost:8000/v1/models
    ```
 
-### Setup on Windows
+### 🪟 Setup on Windows
 
 1. **Install prerequisites:**
    - Download and install [Python 3.10+](https://www.python.org/downloads/)
@@ -156,7 +168,7 @@ without relying on cloud services.
    ```
    Save as `start-lemonade.bat` and double-click to run.
 
-### Important Notes
+### 💡 Important Notes
 
 - **Model Paths:** Ensure model directory structure matches `models/huggingface.co/{model-namespace}/{model-name}/`.
   The script looks for files in this exact format.
@@ -168,17 +180,17 @@ without relying on cloud services.
 
 ---
 
-## Quick-Start and Installation
+## ⚡ Quick-Start and Installation
 
-### Prerequisites
+### 📋 Prerequisites
 
 - Ubuntu 24.04 with a regular (non-root) user.
 - `git` installed (`sudo apt install git`).
 
-> **Do not run the script as root.** The installer will request `sudo` only when
+> ⚠️ **Do not run the script as root.** The installer will request `sudo` only when
 > necessary.
 
-### Steps
+### 👣 Steps
 
 ```bash
 # 1. Clone the repo
@@ -194,32 +206,32 @@ chmod +x oc-bootstrap.sh
 
 ---
 
-## What the Script Does
+## 🛠️ What the Script Does
 
-1. **Installs Dependencies & Runs Health Check** - Safely provisions Node 20.x,
+1. **📦 Installs Dependencies & Runs Health Check** - Safely provisions Node 20.x,
    `curl`, the OpenClaw core daemon, and runs `openclaw doctor --fix` to
    auto-repair common issues.
-2. **Secures Credentials** - Stores API keys in a `chmod 600`-protected local env file,
+2. **🔐 Secures Credentials** - Stores API keys in a `chmod 600`-protected local env file,
    validates Telegram tokens against the Telegram API, and prevents duplicate token usage.
    Checks for existing secrets file and prompts before overwriting.
-3. **Provisions Agents** - Creates isolated workspaces (`~/.openclaw/workspace-*`) for
+3. **👥 Provisions Agents** - Creates isolated workspaces (`~/.openclaw/workspace-*`) for
    Assistant, Research, and Developer agents, then prompts for the Lemonade server IP
    and your preferred model tags, configuring all inference endpoints accordingly.
-4. **Binds Skills and Hooks**:
+4. **🔌 Binds Skills and Hooks**:
     - Adds live-scraping skills to the Research agent (webSearch, webScrape, newsSearch,
       rssReader, trendsFinder, xScraper).
     - Enables `autoMemory` on the Assistant, `sessionSummarize` on the Research agent,
       and `toolValidation` on the Developer agent.
     - Binds the open-source `@zereight/mcp-gitlab` server to **all three agents**
       for unified version-controlled project memory.
-5. **Seeds Context** - Discovers prompt files (`SOUL.md`, `USER.md`, `AGENTS.md`)
+5. **🌱 Seeds Context** - Discovers prompt files (`SOUL.md`, `USER.md`, `AGENTS.md`)
    from agent subdirectories in the repository, then interactively prompts the user to
    choose between [S]eed (copy files), [D]efault (skip seeding), or [H]alt (review first).
    If files exist in the workspace, shows a diff before overwriting.
 
 ---
 
-## Troubleshooting
+## ❓ Troubleshooting
 
 | Symptom | Likely Cause | Fix |
 |:---|:---|:---|
@@ -230,13 +242,13 @@ chmod +x oc-bootstrap.sh
 
 ---
 
-## Privacy and Security
+## 🛡️ Privacy and Security
 
-- **Zero Cloud Data** - All embeddings and inference stay on-premises. Data leaves the
+- **🔒 Zero Cloud Data** - All embeddings and inference stay on-premises. Data leaves the
   network only if you explicitly enable Brave, X, or GitLab integrations.
-- **Isolated State** - Each agent maintains its own `.sqlite` index, preventing
+- **🧊 Isolated State** - Each agent maintains its own `.sqlite` index, preventing
   cross-agent data leakage.
 
 ---
 
-*Happy bootstrapping!*
+*Happy bootstrapping! ✨*
