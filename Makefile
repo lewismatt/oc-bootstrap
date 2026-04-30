@@ -61,7 +61,7 @@ shell:
 shell-new:
 	docker run -it --rm \
 		--env-file docker-config.env \
-		-v oc-bootstrap_openclaw-data:/home/openclaw/.openclaw \
+		-v openclaw-data:/home/openclaw/.openclaw \
 		$(IMAGE_NAME):$(IMAGE_TAG) \
 		shell
 
@@ -69,7 +69,7 @@ shell-new:
 bootstrap:
 	docker run -it --rm \
 		--env-file docker-config.env \
-		-v oc-bootstrap_openclaw-data:/home/openclaw/.openclaw \
+		-v openclaw-data:/home/openclaw/.openclaw \
 		$(IMAGE_NAME):$(IMAGE_TAG) \
 		bootstrap
 
@@ -77,7 +77,7 @@ bootstrap:
 gateway:
 	docker run -it --rm \
 		--env-file docker-config.env \
-		-v oc-bootstrap_openclaw-data:/home/openclaw/.openclaw \
+		-v openclaw-data:/home/openclaw/.openclaw \
 		$(IMAGE_NAME):$(IMAGE_TAG)
 
 # ==============================================================================

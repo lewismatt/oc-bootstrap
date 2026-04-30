@@ -1,6 +1,8 @@
 # Lemonade Configuration
 
-Lemonade Server provides local LLM (Large Language Model) inference, allowing you to run AI models entirely on your own hardware. This guide covers the complete setup and configuration of Lemonade Server for use with OpenClaw.
+Lemonade Server provides local LLM (Large Language Model) inference, allowing you to run AI models entirely on
+your own hardware. This guide covers the complete setup and configuration of Lemonade Server for use with
+OpenClaw.
 
 ---
 
