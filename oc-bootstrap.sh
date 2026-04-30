@@ -19,17 +19,17 @@ set +o histexpand # Disable history expansion to prevent issues with '!' charact
 # ==============================================================================
 
 # Exit code constants (for error classification)
-E_SUDO=10        # Script run as root or sudo unavailable
-E_DEPENDENCY=11  # System package installation failure
-E_OPENCLAW=12    # OpenClaw installation or runtime error
-E_CONFIG=13      # Configuration operation failed
-E_GATEWAY=14     # Gateway start/bind error
+E_SUDO=10       # Script run as root or sudo unavailable
+E_DEPENDENCY=11 # System package installation failure
+E_OPENCLAW=12   # OpenClaw installation or runtime error
+E_CONFIG=13     # Configuration operation failed
+E_GATEWAY=14    # Gateway start/bind error
 
 # Execution settings
-STABILITY_DELAY=5                # Wait time for gateway to stabilize (seconds)
-export FAIL_ON_OPENCLAW_ERRORS=true    # Exported for subshells; treat OpenClaw errors as fatal (not just warnings)
-NON_INTERACTIVE=false            # Interactive prompts mode
-CONFIG_FILE=""                   # Configuration file path (optional)
+STABILITY_DELAY=5                   # Wait time for gateway to stabilize (seconds)
+export FAIL_ON_OPENCLAW_ERRORS=true # Exported for subshells; treat OpenClaw errors as fatal (not just warnings)
+NON_INTERACTIVE=false               # Interactive prompts mode
+CONFIG_FILE=""                      # Configuration file path (optional)
 
 # ==============================================================================
 # SCRIPT INITIALIZATION

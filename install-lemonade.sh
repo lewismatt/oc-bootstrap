@@ -44,15 +44,18 @@ if [[ -d "$LEMONADE_DIR" ]]; then
     fi
 else
     echo "[INFO] Cloning Lemonade Server..."
-    git clone https://github.com/lemonade-ai/lemonade-server.git "$LEMONADE_DIR" || \
-        { echo "[ERROR] Failed to clone repository"; exit 1; }
+    git clone https://github.com/lemonade-ai/lemonade-server.git "$LEMONADE_DIR" ||
+        {
+            echo "[ERROR] Failed to clone repository"
+            exit 1
+        }
     cd "$LEMONADE_DIR"
 fi
 
 # Verify lspci is available for GPU detection (provided by pciutils package)
 if ! command -v lspci >/dev/null 2>&1; then
     echo "[WARN] lspci not found. Installing pciutils to enable GPU detection..."
-    sudo apt update && sudo apt install -y pciutils || \
+    sudo apt update && sudo apt install -y pciutils ||
         echo "[WARN] Failed to install pciutils. GPU detection will be skipped, defaulting to CPU mode."
 fi
 
@@ -66,7 +69,7 @@ if lspci | grep -i "nvidia" >/dev/null; then
 elif lspci | grep -i "amd" >/dev/null; then
     echo "[INFO] AMD GPU detected. Installing ROCm support..."
     echo "[INFO] Installing ROCm core and libraries (this may take a while)..."
-    sudo apt update && sudo apt install -y rocm-core rocm-libs || \
+    sudo apt update && sudo apt install -y rocm-core rocm-libs ||
         echo "[WARN] Failed to install ROCm via apt. Ensure you have the ROCm repositories configured if performance is low."
 else
     echo "[WARN] No dedicated GPU detected. Lemonade will run on CPU (significantly slower)."
@@ -87,11 +90,20 @@ echo "[INFO] Installing Python requirements..."
 source venv/bin/activate
 
 # Upgrade pip first to avoid compatibility issues with newer packages
-pip install --upgrade pip || { echo "[ERROR] Failed to upgrade pip"; exit 1; }
+pip install --upgrade pip || {
+    echo "[ERROR] Failed to upgrade pip"
+    exit 1
+}
 # Install project requirements from the cloned repository
-pip install -r requirements.txt || { echo "[ERROR] Failed to install requirements.txt"; exit 1; }
+pip install -r requirements.txt || {
+    echo "[ERROR] Failed to install requirements.txt"
+    exit 1
+}
 # Install huggingface_hub for model downloads via huggingface-cli
-pip install huggingface_hub || { echo "[ERROR] Failed to install huggingface_hub"; exit 1; }
+pip install huggingface_hub || {
+    echo "[ERROR] Failed to install huggingface_hub"
+    exit 1
+}
 
 # Verify huggingface-cli is available after installation
 if ! command -v huggingface-cli >/dev/null 2>&1; then
@@ -109,15 +121,21 @@ if [[ "${DOWNLOAD_MODELS^^}" == "Y" ]]; then
     # Create local directory for Qwen2.5-4B model (consistent naming with model version)
     mkdir -p models/huggingface.co/user.Qwen2.5-4B-GGUF/
     huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf \
-        --local-dir models/huggingface.co/user.Qwen2.5-4B-GGUF/ || \
-        { echo "[ERROR] Failed to download Qwen2.5-4B model"; exit 1; }
+        --local-dir models/huggingface.co/user.Qwen2.5-4B-GGUF/ ||
+        {
+            echo "[ERROR] Failed to download Qwen2.5-4B model"
+            exit 1
+        }
 
     echo "[INFO] Downloading Nomic Embed Text v1.5 GGUF..."
     # Create local directory for Nomic Embed model
     mkdir -p models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
     huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF nomic-embed-text-v1.5.Q4_K_M.gguf \
-        --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/ || \
-        { echo "[ERROR] Failed to download Nomic Embed model"; exit 1; }
+        --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/ ||
+        {
+            echo "[ERROR] Failed to download Nomic Embed model"
+            exit 1
+        }
 fi
 
 # SECTION 7: Create Startup Script
