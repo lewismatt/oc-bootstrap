@@ -49,12 +49,29 @@ FAIL_ON_OPENCLAW_ERRORS=true
 #   - sudo, apt (for package installation)
 #   - openclaw (installed by this script)
 #
-# Static analysis: Please run `shellcheck oc-bootstrap.sh` on a Linux environment
-# and review suggestions. This script does not run `shellcheck` itself.
-#
-# Quick checks:
-#   bash -n oc-bootstrap.sh
-#   sudo apt install shellcheck -y && shellcheck oc-bootstrap.sh
+# Static analysis: Running ShellCheck
+check_shellcheck() {
+    echo "[INFO] Running ShellCheck on oc-bootstrap.sh for static analysis..."
+    if ! command -v shellcheck >/dev/null 2>&1; then
+        echo "[INFO] ShellCheck not found. Attempting to install..."
+        sudo apt update && sudo apt install -y shellcheck || {
+            echo "[ERROR] Failed to install shellcheck. Please install it manually and re-run."
+            exit $E_DEPENDENCY
+        }
+    fi
+    
+    echo "--- ShellCheck Analysis ---"
+    # Run shellcheck and check the exit status
+    shellcheck oc-bootstrap.sh
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] ShellCheck found issues in oc-bootstrap.sh. Please review the output above."
+        exit $E_DEPENDENCY
+    fi
+    echo "--- ShellCheck Analysis Complete: No critical issues found. ---"
+}
+
+# Run static analysis immediately after required tools are verified
+check_shellcheck
 
 check_required_tools() {
     local missing=()
@@ -774,12 +791,8 @@ print_section_summary "Telegram Channel Binding" \
 echo ""
 echo "=== Configuring Local Memory & Vector Search ==="
 
-memory_tasks=("Configuring memory search provider" "Configuring SQLite index storage" "Enabling sqlite-vec acceleration" "Enabling embedding cache" "Enabling session memory indexing")
-total_tasks=${#memory_tasks[@]}
-
-# Task 1
-progress_bar "$total_tasks" 1
-echo "Configuring memory search embedding provider..."
+memory_tasks=("Configuring memory search provider" "Configuring SQLite index storage" "Enabling sqlite-vec acceleration" "Enabling embedding cache" "Enabling session memory indexi        handle_error_or_warn "Failed to bind Telegram for agent '$agent'." "$E_GATEWAY"
+iguring memory search embedding provider..."
 MEM_PROVIDER="${EMBEDDING_MODEL%%/*}"
 CLEAN_EMBEDDING_MODEL="${EMBEDDING_MODEL#*/}"
 
