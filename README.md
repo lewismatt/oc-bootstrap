@@ -11,8 +11,11 @@ Automated setup for OpenClaw AI agents on Ubuntu 24.04. Deploy three specialized
 3. [Prerequisites Checklist](#-prerequisites-checklist)
 4. [Installation](#-installation)
 5. [Docker Setup](#-docker-setup)
+   - [Docker Management Quick Reference](#docker-management-quick-reference)
 6. [Configuration](#-configuration)
 7. [After Installation](#-after-installation)
+   - [Standard Installation (Bare Metal)](#standard-installation-bare-metal)
+   - [Docker Installation](#docker-installation)
 8. [Troubleshooting](#-troubleshooting)
 9. [Advanced Topics](#-advanced-topics)
 10. [Project Structure](#-project-structure)
@@ -197,6 +200,21 @@ docker-compose logs -f
 docker-compose down
 ```
 
+### Docker Management Quick Reference
+
+| Operation | Command |
+|-----------|---------|
+| Start services | `docker-compose up -d` |
+| Stop services | `docker-compose down` |
+| View logs (follow) | `docker-compose logs -f` |
+| Check status | `docker-compose ps` |
+| Restart services | `docker-compose restart` |
+| Shell access | `docker-compose exec openclaw bash` |
+| Rebuild images | `docker-compose build` |
+| Stop & remove volumes | `docker-compose down -v` |
+
+> 📌 For complete Docker documentation including advanced configuration, volume management, and troubleshooting, see [DOCKER.md](DOCKER.md).
+
 ### Building the Docker Image
 
 ```bash
@@ -316,7 +334,9 @@ export DEVELOPER_TOKEN="..."
 
 ## 🎯 After Installation
 
-### Starting the Gateway
+### Standard Installation (Bare Metal)
+
+#### Starting the Gateway
 
 If the installer didn't start the gateway for you:
 
@@ -330,7 +350,7 @@ Check the status:
 openclaw gateway status
 ```
 
-### Configuring API Keys (if not done during setup)
+#### Configuring API Keys (if not done during setup)
 
 ```bash
 openclaw onboarding
@@ -341,7 +361,7 @@ This interactive wizard will walk you through entering:
 - Anthropic API key
 - Other provider credentials
 
-### Communicating with Your Agents
+#### Communicating with Your Agents
 
 Once the gateway is running, message your agents on Telegram:
 
@@ -359,13 +379,13 @@ You:        "@developer_bot write a Python function to sort a list"
 Developer:  "Here's a Python function..."
 ```
 
-### Checking Agent Status
+#### Checking Agent Status
 
 ```bash
 openclaw agents list --bindings
 ```
 
-### Viewing Memory & Search
+#### Viewing Memory & Search
 
 ```bash
 openclaw memory status
@@ -375,6 +395,77 @@ Shows:
 - Number of indexed memories per agent
 - Vector search index size
 - Last indexing time
+
+### Docker Installation
+
+If you installed using Docker, here are the essential management commands:
+
+#### Starting/Stopping Services
+
+```bash
+# Start all services in background
+docker-compose up -d
+
+# Stop services (keeps volumes)
+docker-compose down
+
+# Stop services and remove volumes (DESTRUCTIVE - deletes data)
+docker-compose down -v
+```
+
+#### Viewing Logs
+
+```bash
+# Follow logs in real-time
+docker-compose logs -f
+
+# View last 50 lines
+docker-compose logs --tail=50 openclaw
+
+# View specific service logs
+docker-compose logs -f openclaw
+```
+
+#### Checking Status
+
+```bash
+# List running containers
+docker-compose ps
+
+# Check OpenClaw health in container
+docker exec oc-bootstrap openclaw doctor
+
+# Inspect container details
+docker inspect oc-bootstrap
+```
+
+#### Restarting Services
+
+```bash
+# Restart all services
+docker-compose restart
+
+# Restart specific service
+docker-compose restart openclaw
+```
+
+#### Accessing the Container Shell
+
+```bash
+# Open interactive shell in running container
+docker-compose exec openclaw bash
+
+# Run new temporary container with shell
+docker run -it --rm --env-file docker-config.env oc-bootstrap:latest shell
+```
+
+#### Advanced Docker Operations
+
+For more advanced Docker operations, see [DOCKER.md](DOCKER.md):
+- Volume management and backups
+- Development mode with hot-reload
+- Local inference with Lemonade Server
+- Troubleshooting and debugging
 
 ---
 
@@ -457,6 +548,72 @@ openclaw agents bind --agent assistant --bind "telegram:YOUR_TOKEN_HERE"
 # Check agent logs
 openclaw agents logs assistant
 ```
+
+---
+
+### Docker-Specific Issues
+
+#### Container Won't Start
+
+**Problem**: `docker-compose up -d` fails or container exits immediately
+
+**Causes**:
+- Port 3000 (or configured port) already in use
+- Missing or invalid `docker-config.env` file
+- Insufficient permissions on volume mount
+
+**Solution**:
+```bash
+# Check for port conflicts
+sudo lsof -i :3000
+
+# Verify environment file exists and has required tokens
+cat docker-config.env | grep TOKEN
+
+# Check container logs
+docker-compose logs openclaw
+
+# Inspect container for errors
+docker inspect oc-bootstrap
+```
+
+#### Telegram Bots Not Connecting (Docker)
+
+**Problem**: Bots don't respond when running in Docker
+
+**Causes**:
+- Tokens not passed correctly to container
+- Container can't reach `api.telegram.org`
+- Network mode issues
+
+**Solution**:
+```bash
+# Verify tokens are loaded in container
+docker exec oc-bootstrap env | grep TOKEN
+
+# Test connectivity from inside container
+docker exec oc-bootstrap curl -I https://api.telegram.org
+
+# Check OpenClaw doctor inside container
+docker exec oc-bootstrap openclaw doctor
+```
+
+#### Volume Permission Issues
+
+**Problem**: `Permission denied` errors when OpenClaw tries to write to volumes
+
+**Solution**:
+```bash
+# Fix permissions on volume data
+docker exec oc-bootstrap sudo chown -R openclaw:openclaw /home/openclaw/.openclaw
+
+# Or rebuild without cache
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+> 📌 For more Docker troubleshooting, see [DOCKER.md - Troubleshooting section](DOCKER.md#troubleshooting).
 
 ---
 
