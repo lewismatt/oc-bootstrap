@@ -27,7 +27,7 @@ E_GATEWAY=14     # Gateway start/bind error
 
 # Execution settings
 STABILITY_DELAY=5                # Wait time for gateway to stabilize (seconds)
-FAIL_ON_OPENCLAW_ERRORS=true    # Treat OpenClaw errors as fatal (not just warnings)
+export FAIL_ON_OPENCLAW_ERRORS=true    # Exported for subshells; treat OpenClaw errors as fatal (not just warnings)
 NON_INTERACTIVE=false            # Interactive prompts mode
 CONFIG_FILE=""                   # Configuration file path (optional)
 

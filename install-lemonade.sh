@@ -76,7 +76,7 @@ fi
 
 # SECTION 5: Install Python dependencies in the virtual environment
 echo "[INFO] Installing Python requirements..."
-# shellcheck source=/dev/null (suppresses shellcheck warnings for dynamic sourcing)
+# shellcheck source=./venv/bin/activate  # suppresses shellcheck warnings for dynamic sourcing
 source venv/bin/activate
 
 # Upgrade pip first to avoid compatibility issues with newer packages
