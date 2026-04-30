@@ -66,7 +66,7 @@ df -h
 # Check for GPU (optional)
 lspci | grep -i vga
 nvidia-smi 2>/dev/null || rocm-smi 2>/dev/null || echo "No GPU detected"
-```
+```text
 
 ---
 
@@ -79,14 +79,14 @@ nvidia-smi 2>/dev/null || rocm-smi 2>/dev/null || echo "No GPU detected"
 ```bash
 git clone https://github.com/openclaw/oc-bootstrap.git
 cd oc-bootstrap
-```
+```text
 
 #### Step 2: Run Installer
 
 ```bash
 chmod +x oc-bootstrap.sh
 ./oc-bootstrap.sh
-```
+```text
 
 The installer will:
 1. Detect system configuration
@@ -125,7 +125,7 @@ sudo apt install -y \
   ca-certificates \
   gnupg \
   lsb-release
-```
+```text
 
 #### Step 2: Install Node.js 22.x
 
@@ -139,7 +139,7 @@ sudo apt install -y nodejs
 # Verify
 node --version  # Should be v22.x
 npm --version
-```
+```text
 
 #### Step 3: Create OpenClaw User (Recommended)
 
@@ -150,7 +150,7 @@ sudo usermod -aG sudo openclaw
 
 # Switch to openclaw user
 su - openclaw
-```
+```text
 
 #### Step 4: Clone and Configure
 
@@ -163,7 +163,7 @@ chmod +x *.sh
 # Create configuration
 cp .env.example .env  # If exists, otherwise create manually
 nano .env
-```
+```text
 
 #### Step 5: Configure Environment
 
@@ -188,7 +188,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 # Local Inference (optional)
 LOCAL_INFERENCE=false
 LEMONADE_KEY=local-dummy-key
-```
+```text
 
 #### Step 6: Install OpenClaw
 
@@ -198,7 +198,7 @@ LEMONADE_KEY=local-dummy-key
 
 # Or manually:
 npm install -g openclaw
-```
+```text
 
 ---
 
@@ -210,7 +210,7 @@ Create systemd service for auto-start:
 
 ```bash
 sudo nano /etc/systemd/system/openclaw.service
-```
+```text
 
 Add:
 
@@ -231,7 +231,7 @@ RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
-```
+```text
 
 Enable and start:
 
@@ -240,17 +240,17 @@ sudo systemctl daemon-reload
 sudo systemctl enable openclaw
 sudo systemctl start openclaw
 sudo systemctl status openclaw
-```
+```text
 
 ### Configure Log Rotation
 
 ```bash
 sudo nano /etc/logrotate.d/openclaw
-```
+```text
 
 Add:
 
-```
+```text
 /home/openclaw/.openclaw/logs/*.log {
     daily
     rotate 7
@@ -263,7 +263,7 @@ Add:
         systemctl reload openclaw
     endscript
 }
-```
+```text
 
 ---
 
@@ -276,7 +276,7 @@ Add:
 ```bash
 sudo systemctl start openclaw
 sudo systemctl status openclaw
-```
+```text
 
 **Manual Start:**
 
@@ -284,7 +284,7 @@ sudo systemctl status openclaw
 # As openclaw user
 su - openclaw
 openclaw gateway start
-```
+```text
 
 ### Stop OpenClaw
 
@@ -294,7 +294,7 @@ sudo systemctl stop openclaw
 
 # Manual
 openclaw gateway stop
-```
+```text
 
 ### View Logs
 
@@ -304,13 +304,13 @@ sudo journalctl -u openclaw -f
 
 # Manual
 tail -f ~/.openclaw/logs/gateway.log
-```
+```text
 
 ### Check Status
 
 ```bash
 openclaw status
-```
+```text
 
 ---
 
@@ -325,7 +325,7 @@ git pull
 
 # Restart service
 sudo systemctl restart openclaw
-```
+```text
 
 ### Manual Update
 
@@ -345,7 +345,7 @@ npm update -g openclaw
 
 # Restart
 sudo systemctl start openclaw
-```
+```text
 
 ---
 
@@ -356,7 +356,7 @@ sudo systemctl start openclaw
 ```bash
 cd /path/to/oc-bootstrap
 ./scripts/uninstall-oc-bootstrap.sh
-```
+```text
 
 ### Manual Uninstallation
 
@@ -378,7 +378,7 @@ rm -rf /path/to/oc-bootstrap
 
 # Remove configuration (optional - backup first!)
 # rm -rf ~/.openclaw
-```
+```text
 
 ---
 
@@ -395,7 +395,7 @@ whoami  # Should be 'openclaw'
 # Fix permissions
 sudo chown -R openclaw:openclaw /home/openclaw/oc-bootstrap
 sudo chown -R openclaw:openclaw /home/openclaw/.openclaw
-```
+```text
 
 ### Issue: "Port already in use"
 
@@ -408,7 +408,7 @@ sudo lsof -i :3000
 # Kill process or change OpenClaw port
 # In .env:
 export OPENCLAW_PORT=3001
-```
+```text
 
 ### Issue: "Agent not responding"
 
@@ -426,7 +426,7 @@ grep TELEGRAM_ /home/openclaw/oc-bootstrap/.env
 
 # Restart service
 sudo systemctl restart openclaw
-```
+```text
 
 ### Issue: "Out of memory"
 
@@ -444,7 +444,7 @@ sudo swapon /swapfile
 
 # Make swap permanent
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-```
+```text
 
 ---
 
@@ -461,7 +461,7 @@ sudo apt install -y nvidia-cuda-toolkit
 
 # Verify
 nvidia-smi
-```
+```text
 
 ### Enable GPU Acceleration (AMD)
 
@@ -475,7 +475,7 @@ sudo usermod -aG render $USER
 
 # Verify
 rocm-smi
-```
+```text
 
 ### Optimize for Local Inference
 
@@ -486,7 +486,7 @@ inference:
   threads: 8  # Match CPU core count
   batch_size: 512  # Adjust based on RAM
   gpu_layers: 32  # Adjust based on VRAM
-```
+```text
 
 ---
 

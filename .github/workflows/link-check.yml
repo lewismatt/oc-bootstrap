@@ -1,9 +1,9 @@
 name: Link Check
 on:
   push:
-    branches: [ main ]
+    branches: [ main, development, docker ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, development, docker ]
 jobs:
   link-check:
     runs-on: ubuntu-latest

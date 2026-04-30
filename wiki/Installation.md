@@ -75,7 +75,7 @@ df -h
 
 # Check internet
 ping -c 3 github.com
-```
+```text
 
 ---
 
@@ -99,14 +99,14 @@ sudo apt install -y docker-compose-plugin
 # Verify installation
 docker --version
 docker compose version
-```
+```text
 
 ### Step 2: Clone Repository
 
 ```bash
 git clone https://github.com/openclaw/oc-bootstrap.git
 cd oc-bootstrap
-```
+```text
 
 ### Step 3: Configure Environment
 
@@ -116,7 +116,7 @@ cp docker-config.env.template docker-config.env
 
 # Edit configuration
 nano docker-config.env
-```
+```text
 
 **Minimum configuration:**
 
@@ -135,7 +135,7 @@ EMBEDDING_MODEL=openai/text-embedding-3-small
 # API Keys (if using cloud models)
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
-```
+```text
 
 ### Step 4: Start Services
 
@@ -145,7 +145,7 @@ docker compose up -d
 
 # View logs
 docker compose logs -f
-```
+```text
 
 ### Step 5: Verify
 
@@ -154,7 +154,7 @@ docker compose logs -f
 docker compose ps
 
 # Should show "oc-bootstrap" as "Up"
-```
+```text
 
 **Full guide**: **[Docker Deployment](Docker-Deployment)**
 
@@ -173,7 +173,7 @@ sudo apt install -y \
   curl wget git python3 python3-pip \
   build-essential ca-certificates \
   gnupg lsb-release
-```
+```text
 
 ### Step 2: Install Node.js 22.x
 
@@ -186,7 +186,7 @@ sudo apt install -y nodejs
 
 # Verify
 node --version  # Should be v22.x
-```
+```text
 
 ### Step 3: Clone and Configure
 
@@ -199,13 +199,13 @@ chmod +x *.sh
 # Create configuration
 cp .env.example .env  # If exists
 nano .env
-```
+```text
 
 ### Step 4: Run Installer
 
 ```bash
 ./oc-bootstrap.sh
-```
+```text
 
 The interactive installer will guide you through:
 - Telegram bot setup
@@ -221,7 +221,7 @@ openclaw gateway start
 
 # Check status
 openclaw status
-```
+```text
 
 **Full guide**: **[Bare Metal Installation](Bare-Metal-Installation)**
 
@@ -245,7 +245,7 @@ If you haven't already:
 ```bash
 # Send /start to each bot in Telegram
 # Verify they respond
-```
+```text
 
 ### 3. Configure Agent Personas (Optional)
 
@@ -258,7 +258,7 @@ nano developer/SOUL.md
 # Restart to apply changes
 docker compose restart  # Docker
 openclaw gateway restart  # Bare Metal
-```
+```text
 
 **Detailed guide**: **[Agent Configuration](Agent-Configuration)**
 
@@ -270,7 +270,7 @@ openclaw gateway restart  # Bare Metal
 
 # Update configuration
 # Set LOCAL_INFERENCE=true in docker-config.env or .env
-```
+```text
 
 **Detailed guide**: **[Lemonade Configuration](Lemonade-Configuration)**
 
@@ -299,7 +299,7 @@ docker compose logs --tail=50 openclaw
 
 # Test bot connection
 docker compose exec openclaw openclaw --version
-```
+```text
 
 **Bare Metal:**
 
@@ -312,13 +312,13 @@ tail -f ~/.openclaw/logs/gateway.log
 
 # Test installation
 openclaw --version
-```
+```text
 
 ### Sample Conversation Test
 
 **In Telegram (to Assistant Bot):**
 
-```
+```text
 You: Hello! What can you do?
 Assistant: I'm your general-purpose AI assistant...
 
@@ -329,7 +329,7 @@ Assistant: Noted! I'll remember that you prefer Python...
 
 You: What language do I prefer?
 Assistant: You prefer Python over bash, as you mentioned earlier.
-```
+```text
 
 ---
 
@@ -365,7 +365,7 @@ docker compose logs -f
 
 # Update
 git pull && docker compose up -d --force-recreate --build
-```
+```text
 
 ### Bare Metal Commands
 
@@ -384,7 +384,7 @@ openclaw status
 
 # Update
 git pull && ./oc-bootstrap.sh --update
-```
+```text
 
 ---
 

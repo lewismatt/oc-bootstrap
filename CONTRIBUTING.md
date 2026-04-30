@@ -77,7 +77,7 @@ git remote add upstream https://github.com/openclaw/oc-bootstrap.git
 # Make scripts executable
 chmod +x *.sh
 chmod +x lib/*.sh
-```
+```text
 
 ### Testing Your Changes
 
@@ -90,7 +90,7 @@ make test
 
 # Test interactive installation (in a VM or test environment)
 ./oc-bootstrap.sh
-```
+```text
 
 ---
 
@@ -120,7 +120,7 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "[ERROR] Configuration file not found: $CONFIG_FILE"
     exit 1
 fi
-```
+```text
 
 ### Documentation Standards
 
@@ -151,7 +151,7 @@ fi
 
 # Test specific functionality
 bash -x oc-bootstrap.sh --help
-```
+```text
 
 ### Writing Tests
 
@@ -174,7 +174,7 @@ test_new_feature() {
     
     echo "✓ New feature test passed"
 }
-```
+```text
 
 ---
 
@@ -210,7 +210,7 @@ install_packages() {
     echo "[INFO] Installing packages: $packages"
     # ... implementation ...
 }
-```
+```text
 
 ---
 
@@ -228,7 +228,7 @@ We use [Semantic Versioning](https://semver.org/):
 
 Update `CHANGELOG` with your changes:
 
-```
+```text
 ## [Unreleased]
 ### Added
 - New feature description
@@ -238,7 +238,7 @@ Update `CHANGELOG` with your changes:
 
 ### Fixed
 - Bug fix description
-```
+```text
 
 ---
 

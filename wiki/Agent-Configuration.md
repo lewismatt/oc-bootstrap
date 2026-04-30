@@ -41,12 +41,12 @@ Each agent has three configuration files in their respective directory:
 
 ### File Structure
 
-```
+```text
 assistant/
 ├── AGENTS.md      # Git protocol and update permissions
 ├── SOUL.md        # Agent persona and behavior
 └── USER.md        # User context and preferences
-```
+```text
 
 ### File Purposes
 
@@ -100,7 +100,7 @@ You are a helpful, general-purpose AI assistant. Your primary purpose is to prov
 
 - **Research Agent:** Request web research, real-time news, or complex data gathering
 - **Developer Agent:** Escalate coding tasks, infrastructure changes, or technical questions
-```
+```text
 
 ### Customizing Assistant
 
@@ -108,7 +108,7 @@ Edit `assistant/SOUL.md` to change the agent's personality:
 
 ```bash
 nano assistant/SOUL.md
-```
+```text
 
 **Example customization:**
 
@@ -117,7 +117,7 @@ nano assistant/SOUL.md
 - **Detailed Explanations:** Provide thorough explanations with examples
 - **Proactive Suggestions:** Offer recommendations before being asked
 - **Learning Mode:** Adapt responses based on user's growing expertise
-```
+```text
 
 ### USER.md Configuration
 
@@ -146,7 +146,7 @@ This file contains information that helps the Assistant provide better, more per
 - **GPU:** [Your GPU model and VRAM]
 - **RAM:** [Your system RAM]
 - **Storage:** [Your available storage]
-```
+```text
 
 Update this file as your needs evolve - the Assistant will reference it automatically and can update it when learning new preferences.
 
@@ -187,7 +187,7 @@ You are a thorough research specialist focused on accuracy and source verificati
 - Executive summary first
 - Detailed findings with sources
 - Confidence levels for each claim
-```
+```text
 
 ### Research-Specific Settings
 
@@ -199,7 +199,7 @@ BRAVE_SEARCH_API_KEY=your_brave_api_key
 
 # Research agent model (requires web access capability)
 RESEARCH_MODEL=openai/gpt-4o
-```
+```text
 
 ---
 
@@ -241,7 +241,7 @@ You are an expert software developer with focus on clean, maintainable code.
 - Review code before suggesting changes
 - Explain architectural decisions
 - Consider backward compatibility
-```
+```text
 
 ### Developer-Specific Settings
 
@@ -251,7 +251,7 @@ GITHUB_PAT=your_github_personal_access_token
 
 # Developer agent model (benefits from larger context)
 DEVELOPER_MODEL=anthropic/claude-3-5-sonnet-latest
-```
+```text
 
 ---
 
@@ -262,13 +262,13 @@ DEVELOPER_MODEL=anthropic/claude-3-5-sonnet-latest
 ```bash
 cd /path/to/oc-bootstrap
 # Options: assistant/, research/, developer/
-```
+```text
 
 ### Step 2: Edit the SOUL.md File
 
 ```bash
 nano assistant/SOUL.md
-```
+```text
 
 ### Step 3: Modify Sections
 
@@ -287,7 +287,7 @@ nano assistant/SOUL.md
 git add assistant/SOUL.md
 git commit -m "Customize Assistant agent persona"
 git push origin main
-```
+```text
 
 ---
 
@@ -316,7 +316,7 @@ When enabled, agents automatically update `USER.md` with important information:
 ```bash
 # Enable auto-memory in configuration
 export AUTO_MEMORY=true
-```
+```text
 
 Agents will proactively update:
 - Hardware changes
@@ -332,7 +332,7 @@ Agents can also update their `USER.md` files when they learn something important
 ## Recent Updates (by Agent)
 - [2026-04-30] User prefers Python over bash for data processing
 - [2026-04-29] Added new project: Log analysis automation
-```
+```text
 
 ---
 
@@ -344,7 +344,7 @@ The Assistant acts as team lead and can delegate tasks:
 
 **Example delegation:**
 
-```
+```text
 User: "Research the latest Python web frameworks and create a comparison table"
 
 Assistant:
@@ -353,7 +353,7 @@ Assistant:
   3. Assistant delegates to Developer Agent: "Create comparison table"
   4. Developer Agent formats and returns table
   5. Assistant presents final result to user
-```
+```text
 
 ### Configuring Agent Collaboration
 
@@ -376,7 +376,7 @@ In `assistant/SOUL.md`, define collaboration rules:
 - Task requires >10 minutes
 - Multiple steps involved
 - External API integration needed
-```
+```text
 
 ---
 
@@ -389,7 +389,7 @@ For advanced users, you can override the default system prompt:
 ```bash
 # In agent's environment or config
 export SYSTEM_PROMPT_OVERRIDE="You are a specialized agent for..."
-```
+```text
 
 ### Model Selection per Agent
 
@@ -404,7 +404,7 @@ ASSISTANT_MODEL=openai/gpt-4o-mini
 
 # Fast model for research
 RESEARCH_MODEL=openai/gpt-4o-mini
-```
+```text
 
 ### Tool Access Control
 
@@ -423,7 +423,7 @@ Control which tools each agent can access via `AGENTS.md`:
 - Delete repository files (require user confirmation)
 - Modify other agents' workspaces
 - Change system configuration outside workspace
-```
+```text
 
 ---
 
@@ -437,7 +437,7 @@ docker compose logs openclaw | grep -i "assistant"
 
 # Check agent status (Bare Metal)
 openclaw status
-```
+```text
 
 ### Agent Personality Not Applied
 
@@ -447,7 +447,7 @@ cat assistant/SOUL.md
 
 # Restart agent to reload configuration
 docker compose restart openclaw
-```
+```text
 
 ### Memory Not Persisting
 
@@ -457,7 +457,7 @@ docker inspect oc-bootstrap | grep openclaw-data
 
 # Check permissions (Bare Metal)
 ls -la ~/.openclaw/agents/
-```
+```text
 
 ### Agent Using Wrong Model
 
@@ -469,7 +469,7 @@ echo $DEVELOPER_MODEL
 
 # Check docker-config.env
 cat docker-config.env | grep MODEL
-```
+```text
 
 ---
 

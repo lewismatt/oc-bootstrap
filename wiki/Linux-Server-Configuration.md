@@ -57,7 +57,7 @@ sudo apt autoremove -y
 
 # Reboot if kernel was updated
 sudo reboot
-```
+```text
 
 ### 2. Set Hostname
 
@@ -67,7 +67,7 @@ sudo hostnamectl set-hostname openclaw-server
 
 # Verify
 hostnamectl
-```
+```text
 
 ### 3. Configure Timezone
 
@@ -80,7 +80,7 @@ sudo timedatectl set-ntp true
 
 # Verify
 timedatectl status
-```
+```text
 
 ---
 
@@ -97,7 +97,7 @@ sudo usermod -aG sudo openclaw
 
 # Set password
 sudo passwd openclaw
-```
+```text
 
 ### 2. Configure SSH Access
 
@@ -115,7 +115,7 @@ chmod 600 ~/.ssh/authorized_keys
 
 # Exit back to original user
 exit
-```
+```text
 
 ### 3. Disable Root SSH Login (Security)
 
@@ -130,7 +130,7 @@ sudo nano /etc/ssh/sshd_config
 
 # Restart SSH
 sudo systemctl restart sshd
-```
+```text
 
 ---
 
@@ -146,7 +146,7 @@ ls /etc/netplan/
 
 # Edit configuration
 sudo nano /etc/netplan/01-netcfg.yaml
-```
+```text
 
 Example configuration:
 
@@ -163,13 +163,13 @@ network:
         addresses:
           - 8.8.8.8
           - 1.1.1.1
-```
+```text
 
 Apply changes:
 
 ```bash
 sudo netplan apply
-```
+```text
 
 ### 2. Firewall Configuration
 
@@ -186,7 +186,7 @@ sudo ufw allow 8000/tcp  # Lemonade Server (if remote access needed)
 
 # Check status
 sudo ufw status verbose
-```
+```text
 
 ### 3. Verify Network Connectivity
 
@@ -199,7 +199,7 @@ ping -c 4 8.8.8.8
 
 # Test DNS resolution
 nslookup github.com
-```
+```text
 
 ---
 
@@ -216,7 +216,7 @@ sudo dpkg-reconfigure -plow unattended-upgrades
 
 # Edit configuration
 sudo nano /etc/apt/apt.conf.d/50unattended-upgrades
-```
+```text
 
 ### 2. Fail2ban Installation
 
@@ -229,7 +229,7 @@ sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 
 # Edit to protect SSH
 sudo nano /etc/fail2ban/jail.local
-```
+```text
 
 Add this section:
 
@@ -241,7 +241,7 @@ filter = sshd
 logpath = /var/log/auth.log
 maxretry = 3
 bantime = 3600
-```
+```text
 
 Start fail2ban:
 
@@ -249,7 +249,7 @@ Start fail2ban:
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 sudo fail2ban-client status
-```
+```text
 
 ### 3. Disable Unnecessary Services
 
@@ -260,7 +260,7 @@ systemctl list-units --type=service --state=running
 # Disable unnecessary services (example)
 sudo systemctl disable bluetooth  # If not needed
 sudo systemctl disable cups       # If no printer
-```
+```text
 
 ---
 
@@ -282,7 +282,7 @@ sudo apt install -y \
   ca-certificates \
   gnupg \
   lsb-release
-```
+```text
 
 ### 2. Install Node.js 22.x
 
@@ -296,7 +296,7 @@ sudo apt install -y nodejs
 # Verify installation
 node --version  # Should be v22.x
 npm --version
-```
+```text
 
 ### 3. Install Docker (Optional - for Docker Deployment)
 
@@ -315,7 +315,7 @@ sudo systemctl start docker
 # Verify (may need to logout/login first)
 docker --version
 docker compose version
-```
+```text
 
 ### 4. Install Python 3 and pip
 
@@ -329,7 +329,7 @@ pip3 --version
 
 # Upgrade pip
 pip3 install --upgrade pip
-```
+```text
 
 ---
 
@@ -340,16 +340,16 @@ pip3 install --upgrade pip
 ```bash
 # Edit limits.conf
 sudo nano /etc/security/limits.conf
-```
+```text
 
 Add these lines:
 
-```
+```text
 - soft nofile 65536
 - hard nofile 65536
 root soft nofile 65536
 root hard nofile 65536
-```
+```text
 
 ### 2. Configure Systemd Limits (for Docker)
 
@@ -357,7 +357,7 @@ root hard nofile 65536
 # Create override for Docker service
 sudo mkdir -p /etc/systemd/system/docker.service.d/
 sudo nano /etc/systemd/system/docker.service.d/limits.conf
-```
+```text
 
 Add:
 
@@ -365,14 +365,14 @@ Add:
 [Service]
 LimitNOFILE=65536
 LimitNPROC=65536
-```
+```text
 
 Apply:
 
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl restart docker
-```
+```text
 
 ### 3. Swap Configuration (Optional)
 
@@ -388,7 +388,7 @@ sudo swapon /swapfile
 
 # Make permanent
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-```
+```text
 
 ---
 
@@ -410,18 +410,18 @@ sudo nano /etc/default/sysstat
 
 sudo systemctl enable sysstat
 sudo systemctl start sysstat
-```
+```text
 
 ### 2. Log Rotation
 
 ```bash
 # Edit logrotate configuration for OpenClaw
 sudo nano /etc/logrotate.d/openclaw
-```
+```text
 
 Add:
 
-```
+```text
 /home/openclaw/.openclaw/logs/*.log {
     daily
     rotate 7
@@ -431,14 +431,14 @@ Add:
     notifempty
     create 0644 openclaw openclaw
 }
-```
+```text
 
 ### 3. Journalctl Configuration
 
 ```bash
 # Limit journal size
 sudo nano /etc/systemd/journald.conf
-```
+```text
 
 Set:
 
@@ -447,13 +447,13 @@ Set:
 Storage=persistent
 SystemMaxUse=100M
 RuntimeMaxUse=50M
-```
+```text
 
 Apply:
 
 ```bash
 sudo systemctl restart systemd-journald
-```
+```text
 
 ---
 
@@ -502,7 +502,7 @@ sudo ufw status
 
 # Check if port 22 is listening
 sudo ss -tlnp | grep 22
-```
+```text
 
 ### Permission Denied Errors
 
@@ -513,7 +513,7 @@ groups $USER
 # Add to docker group if needed
 sudo usermod -aG docker $USER
 # Logout and login again
-```
+```text
 
 ### Out of Memory Errors
 
@@ -525,7 +525,7 @@ free -h
 swapon --show
 
 # Add swap if needed (see Swap Configuration above)
-```
+```text
 
 ---
 

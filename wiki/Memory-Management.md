@@ -23,7 +23,7 @@ OpenClaw agents use a sophisticated memory system to remember conversations, use
 
 OpenClaw uses a multi-layered memory system:
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │                   Memory System                   │
 ├─────────────────────────────────────────────────┤
@@ -44,7 +44,7 @@ OpenClaw uses a multi-layered memory system:
 │  └─────────────────────────────────────────┘   │
 │                                                 │
 └─────────────────────────────────────────────────┘
-```
+```text
 
 ### Memory Benefits
 
@@ -66,11 +66,11 @@ Stores past conversations for context retrieval.
 **Retention**: Configurable (default: 30 days)
 
 **Example**:
-```
+```text
 User: "What's the weather in New York?"
 Agent: "I don't have real-time weather access, but..."
 [Stored in episodic memory]
-```
+```text
 
 ### 2. Semantic Memory (Facts)
 
@@ -87,7 +87,7 @@ Stores learned facts about the user and world.
 - User prefers Python over bash for scripting
 - User has AMD GPU with 12GB VRAM
 - User's server IP: 192.168.12.100
-```
+```text
 
 ### 3. Procedural Memory (Skills)
 
@@ -98,10 +98,10 @@ Stores learned procedures and workflows.
 **Retention**: Permanent
 
 **Example**:
-```
+```text
 Agent learns: "When user asks for file listing, use 'ls -la' format"
 [Stored as procedural memory]
-```
+```text
 
 ---
 
@@ -109,7 +109,7 @@ Agent learns: "When user asks for file listing, use 'ls -la' format"
 
 ### Directory Structure
 
-```
+```text
 ~/.openclaw/
 ├── agents/
 │   ├── assistant/
@@ -126,7 +126,7 @@ Agent learns: "When user asks for file listing, use 'ls -la' format"
 │   │
 │   └── developer/
 │       └── (same structure)
-```
+```text
 
 ### File Types
 
@@ -151,13 +151,13 @@ When enabled, agents automatically update `USER.md` with important information t
 
 ```bash
 AUTO_MEMORY=true
-```
+```text
 
 **Bare Metal (`.env` or environment):**
 
 ```bash
 export AUTO_MEMORY=true
-```
+```text
 
 ### What Auto-Memory Captures
 
@@ -176,14 +176,14 @@ export AUTO_MEMORY=true
 # USER.md
 ## Hardware Setup
 - GPU: Unknown
-```
+```text
 
 **Agent learns from conversation:**
-```
+```text
 User: "I just upgraded to an RTX 4070 with 12GB VRAM"
 Agent: "Great upgrade! I'll remember that."
 [Auto-Memory triggers]
-```
+```text
 
 **After:**
 ```markdown
@@ -191,7 +191,7 @@ Agent: "Great upgrade! I'll remember that."
 ## Hardware Setup
 - GPU: NVIDIA RTX 4070 (12GB VRAM)
 - Updated: 2026-04-30
-```
+```text
 
 ---
 
@@ -203,13 +203,13 @@ Agent: "Great upgrade! I'll remember that."
 
 ```bash
 docker compose exec openclaw openclaw memory list --agent assistant
-```
+```text
 
 **List all memories (Bare Metal):**
 
 ```bash
 openclaw memory list --agent assistant
-```
+```text
 
 ### Searching Memory
 
@@ -221,7 +221,7 @@ openclaw memory search "GPU" --agent assistant
 
 # Search across all agents
 openclaw memory search "project deadline"
-```
+```text
 
 ### Adding Memory Manually
 
@@ -232,7 +232,7 @@ openclaw memory add --agent assistant \
   --key "preferred_language" \
   --value "Python" \
   --category "preferences"
-```
+```text
 
 ### Editing USER.md
 
@@ -247,7 +247,7 @@ nano research/USER.md
 
 # Developer
 nano developer/USER.md
-```
+```text
 
 **Example edit:**
 
@@ -259,7 +259,7 @@ nano developer/USER.md
 **New Addition:**
 - Always provide code examples with comments
 - Use markdown tables for comparisons
-```
+```text
 
 ### Deleting Memories
 
@@ -267,7 +267,7 @@ nano developer/USER.md
 
 ```bash
 openclaw memory delete --agent assistant --key "old_preference"
-```
+```text
 
 **Clear all memories (caution!):**
 
@@ -277,7 +277,7 @@ openclaw memory clear --agent assistant
 
 # Clear all agents
 openclaw memory clear --all
-```
+```text
 
 ---
 
@@ -285,7 +285,7 @@ openclaw memory clear --all
 
 ### How Semantic Search Works
 
-```
+```text
 User asks: "What GPU do I have?"
     │
     ▼
@@ -302,7 +302,7 @@ Include in agent's context
     │
     ▼
 Agent responds: "You have an NVIDIA RTX 4070 with 12GB VRAM"
-```
+```text
 
 ### Search Configuration
 
@@ -317,7 +317,7 @@ export MEMORY_SIMILARITY_THRESHOLD=0.7
 
 # Search scope
 export MEMORY_SEARCH_SCOPE="all"  # or "recent", "facts", etc.
-```
+```text
 
 ### Search Examples
 
@@ -330,7 +330,7 @@ openclaw memory search "project deadline timeline"
 
 # Search with date range
 openclaw memory search "meeting notes" --after 2026-04-01 --before 2026-04-30
-```
+```text
 
 ---
 
@@ -349,7 +349,7 @@ docker run --rm \
 
 # Verify
 ls -lh openclaw-memory-backup-*.tar.gz
-```
+```text
 
 **Bare Metal:**
 
@@ -360,7 +360,7 @@ tar czf ~/openclaw-backup-$(date +%Y%m%d).tar.gz -C ~ .openclaw
 # Backup repository (including USER.md files)
 tar czf ~/oc-bootstrap-backup-$(date +%Y%m%d).tar.gz \
   -C ~/repos oc-bootstrap
-```
+```text
 
 ### Restore Memory
 
@@ -378,7 +378,7 @@ docker run --rm \
 
 # Restart
 docker compose up -d
-```
+```text
 
 **Bare Metal:**
 
@@ -388,7 +388,7 @@ tar xzf ~/openclaw-backup-20260430.tar.gz -C ~
 
 # Restore repository
 tar xzf ~/oc-bootstrap-backup-20260430.tar.gz -C ~/repos
-```
+```text
 
 ### Automated Backups
 
@@ -396,7 +396,7 @@ tar xzf ~/oc-bootstrap-backup-20260430.tar.gz -C ~/repos
 
 ```bash
 nano ~/backup-openclaw.sh
-```
+```text
 
 Add:
 
@@ -412,7 +412,7 @@ tar czf $BACKUP_DIR/openclaw-$(date +%Y%m%d-%H%M%S).tar.gz -C ~ .openclaw
 find $BACKUP_DIR -name "openclaw-*.tar.gz" -mtime +7 -delete
 
 echo "Backup completed: $(ls -t $BACKUP_DIR | head -1)"
-```
+```text
 
 Make executable and schedule:
 
@@ -422,7 +422,7 @@ chmod +x ~/backup-openclaw.sh
 # Add to crontab (daily at 2 AM)
 crontab -e
 # Add: 0 2 * * * ~/backup-openclaw.sh
-```
+```text
 
 ---
 
@@ -445,7 +445,7 @@ docker inspect oc-bootstrap | grep -A 10 "Mounts"
 # Fix permissions (Bare Metal)
 chmod -R u+w ~/.openclaw
 chown -R $USER:$USER ~/.openclaw
-```
+```text
 
 ### Issue: Memory Search Not Working
 
@@ -467,7 +467,7 @@ echo $EMBEDDING_MODEL
 curl https://api.openai.com/v1/embeddings \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
   -d '{"input": "test", "model": "text-embedding-3-small"}'
-```
+```text
 
 ### Issue: USER.md Not Updating
 
@@ -487,7 +487,7 @@ cat assistant/AGENTS.md | grep -i "user.md"
 
 # Restart agent
 docker compose restart openclaw
-```
+```text
 
 ### Issue: Memory Database Corrupted
 
@@ -506,7 +506,7 @@ rm -rf ~/.openclaw/agents/*/memory/vector-db/
 
 # Restart (will rebuild on next use)
 docker compose restart openclaw
-```
+```text
 
 ---
 

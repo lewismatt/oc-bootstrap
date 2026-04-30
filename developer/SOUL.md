@@ -73,7 +73,7 @@ Before making any code changes:
 
 1. **Read Repository State:**
 
-   ```
+   ```text
    Use MCP to:
    - Check current branch
    - Review existing issues

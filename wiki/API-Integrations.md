@@ -52,7 +52,7 @@ GITHUB_PAT=ghp_...
 # Lemonade (local)
 LEMONADE_KEY=local-dummy-key
 LEMONADE_IP=192.168.12.50  # Optional
-```
+```text
 
 ### Bare Metal Configuration (`.env` or environment)
 
@@ -61,7 +61,7 @@ export OPENAI_API_KEY="sk-..."
 export ANTHROPIC_API_KEY="sk-ant-..."
 export BRAVE_SEARCH_API_KEY="BSA..."
 export GITHUB_PAT="ghp_..."
-```
+```text
 
 ---
 
@@ -93,14 +93,14 @@ ASSISTANT_MODEL=openai/gpt-4o
 RESEARCH_MODEL=openai/gpt-4o
 DEVELOPER_MODEL=openai/gpt-4o
 EMBEDDING_MODEL=openai/text-embedding-3-small
-```
+```text
 
 **Bare Metal:**
 
 ```bash
 export OPENAI_API_KEY="sk-..."
 export ASSISTANT_MODEL="openai/gpt-4o"
-```
+```text
 
 ### Available Models
 
@@ -127,7 +127,7 @@ curl https://api.openai.com/v1/chat/completions \
     "model": "gpt-4o",
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
-```
+```text
 
 ---
 
@@ -157,14 +157,14 @@ ANTHROPIC_API_KEY=sk-ant-abcdefghijklmnopqrstuvwxyz
 
 # Use Claude for Developer agent
 DEVELOPER_MODEL=anthropic/claude-3-5-sonnet-latest
-```
+```text
 
 **Bare Metal:**
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
 export DEVELOPER_MODEL="anthropic/claude-3-5-sonnet-latest"
-```
+```text
 
 ### Available Models
 
@@ -186,7 +186,7 @@ curl https://api.anthropic.com/v1/messages \
     "max_tokens": 1024,
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
-```
+```text
 
 ---
 
@@ -215,22 +215,22 @@ BRAVE_SEARCH_API_KEY=BSAabcdefghijklmnopqrstuvwxyz
 
 # Assign to Research agent
 RESEARCH_MODEL=openai/gpt-4o  # Research agent needs an LLM too
-```
+```text
 
 **Bare Metal:**
 
 ```bash
 export BRAVE_SEARCH_API_KEY="BSA..."
-```
+```text
 
 ### Usage in Research Agent
 
 The Research agent can now perform web searches:
 
-```
+```text
 User: "Research the latest news about AI agents"
 Research Agent: [Uses Brave Search API to find recent articles]
-```
+```text
 
 ### Testing Brave Search API
 
@@ -240,7 +240,7 @@ curl "https://api.search.brave.com/res/v1/web/search" \
   -H "X-Subscription-Token: $BRAVE_SEARCH_API_KEY" \
   -G --data-urlencode "q=AI agents" \
   --data-urlencode "count=5"
-```
+```text
 
 ---
 
@@ -273,20 +273,20 @@ GITHUB_PAT=ghp_abcdefghijklmnopqrstuvwxyz
 
 # Assign to Developer agent
 DEVELOPER_MODEL=anthropic/claude-3-5-sonnet-latest
-```
+```text
 
 **Bare Metal:**
 
 ```bash
 export GITHUB_PAT="ghp_..."
-```
+```text
 
 ### Using GitHub API with Developer Agent
 
-```
+```text
 User: "Analyze the repository structure of oc-bootstrap"
 Developer Agent: [Uses GitHub API to fetch repo data]
-```
+```text
 
 ### Testing GitHub API
 
@@ -298,7 +298,7 @@ curl -H "Authorization: token $GITHUB_PAT" \
 # List repositories
 curl -H "Authorization: token $GITHUB_PAT" \
   https://api.github.com/user/repos
-```
+```text
 
 ---
 
@@ -315,7 +315,7 @@ LOCAL_INFERENCE=true
 LEMONADE_KEY=local-dummy-key
 LEMONADE_IP=192.168.12.50  # If running separately
 ASSISTANT_MODEL=lemonade/user.Qwen3.5-4B-GGUF
-```
+```text
 
 ### Weather API (Example)
 
@@ -343,7 +343,7 @@ Check your usage:
 ```bash
 # Visit OpenAI platform
 https://platform.openai.com/usage
-```
+```text
 
 ### Setting Budgets
 
@@ -355,20 +355,20 @@ OPENAI_MONTHLY_BUDGET=50.00
 
 # Enable budget tracking
 TRACK_API_USAGE=true
-```
+```text
 
 **Monitor usage in logs:**
 
 ```bash
 docker compose logs openclaw | grep -i "usage\|cost\|tokens"
-```
+```text
 
 ### Anthropic Usage
 
 ```bash
 # Visit Anthropic console
 https://console.anthropic.com/settings/usage
-```
+```text
 
 ---
 
@@ -377,9 +377,9 @@ https://console.anthropic.com/settings/usage
 ### Issue: "Invalid API Key"
 
 **Symptoms:**
-```
+```text
 Error: 401 Unauthorized
-```
+```text
 
 **Solution:**
 
@@ -390,14 +390,14 @@ echo $OPENAI_API_KEY  # Should print the key
 # Test key manually (see Testing sections above)
 
 # Re-generate key if needed from provider's dashboard
-```
+```text
 
 ### Issue: "Rate Limit Exceeded"
 
 **Symptoms:**
-```
+```text
 Error: 429 Too Many Requests
-```
+```text
 
 **Solution:**
 
@@ -412,9 +412,9 @@ Error: 429 Too Many Requests
 ### Issue: "Model Not Found"
 
 **Symptoms:**
-```
+```text
 Error: The model 'xyz' does not exist
-```
+```text
 
 **Solution:**
 
@@ -425,14 +425,14 @@ curl https://api.openai.com/v1/models \
 
 # Update model name in config
 ASSISTANT_MODEL=openai/gpt-4o  # Use correct model name
-```
+```text
 
 ### Issue: "Connection Timeout"
 
 **Symptoms:**
-```
+```text
 Error: ETIMEDOUT, connect timeout
-```
+```text
 
 **Solution:**
 
@@ -446,7 +446,7 @@ echo $https_proxy
 
 # Increase timeout in config
 export API_TIMEOUT_MS=30000  # 30 seconds
-```
+```text
 
 ---
 
