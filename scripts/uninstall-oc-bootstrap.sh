@@ -100,7 +100,11 @@ confirm() {
     print_question "$message"
     read -r -p "Proceed? (y/N): " response </dev/tty
     response="${response:-$default}"
-    [[ "${response^^}" == "Y" ]]
+    if [[ "${response^^}" == "Y" ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 # ==============================================================================

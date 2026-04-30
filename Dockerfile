@@ -3,7 +3,7 @@
 # ==============================================================================
 # Containerized environment for OpenClaw AI agents
 # Base: Ubuntu 24.04 (matching project requirements)
-# Includes: Node.js 20.x, OpenClaw CLI, and all dependencies
+# Includes: Node.js 22.x, OpenClaw CLI, and all dependencies
 # ==============================================================================
 
 FROM ubuntu:24.04

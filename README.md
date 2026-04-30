@@ -9,7 +9,7 @@ Automated setup for OpenClaw AI agents on Ubuntu 24.04. Deploy three specialized
 [![Node.js 22.x](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
 [![Docker Ready](https://img.shields.io/badge/Docker-Ready-blue.svg)](DOCKER.md)
 [![Telegram Bots](https://img.shields.io/badge/Telegram-Bots-2CA5E0.svg)](https://core.telegram.org/bots)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/openclaw/oc-bootstrap/ci.yml)](https://github.com/openclaw/oc-bootstrap/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/lewismatt/oc-bootstrap/ci.yml)](https://github.com/lewismatt/oc-bootstrap/actions)
 
 </div>
 
@@ -21,7 +21,7 @@ Get OpenClaw running in under 5 minutes:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/openclaw/oc-bootstrap.git
+git clone https://github.com/lewismatt/oc-bootstrap.git
 cd oc-bootstrap
 
 # 2. Make scripts executable
@@ -188,7 +188,7 @@ These unlock additional features:
 
 ```bash
 # 1. Clone this repository
-git clone https://github.com/openclaw/oc-bootstrap.git openclaw-setup
+git clone https://github.com/lewismatt/oc-bootstrap.git openclaw-setup
 cd openclaw-setup
 
 # 2. Make scripts executable
@@ -874,7 +874,7 @@ This project builds upon these excellent open source projects:
 
 Found a bug? Have a suggestion? We'd love your help!
 
-1. Check [open issues](https://github.com/openclaw/oc-bootstrap/issues)
+1. Check [open issues](https://github.com/lewismatt/oc-bootstrap/issues)
 2. Create a new issue with details
 3. Submit a pull request with improvements
 
@@ -890,7 +890,7 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 - **Documentation**: [docs.openclaw.ai](https://docs.openclaw.ai)
 - **Discord Community**: [discord.gg/openclaw](https://discord.gg/openclaw)
-- **GitHub Issues**: [Report a bug](https://github.com/openclaw/oc-bootstrap/issues)
+- **GitHub Issues**: [Report a bug](https://github.com/lewismatt/oc-bootstrap/issues)
 
 ---
 
