@@ -66,16 +66,16 @@ if [[ "${DOWNLOAD_MODELS^^}" == "Y" ]]; then
     echo "[INFO] Downloading Qwen2.5-4B-Instruct-GGUF..."
     mkdir -p models/huggingface.co/user.Qwen3.5-4B-GGUF/
     huggingface-cli download Qwen/Qwen2.5-4B-Instruct-GGUF qwen2.5-4b-instruct-q4_k_m.gguf \
-      --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
+        --local-dir models/huggingface.co/user.Qwen3.5-4B-GGUF/
 
     echo "[INFO] Downloading Nomic Embed Text v1.5 GGUF..."
     mkdir -p models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
     huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF nomic-embed-text-v1.5.Q4_K_M.gguf \
-      --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
+        --local-dir models/huggingface.co/user.nomic-embed-text-v1.5-GGUF/
 fi
 
 # 6. Create Startup Script
-cat <<EOF > start-lemonade.sh
+cat <<EOF >start-lemonade.sh
 #!/bin/bash
 source venv/bin/activate
 # Adjust HSA_OVERRIDE_GFX_VERSION if needed for AMD GPUs

@@ -38,11 +38,11 @@ CONFIG_FILE=""
 # ----------------------------------------------------------------------
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --non-interactive|-y)
+        --non-interactive | -y)
             NON_INTERACTIVE=true
             shift
             ;;
-        --config|-c)
+        --config | -c)
             CONFIG_FILE="$2"
             shift 2
             ;;
@@ -101,7 +101,7 @@ check_shellcheck() {
         echo "      Install with: sudo apt install shellcheck"
         return 0
     fi
-    
+
     echo "[INFO] Running ShellCheck static analysis..."
     if shellcheck "$0" 2>/dev/null; then
         echo "  [OK] ShellCheck analysis complete: No critical issues found."
