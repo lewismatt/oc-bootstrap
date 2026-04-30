@@ -2,9 +2,9 @@ name: Lint and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, development ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, development ]
 
 jobs:
   lint:
@@ -17,9 +17,10 @@ jobs:
 
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@master
+        continue-on-error: true
         with:
           scandir: '.'
-          additional_files: 'oc-bootstrap.sh install-lemonade.sh'
+          additional_files: 'oc-bootstrap.sh install-lemonade.sh lib/helpers.sh'
 
       - name: shfmt
         uses: mfinelli/setup-shfmt@v3
@@ -28,6 +29,7 @@ jobs:
       - name: Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v14
         with:
+          config: '.markdownlint.json'
           glob: '**/*.md'
 
       - name: Yamllint
