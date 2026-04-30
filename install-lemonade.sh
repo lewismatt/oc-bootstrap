@@ -1,59 +1,69 @@
 #!/bin/bash
-set -euo pipefail
-
 # ==============================================================================
 # LEMONADE SERVER INSTALLER (LOCAL INFERENCE)
 # ==============================================================================
 # This script installs Lemonade Server for local LLM inference.
 # It is optimized for Ubuntu 24.04 and AMD/NVIDIA GPUs.
+#
+# Exit on errors, undefined variables, and pipe failures to ensure robustness
 # ==============================================================================
+set -euo pipefail
 
 echo "=== Lemonade Server Installer ==="
 
-# 1. Check for Python and Virtual Environment
+# SECTION 1: Verify Python3 is installed and accessible
+# Requirements: Python 3.8+ for lemonade-server compatibility
 if ! command -v python3 >/dev/null 2>&1; then
     echo "[ERROR] Python 3 is not installed. Please install it with: sudo apt install python3"
     exit 1
 fi
 
+# Verify pip3 is installed, which is required for dependency management
 if ! command -v pip3 >/dev/null 2>&1; then
     echo "[INFO] Installing pip3..."
     sudo apt update && sudo apt install -y python3-pip
 fi
 
-# 2. Clone Lemonade Server
+# SECTION 2: Clone or update Lemonade Server repository
+# This repository contains the server code and requirements.txt
 LEMONADE_DIR="$HOME/lemonade-server"
 if [[ -d "$LEMONADE_DIR" ]]; then
     echo "[INFO] Lemonade Server already exists at $LEMONADE_DIR. Updating..."
-    cd "$LEMONADE_DIR" && git pull
+    cd "$LEMONADE_DIR" && git pull || { echo "[ERROR] Failed to update repository"; exit 1; }
 else
     echo "[INFO] Cloning Lemonade Server..."
-    git clone https://github.com/lemonade-ai/lemonade-server.git "$LEMONADE_DIR"
+    git clone https://github.com/lemonade-ai/lemonade-server.git "$LEMONADE_DIR" || \
+        { echo "[ERROR] Failed to clone repository"; exit 1; }
     cd "$LEMONADE_DIR"
 fi
 
-# 3. Detect GPU and Install Dependencies
+# SECTION 3: Detect GPU hardware and install appropriate drivers/libraries
+# GPU acceleration dramatically improves inference speed. CPU-only mode is significantly slower.
 echo ""
 echo "--- GPU Detection & Dependency Installation ---"
 if lspci | grep -i "nvidia" >/dev/null; then
-    echo "[INFO] NVIDIA GPU detected."
-    # Add NVIDIA-specific dependencies if any, otherwise standard pip install
+    echo "[INFO] NVIDIA GPU detected. CUDA support will be used automatically."
+    # NVIDIA container toolkit and CUDA are typically handled by torch installation
 elif lspci | grep -i "amd" >/dev/null; then
-    echo "[INFO] AMD GPU detected."
+    echo "[INFO] AMD GPU detected. Installing ROCm support..."
     echo "[INFO] Installing ROCm core and libraries (this may take a while)..."
-    sudo apt update && sudo apt install -y rocm-core rocm-libs || echo "[WARN] Failed to install ROCm via apt. Ensure you have the ROCm repositories configured if performance is low."
+    sudo apt update && sudo apt install -y rocm-core rocm-libs || \
+        echo "[WARN] Failed to install ROCm via apt. Ensure you have the ROCm repositories configured if performance is low."
 else
-    echo "[WARN] No dedicated GPU detected. Lemonade will run on CPU (slow)."
+    echo "[WARN] No dedicated GPU detected. Lemonade will run on CPU (significantly slower)."
 fi
 
-# 4. Create Virtual Environment and Install Requirements
+# SECTION 4: Create and activate Python virtual environment
+# Isolates dependencies from system packages to prevent conflicts
+# The --system-site-packages flag is intentionally omitted for cleaner isolation
 if [[ ! -d "venv" ]]; then
-    echo "[INFO] Creating virtual environment..."
+    echo "[INFO] Creating Python virtual environment..."
     python3 -m venv venv
 fi
 
+# SECTION 5: Install Python dependencies in the virtual environment
 echo "[INFO] Installing Python requirements..."
-# shellcheck source=/dev/null
+# shellcheck source=/dev/null (suppresses shellcheck warnings for dynamic sourcing)
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
