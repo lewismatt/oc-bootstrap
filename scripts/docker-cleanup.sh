@@ -59,16 +59,16 @@ confirm_action() {
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -p|--prune)
+        -p | --prune)
             PRUNE_VOLUMES=true
             shift
             ;;
-        -a|--all)
+        -a | --all)
             PRUNE_VOLUMES=true
             REMOVE_IMAGES=true
             shift
             ;;
-        -h|--help)
+        -h | --help)
             print_usage
             exit 0
             ;;
@@ -100,7 +100,7 @@ docker-compose -f "$COMPOSE_FILE" down --remove-orphans
 if [[ "$PRUNE_VOLUMES" == "true" ]]; then
     log "WARNING: This will delete ALL OpenClaw data (config, memory, workspaces)!"
     confirm_action "Are you sure you want to delete all volumes?"
-    
+
     log "Removing volumes..."
     docker-compose -f "$COMPOSE_FILE" down --volumes --remove-orphans
     log "Volumes removed."

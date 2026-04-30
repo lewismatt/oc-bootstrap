@@ -962,6 +962,6 @@ To run the uninstall script:
 
 ---
 
-## 🗂️ Additional Resources
+## �️ Uninstallation
 
 ---

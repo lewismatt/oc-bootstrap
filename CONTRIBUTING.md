@@ -105,7 +105,7 @@ make test
 - **Use the helper functions** from `lib/helpers.sh` when possible
 - **Follow the existing code style** (indentation, spacing)
 
-### Example:
+### Example
 
 ```bash
 #!/bin/bash
@@ -252,6 +252,6 @@ Feel free to:
 
 ---
 
-## 🙏 Thank You!
+## 🙏 Thank You
 
 Your contributions help make OpenClaw Bootstrap better for everyone. We appreciate your time and effort!

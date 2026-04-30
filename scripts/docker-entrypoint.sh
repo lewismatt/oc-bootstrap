@@ -3,7 +3,7 @@
 # OpenClaw Docker Entrypoint Script
 # ==============================================================================
 # Handles container initialization, configuration, and service startup
-# 
+#
 # Usage:
 #   docker run oc-bootstrap                    # Start gateway (default)
 #   docker run oc-bootstrap bootstrap          # Run bootstrap script
@@ -58,7 +58,7 @@ verify_openclaw() {
     if ! command -v openclaw &>/dev/null; then
         handle_error "OpenClaw CLI not found in PATH"
     fi
-    
+
     openclaw --version || log "Warning: openclaw --version failed"
     openclaw doctor --fix || log "Warning: openclaw doctor reported issues"
 }
@@ -67,13 +67,13 @@ verify_openclaw() {
 run_bootstrap() {
     if [[ "${RUN_BOOTSTRAP:-false}" == "true" ]]; then
         log "Running OpenClaw bootstrap script..."
-        
+
         if [[ ! -f "$BOOTSTRAP_SCRIPT" ]]; then
             handle_error "Bootstrap script not found at $BOOTSTRAP_SCRIPT"
         fi
-        
+
         chmod +x "$BOOTSTRAP_SCRIPT"
-        
+
         # Run in non-interactive mode with config file if provided
         if [[ -n "${CONFIG_FILE:-}" && -f "$CONFIG_FILE" ]]; then
             log "Using config file: $CONFIG_FILE"
@@ -88,10 +88,10 @@ run_bootstrap() {
 # Start OpenClaw gateway
 start_gateway() {
     log "Starting OpenClaw Gateway..."
-    
+
     # Ensure OpenClaw is properly configured
     verify_openclaw
-    
+
     # Start gateway in foreground (container will stop when this process ends)
     exec openclaw gateway start --foreground
 }
@@ -117,7 +117,7 @@ fi
 
 # Parse command argument
 COMMAND="${1:-gateway}"
-shift || true  # Remove the command, keep remaining args
+shift || true # Remove the command, keep remaining args
 
 case "$COMMAND" in
     gateway)
@@ -128,7 +128,7 @@ case "$COMMAND" in
         log "Bootstrap complete. Starting gateway..."
         start_gateway
         ;;
-    shell|bash|sh)
+    shell | bash | sh)
         # If additional arguments provided (like -c "command"), pass them to bash
         if [[ $# -gt 0 ]]; then
             exec /bin/bash "$@"

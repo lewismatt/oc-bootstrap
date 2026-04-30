@@ -115,13 +115,18 @@ community.
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/),
+This Code of Conduct is adapted from the [Contributor Covenant][covenant],
 version 2.1, available at
-https://www.contributor-covenant.org/version/2/1/code_of_conduct.html.
+[covenant-v2.1].
 
 Community Impact Guidelines were inspired by
-[Mozilla's code of conduct enforcement ladder](https://github.com/mozilla/diversity).
+[Mozilla's code of conduct enforcement ladder][mozilla-coc].
 
-For answers to common questions about this code of conduct, see the FAQ at
-https://www.contributor-covenant.org/faq. Translations are available at
-https://www.contributor-covenant.org/translations.
+For answers to common questions about this code of conduct, see the [FAQ][covenant-faq]. Translations are available at
+[covenant-translations].
+
+[covenant]: https://www.contributor-covenant.org/
+[covenant-v2.1]: https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
+[mozilla-coc]: https://github.com/mozilla/diversity
+[covenant-faq]: https://www.contributor-covenant.org/faq
+[covenant-translations]: https://www.contributor-covenant.org/translations

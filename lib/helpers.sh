@@ -117,21 +117,21 @@ progress_bar() {
     local total=$1
     local current=$2
     local bar_width=40
-    
+
     if [[ -z "$total" || "$total" -le 0 ]]; then
         return 0
     fi
-    
+
     local percent=$((current * 100 / total))
     local filled=$((current * bar_width / total))
     local empty=$((bar_width - filled))
     local filled_str=""
     local empty_str=""
     local i
-    
+
     for ((i = 0; i < filled; i++)); do filled_str+="#"; done
     for ((i = 0; i < empty; i++)); do empty_str+=" "; done
-    
+
     printf "\rProgress: [%-${bar_width}s] %d%%" "${filled_str}${empty_str}" "$percent"
 }
 
@@ -208,7 +208,7 @@ log_timestamp() {
 handle_error_or_warn() {
     local msg=$1
     local code=${2:-1}
-    
+
     if [[ "${FAIL_ON_OPENCLAW_ERRORS,,}" == "true" ]]; then
         echo "[ERROR] $msg"
         exit "$code"
@@ -248,7 +248,7 @@ require_tool() {
 check_required_tools() {
     local missing=()
     local tools=("$@")
-    
+
     for t in "${tools[@]}"; do
         if ! require_tool "$t"; then
             missing+=("$t")
@@ -274,11 +274,11 @@ check_required_tools() {
 ##
 install_if_missing() {
     local tool=$1
-    
+
     if require_tool "$tool"; then
         return 0
     fi
-    
+
     echo "[INFO] '$tool' is missing. Attempting installation..."
     if ! sudo apt-get update && sudo apt-get install -y "$tool"; then
         echo "[ERROR] Failed to install $tool."
@@ -312,7 +312,7 @@ install_if_missing() {
 ##
 safe_write_secrets_file() {
     local filepath=$1
-    
+
     {
         printf 'LOCAL_INFERENCE=%q\n' "$LOCAL_INFERENCE"
         printf 'LEMONADE_KEY=%q\n' "$LEMONADE_KEY"
@@ -328,7 +328,7 @@ safe_write_secrets_file() {
         printf 'BRAVE_API_KEY=%q\n' "$BRAVE_API_KEY"
         printf 'X_API_KEY=%q\n' "$X_API_KEY"
     } >"$filepath"
-    
+
     chmod 600 "$filepath" || true
     chown "$(id -un):$(id -gn)" "$filepath" 2>/dev/null || true
 }
@@ -353,7 +353,7 @@ prompt_for_value() {
     local default=$2
     local is_secret=${3:-}
     local response
-    
+
     if [[ "$is_secret" == "secret" ]]; then
         read -r -s -p "$prompt: " response </dev/tty
         echo ""
@@ -364,7 +364,7 @@ prompt_for_value() {
             read -r -p "$prompt: " response </dev/tty
         fi
     fi
-    
+
     echo "${response:-$default}"
 }
 
@@ -390,7 +390,7 @@ prompt_for_value() {
 run_parallel() {
     local pids=()
     local cmd
-    
+
     for cmd in "$@"; do
         bash -c -- "$cmd" &
         pids+=($!)
@@ -413,11 +413,11 @@ run_parallel() {
 ##
 ensure_directory() {
     local path=$1
-    
+
     if [[ -d "$path" ]]; then
         return 0
     fi
-    
+
     if mkdir -p "$path"; then
         return 0
     else
@@ -439,10 +439,10 @@ ensure_directory() {
 ##
 init_logging() {
     local log_file=$1
-    
+
     ensure_directory "$(dirname "$log_file")" || return 1
     exec > >(tee -a "$log_file") 2>&1
-    
+
     log_timestamp "Starting OpenClaw Multi-Agent Setup"
 }
 
@@ -459,13 +459,13 @@ init_logging() {
 ##
 setup_cleanup_trap() {
     local cleanup_fn=$1
-    
+
     trap_handler() {
         local exit_code=$?
         $cleanup_fn "$exit_code"
         exit "$exit_code"
     }
-    
+
     trap trap_handler EXIT INT TERM
 }
 
@@ -528,7 +528,7 @@ verify_openclaw_installed() {
 openclaw_config_safe() {
     local key=$1
     local value=$2
-    
+
     if ! openclaw config set "$key" "$value"; then
         handle_error_or_warn "Failed to set configuration: $key=$value" "${E_CONFIG:-13}"
     fi
