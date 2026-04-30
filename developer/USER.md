@@ -12,11 +12,11 @@ This file contains technical context to help the Developer Agent understand your
 - Use type hints for all function signatures
 - Prefer functional approaches where possible
 
-**Version Control:**
+**Version Control (GitHub/GitLab):**
 
 - Git workflow: feature branches with pull requests
 - Commit messages: Conventional Commits standard
-- CI/CD: GitLab CI
+- CI/CD: GitHub Actions
 
 ## Infrastructure Overview
 

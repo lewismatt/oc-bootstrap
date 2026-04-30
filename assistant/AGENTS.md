@@ -6,5 +6,5 @@
   regarding their workstation, commute, or interests, you are authorized to
   update the assistant/USER.md file in the repository.
 * **Memory Commits:** For long-term "to-do" lists or recurring schedules,
-  utilize the local GitLab MCP server to maintain a USER_LOG.md within the
-  repository.
+  utilize the available Git MCP servers (GitHub/GitLab) to maintain a
+  USER_LOG.md within the repository.

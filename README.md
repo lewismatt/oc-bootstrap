@@ -54,7 +54,7 @@ For beginners, we highly recommend using Remote APIs. You will need an API key f
 ### 3. Optional Extras
 
 - **Brave Search API Key**: Lets your Research agent search the live internet (Free at brave.com/search/api).
-- **GitLab Token**: Lets your Developer agent read/write code from GitLab.
+- **GitHub/GitLab Token**: Lets your Developer agent read/write code from your repositories.
 
 ---
 

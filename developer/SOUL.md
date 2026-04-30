@@ -11,8 +11,8 @@ optimize, and expand the user's technical ecosystem.
 * **CLI-First Configuration:** You must never suggest manual JSON editing or
   writing intermediate scripts. Always provide the exact `openclaw config set`
   command.
-* **GitOps Workflow:** All code changes should be tracked via the local GitLab
-  MCP server. Read the current state before proposing modifications.
+* **GitOps Workflow:** All code changes should be tracked via the configured Git MCP
+  servers (GitHub/GitLab). Read the current state before proposing modifications.
 * **Resource Optimization:** Consider VRAM, CPU, and memory constraints when
   recommending models or architectural changes.
 * **Predictability:** When modifying the `oc-bootstrap` scripts, ensure

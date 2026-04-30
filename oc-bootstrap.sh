@@ -182,6 +182,8 @@ EMBEDDING_MODEL=""
 ASSISTANT_MODEL=""
 RESEARCH_MODEL=""
 DEVELOPER_MODEL=""
+GITHUB_PAT=""
+GITLAB_PAT=""
 
 # ==============================================================================
 # HELPER FUNCTIONS
@@ -472,6 +474,12 @@ fi
 
 echo ""
 echo "=== Agent-Specific External Secrets (optional) ==="
+if [[ -z "${GITHUB_PAT:-}" && "$NON_INTERACTIVE" == "false" ]]; then
+    read -r -s -p "Enter GitHub Personal Access Token (for local MCP, or press Enter to skip): " GITHUB_PAT </dev/tty
+    echo ""
+    GITHUB_PAT="${GITHUB_PAT:-}"
+fi
+
 if [[ -z "${GITLAB_PAT:-}" && "$NON_INTERACTIVE" == "false" ]]; then
     read -r -s -p "Enter GitLab Personal Access Token (for local MCP, or press Enter to skip): " GITLAB_PAT </dev/tty
     echo ""
@@ -504,6 +512,11 @@ fi
 echo "[OK] Assistant Telegram Bot Token: Configured"
 echo "[OK] Research Telegram Bot Token: Configured"
 echo "[OK] Developer Telegram Bot Token: Configured"
+if [[ -n "$GITHUB_PAT" ]]; then
+    echo "[OK] GitHub Personal Access Token: Configured"
+else
+    echo "[WARN] GitHub Personal Access Token: Not configured"
+fi
 if [[ -n "$GITLAB_PAT" ]]; then
     echo "[OK] GitLab Personal Access Token: Configured"
 else
@@ -556,6 +569,7 @@ write_secrets_file() {
         printf 'ASSISTANT_TOKEN=%q\n' "$ASSISTANT_TOKEN"
         printf 'RESEARCH_TOKEN=%q\n' "$RESEARCH_TOKEN"
         printf 'DEVELOPER_TOKEN=%q\n' "$DEVELOPER_TOKEN"
+        printf 'GITHUB_PAT=%q\n' "$GITHUB_PAT"
         printf 'GITLAB_PAT=%q\n' "$GITLAB_PAT"
         printf 'BRAVE_API_KEY=%q\n' "$BRAVE_API_KEY"
         printf 'X_API_KEY=%q\n' "$X_API_KEY"
@@ -747,6 +761,20 @@ print_section_summary "Agent Workspace Provisioning" \
 echo ""
 echo "=== Injecting Isolated Agent Secrets & MCPs ==="
 
+if [[ -n "$GITHUB_PAT" ]]; then
+    for agent in "${AGENTS[@]}"; do
+        openclaw config set agents.list."${agent}".env.GITHUB_PERSONAL_ACCESS_TOKEN "$GITHUB_PAT" || handle_error_or_warn "Failed to set GitHub PAT for $agent." $E_CONFIG
+        echo "Binding local GitHub MCP server to ${agent^^} Agent..."
+        openclaw config set agents.list."${agent}".mcp.servers.github.command "npx" || handle_error_or_warn "Failed to set MCP command for $agent."
+        openclaw config set agents.list."${agent}".mcp.servers.github.args '["-y", "@modelcontextprotocol/server-github"]' || {
+            echo "[WARN] Failed to set GitHub MCP args. Attempting legacy string format..."
+            openclaw config set agents.list."${agent}".mcp.servers.github.args "-y @modelcontextprotocol/server-github" || echo "[WARN] Failed to set legacy MCP args."
+        }
+    done
+else
+    echo "[INFO] Skipping GitHub MCP configuration (no token provided)."
+fi
+
 if [[ -n "$GITLAB_PAT" ]]; then
     for agent in "${AGENTS[@]}"; do
         openclaw config set agents.list."${agent}".env.GITLAB_PERSONAL_ACCESS_TOKEN "$GITLAB_PAT" || handle_error_or_warn "Failed to set GitLab PAT for $agent." $E_CONFIG
@@ -778,6 +806,7 @@ fi
 
 # FIX: Build the summary dynamically so it only reports items that were actually configured.
 _summary_items=()
+[[ -n "$GITHUB_PAT" ]] && _summary_items+=("GitHub PAT injected and MCP server bound to all agents")
 [[ -n "$GITLAB_PAT" ]] && _summary_items+=("GitLab PAT injected and MCP server bound to all agents")
 [[ -n "$BRAVE_API_KEY" ]] && _summary_items+=("Brave Search API key configured for Research agent")
 [[ -n "$X_API_KEY" ]] && _summary_items+=("X/Twitter credentials configured for Research agent")
