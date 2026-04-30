@@ -3,6 +3,10 @@ yaml-files:
   - '*.yml'
   - '*.yaml'
 
+ignore: |
+  node_modules/
+  .git/
+
 rules:
   document-start: disable
   truthy:
