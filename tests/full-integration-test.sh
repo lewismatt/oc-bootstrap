@@ -333,7 +333,7 @@ test_openclaw_directory_exists() {
 test_openclaw_directory_permissions() {
     local perms
     perms=$(docker_exec_capture "stat -c '%a' \$HOME/.openclaw")
-    [[ "$perms" == "755" || "$perms" == "700" ]
+    [[ "$perms" == "755" || "$perms" == "700" ]]
 }
 
 test_secrets_file_exists() {
@@ -343,7 +343,7 @@ test_secrets_file_exists() {
 test_secrets_file_permissions() {
     local perms
     perms=$(docker_exec_capture "stat -c '%a' \$HOME/.openclaw/secrets.env")
-    [[ "$perms" == "600" ]
+    [[ "$perms" == "600" ]]
 }
 
 test_memory_directory_exists() {
