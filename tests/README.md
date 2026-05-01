@@ -2,7 +2,8 @@
 
 ## Overview
 
-This directory contains integration tests for the OpenClaw Bootstrap project. The tests use Docker to spin up a container, run the bootstrap script with test credentials, and verify that the installation and configuration work correctly.
+This directory contains integration tests for the OpenClaw Bootstrap project.
+The tests use Docker to spin up a container, run the bootstrap script, and verify that the installation and configuration work correctly.
 
 ## Test Files
 
@@ -285,3 +286,4 @@ docker rm oc-bootstrap-full-test-<PID>
 - Dummy credentials are NOT real - never use them in production
 - The test config template is in `tests/test-config.env.template`
 - With real credentials, the test validates **actual** OpenClaw functionality
+
