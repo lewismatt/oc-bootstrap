@@ -34,7 +34,7 @@
 valid_ipv4() {
     local ip=$1
     local IFS=.
-    read -r -a octets <<< "$ip"
+    read -r -a octets <<<"$ip"
     [[ ${#octets[@]} -eq 4 ]] || return 1
     for o in "${octets[@]}"; do
         if [[ ! "$o" =~ ^[0-9]+$ ]]; then
@@ -76,7 +76,7 @@ validate_telegram_token() {
     # Attempt API validation with Telegram
     local http_code
     http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time "$timeout" \
-        "https://api.telegram.org/bot$token/getMe" 2> /dev/null)
+        "https://api.telegram.org/bot$token/getMe" 2>/dev/null)
 
     case "$http_code" in
         200)
@@ -229,7 +229,7 @@ handle_error_or_warn() {
 ##
 require_tool() {
     local tool=$1
-    if ! command -v "$tool" > /dev/null 2>&1; then
+    if ! command -v "$tool" >/dev/null 2>&1; then
         return 1
     fi
     return 0
@@ -327,10 +327,10 @@ safe_write_secrets_file() {
         printf 'GITLAB_PAT=%q\n' "$GITLAB_PAT"
         printf 'BRAVE_API_KEY=%q\n' "$BRAVE_API_KEY"
         printf 'X_API_KEY=%q\n' "$X_API_KEY"
-    } > "$filepath"
+    } >"$filepath"
 
     chmod 600 "$filepath" || true
-    chown "$(id -un):$(id -gn)" "$filepath" 2> /dev/null || true
+    chown "$(id -un):$(id -gn)" "$filepath" 2>/dev/null || true
 }
 
 ##
@@ -355,13 +355,13 @@ prompt_for_value() {
     local response
 
     if [[ "$is_secret" == "secret" ]]; then
-        read -r -s -p "$prompt: " response < /dev/tty
+        read -r -s -p "$prompt: " response </dev/tty
         echo ""
     else
         if [[ -n "$default" ]]; then
-            read -r -p "$prompt [Default: $default]: " response < /dev/tty
+            read -r -p "$prompt [Default: $default]: " response </dev/tty
         else
-            read -r -p "$prompt: " response < /dev/tty
+            read -r -p "$prompt: " response </dev/tty
         fi
     fi
 
@@ -485,7 +485,7 @@ check_shellcheck() {
     fi
 
     echo "[INFO] Running ShellCheck static analysis..."
-    if shellcheck "$0" 2> /dev/null; then
+    if shellcheck "$0" 2>/dev/null; then
         echo "  [OK] ShellCheck analysis complete: No critical issues found."
     else
         echo "  [WARN] ShellCheck found some issues. Review output above."

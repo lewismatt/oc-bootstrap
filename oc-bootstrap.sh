@@ -36,7 +36,7 @@ CONFIG_FILE=""                      # Configuration file path (optional)
 # ==============================================================================
 
 # Get script directory (for sourcing helpers and accessing agent templates)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
 # Source helper functions library
 if [[ ! -f "$SCRIPT_DIR/lib/helpers.sh" ]]; then
@@ -164,7 +164,7 @@ echo "OpenClaw Multi-Agent Setup"
 echo "=============================================================================="
 echo ""
 if [[ "$NON_INTERACTIVE" == "false" ]]; then
-    read -r -p "Proceed with installation? (Y/n) " CONFIRM < /dev/tty
+    read -r -p "Proceed with installation? (Y/n) " CONFIRM </dev/tty
     [[ "$CONFIRM" == "y" || "$CONFIRM" == "Y" || -z "$CONFIRM" ]] || exit 0
 fi
 
@@ -190,12 +190,12 @@ echo "     • Requires internet connection"
 echo ""
 echo "Recommendation for beginners: Start with Remote APIs, then add local models later if desired."
 echo ""
-read -r -p "Will you use local inference via Lemonade Server for any agents? [y/N]: " USE_LOCAL < /dev/tty
+read -r -p "Will you use local inference via Lemonade Server for any agents? [y/N]: " USE_LOCAL </dev/tty
 if [[ "${USE_LOCAL^^}" == "Y" ]]; then
     LOCAL_INFERENCE=true
     echo ""
     echo "Lemonade Server will be used for local inference."
-    read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY < /dev/tty
+    read -r -p "Enter Lemonade Server API Key [Press Enter to use 'local-dummy-key']: " LEMONADE_KEY </dev/tty
     LEMONADE_KEY="${LEMONADE_KEY:-local-dummy-key}"
     echo "  [OK] Lemonade API Key configured"
 else
@@ -230,7 +230,7 @@ echo ""
 if [[ -z "${EMBEDDING_MODEL:-}" ]]; then
     echo "Embedding Model: Used for memory search and finding relevant past conversations."
     while [[ -z "$EMBEDDING_MODEL" ]]; do
-        read -r -p "Enter Embedding Model [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL < /dev/tty
+        read -r -p "Enter Embedding Model [Default: openai/text-embedding-3-small]: " EMBEDDING_MODEL </dev/tty
         EMBEDDING_MODEL="${EMBEDDING_MODEL:-openai/text-embedding-3-small}"
     done
     echo "  [OK] Embedding model set"
@@ -240,7 +240,7 @@ if [[ -z "${ASSISTANT_MODEL:-}" ]]; then
     echo ""
     echo "Assistant Model: Your general-purpose AI helper for everyday tasks."
     while [[ -z "$ASSISTANT_MODEL" ]]; do
-        read -r -p "Enter Assistant Model [Default: openai/gpt-4o]: " ASSISTANT_MODEL < /dev/tty
+        read -r -p "Enter Assistant Model [Default: openai/gpt-4o]: " ASSISTANT_MODEL </dev/tty
         ASSISTANT_MODEL="${ASSISTANT_MODEL:-openai/gpt-4o}"
     done
     echo "  [OK] Assistant model set"
@@ -250,7 +250,7 @@ if [[ -z "${RESEARCH_MODEL:-}" ]]; then
     echo ""
     echo "Research Model: Specialized for web searches, data gathering, and analysis."
     while [[ -z "$RESEARCH_MODEL" ]]; do
-        read -r -p "Enter Research Model [Default: openai/gpt-4o]: " RESEARCH_MODEL < /dev/tty
+        read -r -p "Enter Research Model [Default: openai/gpt-4o]: " RESEARCH_MODEL </dev/tty
         RESEARCH_MODEL="${RESEARCH_MODEL:-openai/gpt-4o}"
     done
     echo "  [OK] Research model set"
@@ -260,7 +260,7 @@ if [[ -z "${DEVELOPER_MODEL:-}" ]]; then
     echo ""
     echo "Developer Model: Specialized for coding, debugging, and technical tasks."
     while [[ -z "$DEVELOPER_MODEL" ]]; do
-        read -r -p "Enter Developer Model [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL < /dev/tty
+        read -r -p "Enter Developer Model [Default: anthropic/claude-3-5-sonnet-latest]: " DEVELOPER_MODEL </dev/tty
         DEVELOPER_MODEL="${DEVELOPER_MODEL:-anthropic/claude-3-5-sonnet-latest}"
     done
     echo "  [OK] Developer model set"
@@ -302,7 +302,7 @@ if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_T
             fi
 
             CURRENT_TOKEN=""
-            read -r -s -p "Enter Telegram Bot Token for the $AGENT_PREFIX Agent: " CURRENT_TOKEN < /dev/tty
+            read -r -s -p "Enter Telegram Bot Token for the $AGENT_PREFIX Agent: " CURRENT_TOKEN </dev/tty
             echo ""
 
             if [[ -z "$CURRENT_TOKEN" ]]; then
@@ -362,7 +362,7 @@ if [[ -z "${GITHUB_PAT:-}" && "$NON_INTERACTIVE" == "false" ]]; then
     echo "  • Get one at: https://github.com/settings/tokens"
     echo "  • Required scope: repo, read:org"
     echo ""
-    read -r -s -p "Enter GitHub PAT (or press Enter to skip): " GITHUB_PAT < /dev/tty
+    read -r -s -p "Enter GitHub PAT (or press Enter to skip): " GITHUB_PAT </dev/tty
     echo ""
     GITHUB_PAT="${GITHUB_PAT:-}"
     [[ -n "$GITHUB_PAT" ]] && echo "  [OK] GitHub PAT configured"
@@ -375,7 +375,7 @@ if [[ -z "${GITLAB_PAT:-}" && "$NON_INTERACTIVE" == "false" ]]; then
     echo "  • Get one at: https://gitlab.com/-/profile/personal_access_tokens"
     echo "  • Required scope: api, read_repository"
     echo ""
-    read -r -s -p "Enter GitLab PAT (or press Enter to skip): " GITLAB_PAT < /dev/tty
+    read -r -s -p "Enter GitLab PAT (or press Enter to skip): " GITLAB_PAT </dev/tty
     echo ""
     GITLAB_PAT="${GITLAB_PAT:-}"
     [[ -n "$GITLAB_PAT" ]] && echo "  [OK] GitLab PAT configured"
@@ -388,7 +388,7 @@ if [[ -z "${BRAVE_API_KEY:-}" && "$NON_INTERACTIVE" == "false" ]]; then
     echo "  • Get one at: https://brave.com/search/api/"
     echo "  • Free tier: 2,000 queries/month"
     echo ""
-    read -r -s -p "Enter Brave API Key (or press Enter to skip): " BRAVE_API_KEY < /dev/tty
+    read -r -s -p "Enter Brave API Key (or press Enter to skip): " BRAVE_API_KEY </dev/tty
     echo ""
     BRAVE_API_KEY="${BRAVE_API_KEY:-}"
     [[ -n "$BRAVE_API_KEY" ]] && echo "  [OK] Brave Search API Key configured"
@@ -401,7 +401,7 @@ if [[ -z "${X_API_KEY:-}" && "$NON_INTERACTIVE" == "false" ]]; then
     echo "  • Get API access at: https://developer.x.com/"
     echo "  • Or use auth cookie from browser (for personal/small-scale use)"
     echo ""
-    read -r -s -p "Enter X API Key/Auth Cookie (or press Enter to skip): " X_API_KEY < /dev/tty
+    read -r -s -p "Enter X API Key/Auth Cookie (or press Enter to skip): " X_API_KEY </dev/tty
     echo ""
     X_API_KEY="${X_API_KEY:-}"
     [[ -n "$X_API_KEY" ]] && echo "  [OK] X/Twitter credentials configured"
@@ -469,7 +469,7 @@ if [[ -f "$SECRETS_FILE" ]]; then
     echo "  [WARN] Secrets file already exists at $SECRETS_FILE"
     echo "  Overwriting will replace all previously stored credentials."
     echo ""
-    read -r -p "  Overwrite existing secrets file? (y/N) " OVERWRITE_SECRETS < /dev/tty
+    read -r -p "  Overwrite existing secrets file? (y/N) " OVERWRITE_SECRETS </dev/tty
     if [[ "${OVERWRITE_SECRETS^^}" != "Y" ]]; then
         echo "Skipping secrets file update. Loading existing credentials into memory..."
         # shellcheck disable=SC1090
@@ -543,7 +543,7 @@ else
     handle_error_or_warn "OpenClaw installation failed." $E_OPENCLAW
 fi
 
-if command -v openclaw &> /dev/null; then
+if command -v openclaw &>/dev/null; then
     echo "  [OK] OpenClaw binary found in PATH"
 else
     echo "  [ERROR] OpenClaw binary not found in PATH after installation."
@@ -579,7 +579,7 @@ if [[ "$LOCAL_INFERENCE" == true ]]; then
     if [[ -z "${LEMONADE_IP:-}" ]]; then
         LEMONADE_IP=""
         while true; do
-            read -r -p "Enter Lemonade server IP address (e.g., 192.168.12.50): " LEMONADE_IP < /dev/tty
+            read -r -p "Enter Lemonade server IP address (e.g., 192.168.12.50): " LEMONADE_IP </dev/tty
             if valid_ipv4 "$LEMONADE_IP"; then
                 break
             else
@@ -592,7 +592,7 @@ if [[ "$LOCAL_INFERENCE" == true ]]; then
 
     BASE_URL="http://${LEMONADE_IP}:8000/v1"
     if [[ "$NON_INTERACTIVE" == "false" ]]; then
-        read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL < /dev/tty
+        read -r -p "Enter Lemonade base URL [Press Enter for default: $BASE_URL]: " CUSTOM_URL </dev/tty
         [[ -n "$CUSTOM_URL" ]] && BASE_URL="$CUSTOM_URL"
     fi
 
@@ -625,8 +625,8 @@ for i in "${!agents_to_provision[@]}"; do
     progress_bar ${#agents_to_provision[@]} $current
 
     echo "Provisioning agent: ${agent^^}..."
-    openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive \
-        || handle_error_or_warn "Issue provisioning agent '$agent'. Continuing." "$E_OPENCLAW"
+    openclaw agents add "$agent" --workspace "$WORKSPACE" --non-interactive ||
+        handle_error_or_warn "Issue provisioning agent '$agent'. Continuing." "$E_OPENCLAW"
 done
 echo "" # Newline after progress bar
 
@@ -746,8 +746,8 @@ for agent in "${AGENTS[@]}"; do
     # Previously this was done AFTER openclaw agents bind, which immediately
     # undid the binding that had just been created.
     echo "Clearing existing bindings for ${agent^^}..."
-    openclaw agents unbind --agent "$agent" --all \
-        || handle_error_or_warn "Failed to unbind defaults for agent '$agent'. Continuing." "$E_GATEWAY"
+    openclaw agents unbind --agent "$agent" --all ||
+        handle_error_or_warn "Failed to unbind defaults for agent '$agent'. Continuing." "$E_GATEWAY"
 
     echo "Binding Telegram for ${agent^^}..."
     if ! openclaw agents bind --agent "$agent" --bind "telegram:$TOKEN"; then
@@ -796,31 +796,31 @@ progress_bar "$total_tasks" 2
 echo "${memory_tasks[1]}..."
 MEMORY_DIR="$HOME/.openclaw/memory"
 mkdir -p "$MEMORY_DIR"
-openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentId}.sqlite" \
-    || handle_error_or_warn "Failed to set memory index path." "$E_CONFIG"
+openclaw config set agents.defaults.memorySearch.store.path "$MEMORY_DIR/{agentId}.sqlite" ||
+    handle_error_or_warn "Failed to set memory index path." "$E_CONFIG"
 
 # Task 3: Enable sqlite-vec vector search acceleration
 progress_bar "$total_tasks" 3
 echo "${memory_tasks[2]}..."
-openclaw config set agents.defaults.memorySearch.store.vector.enabled true \
-    || handle_error_or_warn "Failed to enable sqlite-vec. OpenClaw will use JS fallback." "$E_CONFIG"
+openclaw config set agents.defaults.memorySearch.store.vector.enabled true ||
+    handle_error_or_warn "Failed to enable sqlite-vec. OpenClaw will use JS fallback." "$E_CONFIG"
 
 # Task 4: Enable embedding cache
 progress_bar "$total_tasks" 4
 echo "${memory_tasks[3]}..."
-openclaw config set agents.defaults.memorySearch.cache.enabled true \
-    || handle_error_or_warn "Failed to enable embedding cache." "$E_CONFIG"
+openclaw config set agents.defaults.memorySearch.cache.enabled true ||
+    handle_error_or_warn "Failed to enable embedding cache." "$E_CONFIG"
 
 # Task 5: Enable session transcript indexing
 progress_bar "$total_tasks" 5
 echo "${memory_tasks[4]}..."
-openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true \
-    || handle_error_or_warn "Failed to enable session memory indexing." "$E_CONFIG"
+openclaw config set agents.defaults.memorySearch.experimental.sessionMemory true ||
+    handle_error_or_warn "Failed to enable session memory indexing." "$E_CONFIG"
 
-openclaw config set agents.defaults.memorySearch.sources[0] "memory" \
-    || handle_error_or_warn "Failed to set memory source." "$E_CONFIG"
-openclaw config set agents.defaults.memorySearch.sources[1] "sessions" \
-    || handle_error_or_warn "Failed to set sessions source." "$E_CONFIG"
+openclaw config set agents.defaults.memorySearch.sources[0] "memory" ||
+    handle_error_or_warn "Failed to set memory source." "$E_CONFIG"
+openclaw config set agents.defaults.memorySearch.sources[1] "sessions" ||
+    handle_error_or_warn "Failed to set sessions source." "$E_CONFIG"
 
 echo "" # Newline after progress bar
 
@@ -878,7 +878,7 @@ else
             else
                 echo "    ./${agent}/${file}  →  ~/.openclaw/workspace-${agent}/${file}"
             fi
-        done <<< "${AGENT_SEED_FILES[$agent]}"
+        done <<<"${AGENT_SEED_FILES[$agent]}"
     done
     echo ""
 
@@ -892,7 +892,7 @@ else
             echo "  [D] Default  — skip seeding, let OpenClaw use its own defaults"
             echo "  [H] Halt     — stop the installation to review files first"
             echo ""
-            read -r -p "Enter choice [S/D/H]: " SEED_CHOICE < /dev/tty
+            read -r -p "Enter choice [S/D/H]: " SEED_CHOICE </dev/tty
         fi
 
         case "${SEED_CHOICE^^}" in
@@ -918,26 +918,26 @@ else
                             echo "  Diff (workspace → repository):"
                             echo "  ------------------------------------------------------------"
                             if [[ -f "$DEST" && -f "$SRC" ]]; then
-                                diff -u "$DEST" "$SRC" \
-                                    | sed 's/^/  /' \
-                                    || true
+                                diff -u "$DEST" "$SRC" |
+                                    sed 's/^/  /' ||
+                                    true
                             fi
                             echo "  ------------------------------------------------------------"
                             echo ""
-                            read -r -p "  Overwrite ~/.openclaw/workspace-${agent}/${file}? (y/N) " OVERWRITE_FILE < /dev/tty
+                            read -r -p "  Overwrite ~/.openclaw/workspace-${agent}/${file}? (y/N) " OVERWRITE_FILE </dev/tty
                             if [[ "${OVERWRITE_FILE^^}" == "Y" ]]; then
-                                cp "$SRC" "$DEST" \
-                                    && echo "  [OK] ${agent^^}: $file overwritten." \
-                                    || echo "  [WARN] Failed to copy $file for $agent."
+                                cp "$SRC" "$DEST" &&
+                                    echo "  [OK] ${agent^^}: $file overwritten." ||
+                                    echo "  [WARN] Failed to copy $file for $agent."
                             else
                                 echo "  Skipped ${agent^^}: $file — existing file kept."
                             fi
                         else
-                            cp "$SRC" "$DEST" \
-                                && echo "  [OK] ${agent^^}: $file" \
-                                || echo "  [WARN] Failed to copy $file for $agent."
+                            cp "$SRC" "$DEST" &&
+                                echo "  [OK] ${agent^^}: $file" ||
+                                echo "  [WARN] Failed to copy $file for $agent."
                         fi
-                    done <<< "${AGENT_SEED_FILES[$agent]}"
+                    done <<<"${AGENT_SEED_FILES[$agent]}"
                 done
 
                 echo ""
@@ -982,13 +982,13 @@ elif [[ "$HAS_REMOTE_MODELS" == true ]]; then
     echo "Notice: You have configured remote API provider tags. OpenClaw requires your API keys to function."
     echo "You can provide these keys by running: openclaw onboarding"
     echo ""
-    read -r -p "Have you already configured your API keys and want to start the gateway now? (y/N) " START_GATEWAY < /dev/tty
+    read -r -p "Have you already configured your API keys and want to start the gateway now? (y/N) " START_GATEWAY </dev/tty
     START_GATEWAY="${START_GATEWAY:-N}"
 else
     echo "Your local Lemonade configuration has been applied."
     echo "You may still want to configure additional API keys or review settings before starting."
     echo ""
-    read -r -p "Would you like to start the OpenClaw gateway now? (Y/n) " START_GATEWAY < /dev/tty
+    read -r -p "Would you like to start the OpenClaw gateway now? (Y/n) " START_GATEWAY </dev/tty
     START_GATEWAY="${START_GATEWAY:-Y}"
 fi
 

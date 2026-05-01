@@ -24,14 +24,13 @@ jobs:
 
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@master
-        continue-on-error: true
         with:
           scandir: '.'
           additional_files: 'oc-bootstrap.sh scripts/install-lemonade.sh lib/helpers.sh'
 
       - name: shfmt
         uses: mfinelli/setup-shfmt@v3
-      - run: shfmt -d -i 4 -ci oc-bootstrap.sh scripts/install-lemonade.sh
+      - run: shfmt -d -i 4 -ci oc-bootstrap.sh lib/helpers.sh scripts/install-lemonade.sh
 
       - name: Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v14
@@ -42,7 +41,7 @@ jobs:
       - name: Yamllint
         uses: ibiqlik/action-yamllint@v3
         with:
-          file_or_dir: '.github/workflows/'
+          file_or_dir: '.github/workflows/ .yamllint.yaml .gitlab-ci.yml'
           config_file: .yamllint.yaml
         continue-on-error: true  # Create a default config if not present
 

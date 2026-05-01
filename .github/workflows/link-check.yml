@@ -1,15 +1,16 @@
 name: Link Check
+
 on:
   push:
-    branches: [ main, development, docker ]
+    branches: [main, development, docker]
   pull_request:
-    branches: [ main, development, docker ]
+    branches: [main, development, docker]
+
 jobs:
   link-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      - uses: actionlink-checker/action-link-checker@v1
         with:
-          use-quiet-mode: 'yes'
           config-file: .github/link-check-config.json

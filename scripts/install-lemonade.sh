@@ -13,19 +13,19 @@ echo "=== Lemonade Server Installer ==="
 
 # SECTION 1: Verify Python3 is installed and accessible
 # Requirements: Python 3.8+ for lemonade-server compatibility
-if ! command -v python3 > /dev/null 2>&1; then
+if ! command -v python3 >/dev/null 2>&1; then
     echo "[ERROR] Python 3 is not installed. Please install it with: sudo apt install python3"
     exit 1
 fi
 
 # Verify pip3 is installed, which is required for dependency management
-if ! command -v pip3 > /dev/null 2>&1; then
+if ! command -v pip3 >/dev/null 2>&1; then
     echo "[INFO] Installing pip3..."
     sudo apt update && sudo apt install -y python3-pip
 fi
 
 # Verify git is installed (required for cloning/updating the Lemonade Server repository)
-if ! command -v git > /dev/null 2>&1; then
+if ! command -v git >/dev/null 2>&1; then
     echo "[ERROR] Git is not installed. Please install it with: sudo apt install git"
     exit 1
 fi
@@ -53,7 +53,7 @@ else
 fi
 
 # Verify lspci is available for GPU detection (provided by pciutils package)
-if ! command -v lspci > /dev/null 2>&1; then
+if ! command -v lspci >/dev/null 2>&1; then
     echo "[WARN] lspci not found. Installing pciutils to enable GPU detection..."
     sudo apt update && sudo apt install -y pciutils ||
         echo "[WARN] Failed to install pciutils. GPU detection will be skipped, defaulting to CPU mode."
@@ -63,10 +63,10 @@ fi
 # GPU acceleration dramatically improves inference speed. CPU-only mode is significantly slower.
 echo ""
 echo "--- GPU Detection & Dependency Installation ---"
-if lspci | grep -i "nvidia" > /dev/null; then
+if lspci | grep -i "nvidia" >/dev/null; then
     echo "[INFO] NVIDIA GPU detected. CUDA support will be used automatically."
     # NVIDIA container toolkit and CUDA are typically handled by torch installation
-elif lspci | grep -i "amd" > /dev/null; then
+elif lspci | grep -i "amd" >/dev/null; then
     echo "[INFO] AMD GPU detected. Installing ROCm support..."
     echo "[INFO] Installing ROCm core and libraries (this may take a while)..."
     sudo apt update && sudo apt install -y rocm-core rocm-libs ||
@@ -106,7 +106,7 @@ pip install huggingface_hub || {
 }
 
 # Verify huggingface-cli is available after installation
-if ! command -v huggingface-cli > /dev/null 2>&1; then
+if ! command -v huggingface-cli >/dev/null 2>&1; then
     echo "[ERROR] huggingface-cli not found after installing huggingface_hub. Please check installation."
     exit 1
 fi
@@ -140,7 +140,7 @@ fi
 
 # SECTION 7: Create Startup Script
 # This script activates the venv and starts the Lemonade server with sensible defaults
-cat << EOF > start-lemonade.sh
+cat <<EOF >start-lemonade.sh
 #!/bin/bash
 # Activate the Python virtual environment created during installation
 source venv/bin/activate
