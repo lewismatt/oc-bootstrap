@@ -48,9 +48,7 @@ yamllint:
     - pip install yamllint
     - yamllint -c .yamllint.yaml .gitlab-ci.yml .yamllint.yaml .markdownlint.json
 
-sast:
-  stage: test
-
+# SAST and Secret Detection are included from GitLab templates
 include:
   - template: Security/SAST.gitlab-ci.yml
   - template: Security/Secret-Detection.gitlab-ci.yml
