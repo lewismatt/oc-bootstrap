@@ -19,7 +19,7 @@ shellcheck:
   stage: lint
   image: koalaman/shellcheck-alpine:stable
   script:
-    - shellcheck oc-bootstrap.sh
+    - shellcheck oc-bootstrap.sh lib/helpers.sh
 
 # 3. shfmt: Enforces strict styling and indentation
 shfmt:
@@ -30,7 +30,7 @@ shfmt:
     # The -d flag prints a diff and fails the job if formatting is incorrect
     # The -i 4 flag enforces 4-space indentation
     # The -ci flag indents switch cases
-    - shfmt -d -i 4 -ci oc-bootstrap.sh
+    - shfmt -d -i 4 -ci oc-bootstrap.sh lib/helpers.sh scripts/install-lemonade.sh
 
 # 4. MarkdownLint: Ensures prompt files are LLM-ready
 markdownlint:
@@ -38,7 +38,7 @@ markdownlint:
   image: node:alpine
   script:
     - npm install -g markdownlint-cli
-    - markdownlint **/*.md
+    - markdownlint -c .markdownlint.json .
 
 # 5. Yamllint: Checks CI and config templates
 yamllint:
@@ -46,14 +46,9 @@ yamllint:
   image: python:alpine
   script:
     - pip install yamllint
-    - yamllint .gitlab-ci.yml
+    - yamllint -c .yamllint.yaml .gitlab-ci.yml .yamllint.yaml .markdownlint.json
 
-sast:
-  stage: test
-
+# SAST and Secret Detection are included from GitLab templates
 include:
   - template: Security/SAST.gitlab-ci.yml
   - template: Security/Secret-Detection.gitlab-ci.yml
-
-secret_detection:
-  stage: secret-detection
