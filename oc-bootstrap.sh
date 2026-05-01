@@ -43,7 +43,7 @@ if [[ ! -f "$SCRIPT_DIR/lib/helpers.sh" ]]; then
     echo "[ERROR] Helper library not found: $SCRIPT_DIR/lib/helpers.sh"
     exit 1
 fi
-# shellcheck disable=SC1090
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/lib/helpers.sh"
 
 # Parse command-line arguments

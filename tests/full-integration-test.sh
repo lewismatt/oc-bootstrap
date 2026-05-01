@@ -524,6 +524,7 @@ test_research_prompt_files() {
         test -f \$HOME/.openclaw/workspace-research/USER.md"
 }
 
+# shellcheck disable=SC2329
 test_developer_prompt_files() {
     docker_exec "
         test -f \$HOME/.openclaw/workspace-developer/SOUL.md &&
@@ -533,6 +534,7 @@ test_developer_prompt_files() {
 
 # --- Gateway Startup Test (optional, may fail with dummy credentials) ---
 
+# shellcheck disable=SC2329
 test_gateway_start() {
     if [[ "$QUICK_MODE" == "true" ]]; then
         warn "Skipping gateway startup test (quick mode)"
