@@ -1,0 +1,7 @@
+ignored:
+  - DL3008  # pinned versions in apt-get install
+  - DL3009  # deleted apt-get lists
+  - DL3020  # multi-stage build COPY flags
+  - DL4000  # MAINTAINER deprecated
+  - DL4001  # FROM latest tag
+  - DL4006  # trust proxy
