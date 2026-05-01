@@ -1,90 +1,40 @@
-# User Context
+# Assistant Agent User Guide
 
-This file contains personal information that helps the Assistant provide
-better, more personalized help. You can edit this file at any time.
+You are interacting with the Assistant Agent of OpenClaw Bootstrap.
 
-## Communication Preferences
+## What Can This Agent Do?
 
-**Preferred Language:** English (US)
+- Answer questions about OpenClaw Bootstrap
+- Help with installation and configuration
+- Provide troubleshooting guidance
+- Create issues for bugs or feature requests
+- Point you to relevant documentation
 
-**Response Style:**
+## How to Interact
 
-- Keep answers concise unless I ask for details
-- Use technical terminology - I'm comfortable with command-line tools
-- Provide code examples in Python when relevant
+Simply ask questions or describe your problem. The assistant will:
+1. Understand your query
+2. Search relevant documentation
+3. Provide clear, actionable answers
+4. Escalate to other agents if needed
 
-**Formatting:**
+## Example Questions
 
-- Use markdown code blocks for commands and scripts
-- Include comments in code to explain complex sections
-- Break down multi-step processes into numbered lists
+- "How do I install OpenClaw?"
+- "The Docker container won't start, what should I check?"
+- "How do I configure a new agent?"
+- "I found a bug, how do I report it?"
 
-## Personal Background
+## Limitations
 
-**Technical Experience:**
+This agent cannot:
+- Directly modify code (use Developer agent)
+- Perform system administration tasks
+- Access private repositories without permission
 
-- Comfortable with Linux command line (Ubuntu 24.04)
-- Familiar with basic Python scripting
-- Learning about AI/LLM deployment and infrastructure
+## Escalation
 
-**Hardware Setup:**
-
-- **GPU:** AMD Radeon (12 GB VRAM)
-- **RAM:** 32 GB
-- **Storage:** 1 TB NVMe SSD
-- **Network:** Gigabit home network with local server
-
-**Primary Use Cases:**
-
-- Managing local AI inference server (Lemonade)
-- Automating file processing and data analysis
-- Learning about agent-based workflows
-- Personal task management and scheduling
-
-## Current Projects
-
-1. **Local AI Infrastructure:** Setting up and optimizing OpenClaw multi-agent
-   system
-2. **Data Processing:** Automating CSV and JSON data transformations
-3. **Workflow Automation:** Building scripts to streamline repetitive tasks
-
-## Important Preferences
-
-**Privacy:**
-
-- Always prefer local/offline solutions
-- Avoid suggesting cloud services unless absolutely necessary
-- Keep all data on local network
-
-**Learning Style:**
-
-- I learn best by doing - provide working examples
-- Explain *why* something works, not just *how*
-- Point me to official documentation for deeper learning
-
-## Schedule & Availability
-
-**Typical Work Hours:** 9 AM - 6 PM Mountain Time
-
-**Busy Times:**
-
-- Mornings before 10 AM (prefer quick responses)
-- Friday afternoons (end-of-week wrap-ups)
-
-## Frequently Asked Questions
-
-*You can track common questions and their answers here so the Assistant
-provides consistent responses.*
-
-**Q: What model should I use for task X?**
-A: For general tasks, use gpt-4o. For coding, use claude-3-5-sonnet. For
-local/private tasks, use Qwen3.5-4B on Lemonade.
-
-**Q: How should file paths be formatted?**
-A: Always use absolute paths when possible. Home directory is `/home/lewis/`.
-
----
-
-*Note: The Assistant agent can update this file automatically via GitLab MCP
-when it learns new preferences through conversation. You can also edit it
-manually at any time: `nano ~/.openclaw/workspace-assistant/USER.md`*
+If your issue requires:
+- **Code changes**: Will create an issue for Developer agent
+- **Research**: Will consult Research agent
+- **Infrastructure**: Will notify Maintainer agent
