@@ -38,7 +38,7 @@ markdownlint:
   image: node:alpine
   script:
     - npm install -g markdownlint-cli
-    - markdownlint -c .markdownlint.json **/*.md
+    - markdownlint -c .markdownlint.json .
 
 # 5. Yamllint: Checks CI and config templates
 yamllint:

@@ -37,6 +37,7 @@ jobs:
         with:
           config: '.markdownlint.json'
           glob: '**/*.md'
+          ignore: 'node_modules/'
 
       - name: Yamllint
         uses: ibiqlik/action-yamllint@v3
