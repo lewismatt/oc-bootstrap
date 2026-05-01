@@ -26,31 +26,31 @@ PRESERVE_WORKSPACES=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-    --yes | -y)
-        SKIP_CONFIRMATIONS=true
-        shift
-        ;;
-    --preserve-workspaces | -p)
-        PRESERVE_WORKSPACES=true
-        shift
-        ;;
-    --help | -h)
-        echo "OpenClaw Multi-Agent Uninstall Script"
-        echo ""
-        echo "Usage: $0 [OPTIONS]"
-        echo ""
-        echo "Options:"
-        echo "  -y, --yes                Skip confirmation prompts (use with caution)"
-        echo "  -p, --preserve-workspaces  Keep agent workspaces (SOUL.md, AGENTS.md, etc.)"
-        echo "  -h, --help               Show this help message"
-        echo ""
-        exit 0
-        ;;
-    *)
-        echo "Unknown option: $1"
-        echo "Usage: $0 [--yes] [--preserve-workspaces]"
-        exit 1
-        ;;
+        --yes | -y)
+            SKIP_CONFIRMATIONS=true
+            shift
+            ;;
+        --preserve-workspaces | -p)
+            PRESERVE_WORKSPACES=true
+            shift
+            ;;
+        --help | -h)
+            echo "OpenClaw Multi-Agent Uninstall Script"
+            echo ""
+            echo "Usage: $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  -y, --yes                Skip confirmation prompts (use with caution)"
+            echo "  -p, --preserve-workspaces  Keep agent workspaces (SOUL.md, AGENTS.md, etc.)"
+            echo "  -h, --help               Show this help message"
+            echo ""
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--yes] [--preserve-workspaces]"
+            exit 1
+            ;;
     esac
 done
 

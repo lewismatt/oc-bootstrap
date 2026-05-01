@@ -569,27 +569,27 @@ test_gateway_start() {
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-    --verbose)
-        VERBOSE=true
-        shift
-        ;;
-    --keep)
-        KEEP_CONTAINER=true
-        shift
-        ;;
-    --quick)
-        QUICK_MODE=true
-        shift
-        ;;
-    --help | -h)
-        print_usage
-        exit 0
-        ;;
-    *)
-        echo "Unknown option: $1"
-        print_usage
-        exit 1
-        ;;
+        --verbose)
+            VERBOSE=true
+            shift
+            ;;
+        --keep)
+            KEEP_CONTAINER=true
+            shift
+            ;;
+        --quick)
+            QUICK_MODE=true
+            shift
+            ;;
+        --help | -h)
+            print_usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            print_usage
+            exit 1
+            ;;
     esac
 done
 

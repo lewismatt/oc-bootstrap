@@ -59,24 +59,24 @@ confirm_action() {
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-    -p | --prune)
-        PRUNE_VOLUMES=true
-        shift
-        ;;
-    -a | --all)
-        PRUNE_VOLUMES=true
-        REMOVE_IMAGES=true
-        shift
-        ;;
-    -h | --help)
-        print_usage
-        exit 0
-        ;;
-    *)
-        echo "Unknown option: $1"
-        print_usage
-        exit 1
-        ;;
+        -p | --prune)
+            PRUNE_VOLUMES=true
+            shift
+            ;;
+        -a | --all)
+            PRUNE_VOLUMES=true
+            REMOVE_IMAGES=true
+            shift
+            ;;
+        -h | --help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            print_usage
+            exit 1
+            ;;
     esac
 done
 
