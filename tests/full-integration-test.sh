@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2329  # Functions invoked indirectly via run_test
 # =============================================================================
 # OpenClaw Bootstrap Full Integration Test
 # =============================================================================
