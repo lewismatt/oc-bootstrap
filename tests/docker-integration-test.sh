@@ -208,9 +208,9 @@ test_bootstrap_syntax_check() {
 test_config_has_all_tokens() {
     # Verify config template has all required tokens
     docker exec "$TEST_CONTAINER_NAME" bash -c "
-        source /tmp/test-config.env && 
-        [[ \$ASSISTANT_TOKEN =~ ^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$ ]] && 
-        [[ \$RESEARCH_TOKEN =~ ^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$ ]] && 
+        source $GENERATED_CONFIG &&
+        [[ \$ASSISTANT_TOKEN =~ ^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$ ]] &&
+        [[ \$RESEARCH_TOKEN =~ ^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$ ]] &&
         [[ \$DEVELOPER_TOKEN =~ ^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$ ]]"
 }
 
