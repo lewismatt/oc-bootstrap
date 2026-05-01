@@ -1,5 +1,6 @@
 #!/bin/bash
-# ==============================================================================
+# shellcheck disable=SC2034  # Disable "appears unused" warnings
+# =============================================================================
 # OpenClaw Multi-Agent Bootstrap Script
 # ==============================================================================
 # Automated setup for OpenClaw AI agents on Ubuntu 24.04
