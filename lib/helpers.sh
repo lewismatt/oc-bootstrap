@@ -460,6 +460,7 @@ init_logging() {
 setup_cleanup_trap() {
     local cleanup_fn=$1
 
+    # shellcheck disable=SC2329
     trap_handler() {
         local exit_code=$?
         $cleanup_fn "$exit_code"
