@@ -42,7 +42,10 @@ jobs:
       - name: Yamllint
         uses: ibiqlik/action-yamllint@v3
         with:
-          file_or_dir: '.github/workflows/ .yamllint.yaml .gitlab-ci.yml'
+          file_or_dir: |
+            .github/workflows/
+            .yamllint.yaml
+            .gitlab-ci.yml
           config_file: .yamllint.yaml
         continue-on-error: true  # Create a default config if not present
 
