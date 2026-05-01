@@ -249,23 +249,23 @@ test_shell_access() {
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-    --quick)
-        QUICK_MODE=true
-        shift
-        ;;
-    --verbose)
-        VERBOSE=true
-        shift
-        ;;
-    --help | -h)
-        print_usage
-        exit 0
-        ;;
-    *)
-        echo "Unknown option: $1"
-        print_usage
-        exit 1
-        ;;
+        --quick)
+            QUICK_MODE=true
+            shift
+            ;;
+        --verbose)
+            VERBOSE=true
+            shift
+            ;;
+        --help | -h)
+            print_usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            print_usage
+            exit 1
+            ;;
     esac
 done
 
