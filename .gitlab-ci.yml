@@ -19,14 +19,13 @@ shellcheck:
   stage: lint
   image: koalaman/shellcheck-alpine:stable
   script:
-    - shellcheck oc-bootstrap.sh lib/helpers.sh
+    - shellcheck oc-bootstrap.sh lib/helpers.sh tests/full-integration-test.sh
 
 # 3. shfmt: Enforces strict styling and indentation
 shfmt:
   stage: lint
-  image: alpine:latest
+  image: mvdan/shfmt:latest
   script:
-    - apk add --no-cache shfmt
     # The -d flag prints a diff and fails the job if formatting is incorrect
     # The -i 4 flag enforces 4-space indentation
     # The -ci flag indents switch cases
