@@ -79,22 +79,22 @@ validate_telegram_token() {
         "https://api.telegram.org/bot$token/getMe" 2>/dev/null)
 
     case "$http_code" in
-        200)
-            echo "  [OK] Token validated successfully"
-            return 0
-            ;;
-        401)
-            echo "  [ERROR] Invalid token (401 Unauthorized)"
-            return 1
-            ;;
-        404)
-            echo "  [ERROR] Bot not found (404 Not Found)"
-            return 1
-            ;;
-        *)
-            echo "  [WARN] Token format valid but API validation returned HTTP $http_code"
-            return 0 # Don't fail; warn only
-            ;;
+    200)
+        echo "  [OK] Token validated successfully"
+        return 0
+        ;;
+    401)
+        echo "  [ERROR] Invalid token (401 Unauthorized)"
+        return 1
+        ;;
+    404)
+        echo "  [ERROR] Bot not found (404 Not Found)"
+        return 1
+        ;;
+    *)
+        echo "  [WARN] Token format valid but API validation returned HTTP $http_code"
+        return 0 # Don't fail; warn only
+        ;;
     esac
 }
 
@@ -460,6 +460,7 @@ init_logging() {
 setup_cleanup_trap() {
     local cleanup_fn=$1
 
+    # shellcheck disable=SC2329
     trap_handler() {
         local exit_code=$?
         $cleanup_fn "$exit_code"

@@ -59,24 +59,24 @@ confirm_action() {
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -p | --prune)
-            PRUNE_VOLUMES=true
-            shift
-            ;;
-        -a | --all)
-            PRUNE_VOLUMES=true
-            REMOVE_IMAGES=true
-            shift
-            ;;
-        -h | --help)
-            print_usage
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            print_usage
-            exit 1
-            ;;
+    -p | --prune)
+        PRUNE_VOLUMES=true
+        shift
+        ;;
+    -a | --all)
+        PRUNE_VOLUMES=true
+        REMOVE_IMAGES=true
+        shift
+        ;;
+    -h | --help)
+        print_usage
+        exit 0
+        ;;
+    *)
+        echo "Unknown option: $1"
+        print_usage
+        exit 1
+        ;;
     esac
 done
 
@@ -125,8 +125,8 @@ log "Cleanup complete!"
 echo ""
 log "Remaining OpenClaw-related resources:"
 echo "  Containers:"
-docker ps -a --filter "name=oc-bootstrap" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2> /dev/null || echo "    (none)"
+docker ps -a --filter "name=oc-bootstrap" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || echo "    (none)"
 echo "  Volumes:"
-docker volume ls --filter "name=openclaw" --format "{{.Name}}" 2> /dev/null || echo "    (none)"
+docker volume ls --filter "name=openclaw" --format "{{.Name}}" 2>/dev/null || echo "    (none)"
 echo "  Images:"
-docker images --filter "reference=oc-bootstrap" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" 2> /dev/null || echo "    (none)"
+docker images --filter "reference=oc-bootstrap" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" 2>/dev/null || echo "    (none)"

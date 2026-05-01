@@ -99,7 +99,7 @@ run_test() {
             return 1
         fi
     else
-        if eval "$test_command" > /dev/null 2>&1; then
+        if eval "$test_command" >/dev/null 2>&1; then
             pass "$test_name"
             TESTS_PASSED=$((TESTS_PASSED + 1))
             return 0
@@ -113,17 +113,17 @@ run_test() {
 
 # Check if Docker is available
 check_docker() {
-    if ! command -v docker &> /dev/null; then
+    if ! command -v docker &>/dev/null; then
         error "Docker is not installed or not in PATH"
         exit 1
     fi
 
-    if ! docker info &> /dev/null; then
+    if ! docker info &>/dev/null; then
         error "Docker daemon is not running"
         exit 1
     fi
 
-    if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+    if ! command -v docker-compose &>/dev/null && ! docker compose version &>/dev/null; then
         error "Docker Compose is not installed"
         exit 1
     fi
@@ -134,11 +134,11 @@ cleanup() {
     log "Cleaning up test resources..."
 
     # Stop and remove test container
-    docker stop "$TEST_CONTAINER_NAME" &> /dev/null 2>&1 || true
-    docker rm "$TEST_CONTAINER_NAME" &> /dev/null 2>&1 || true
+    docker stop "$TEST_CONTAINER_NAME" &>/dev/null 2>&1 || true
+    docker rm "$TEST_CONTAINER_NAME" &>/dev/null 2>&1 || true
 
     # Remove test volume
-    docker volume rm "$TEST_VOLUME_NAME" &> /dev/null 2>&1 || true
+    docker volume rm "$TEST_VOLUME_NAME" &>/dev/null 2>&1 || true
 
     # Remove test image (optional)
     # docker rmi oc-bootstrap-test:latest &>/dev/null 2>&1 || true
@@ -204,13 +204,13 @@ test_container_runs() {
 }
 
 test_container_stops() {
-    docker stop "$TEST_CONTAINER_NAME" &> /dev/null
-    docker rm "$TEST_CONTAINER_NAME" &> /dev/null
+    docker stop "$TEST_CONTAINER_NAME" &>/dev/null
+    docker rm "$TEST_CONTAINER_NAME" &>/dev/null
 }
 
 test_volume_persistence() {
     # Create a test volume
-    docker volume create "$TEST_VOLUME_NAME" &> /dev/null
+    docker volume create "$TEST_VOLUME_NAME" &>/dev/null
 
     # Write test data to volume as openclaw user
     docker run --rm \
@@ -249,23 +249,23 @@ test_shell_access() {
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --quick)
-            QUICK_MODE=true
-            shift
-            ;;
-        --verbose)
-            VERBOSE=true
-            shift
-            ;;
-        --help | -h)
-            print_usage
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            print_usage
-            exit 1
-            ;;
+    --quick)
+        QUICK_MODE=true
+        shift
+        ;;
+    --verbose)
+        VERBOSE=true
+        shift
+        ;;
+    --help | -h)
+        print_usage
+        exit 0
+        ;;
+    *)
+        echo "Unknown option: $1"
+        print_usage
+        exit 1
+        ;;
     esac
 done
 

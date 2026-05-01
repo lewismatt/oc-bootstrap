@@ -55,7 +55,7 @@ load_secrets() {
 # Run OpenClaw doctor to verify installation
 verify_openclaw() {
     log "Verifying OpenClaw installation..."
-    if ! command -v openclaw &> /dev/null; then
+    if ! command -v openclaw &>/dev/null; then
         handle_error "OpenClaw CLI not found in PATH"
     fi
 
@@ -120,25 +120,25 @@ COMMAND="${1:-gateway}"
 shift || true # Remove the command, keep remaining args
 
 case "$COMMAND" in
-    gateway)
-        start_gateway
-        ;;
-    bootstrap)
-        run_bootstrap
-        log "Bootstrap complete. Starting gateway..."
-        start_gateway
-        ;;
-    shell | bash | sh)
-        # If additional arguments provided (like -c "command"), pass them to bash
-        if [[ $# -gt 0 ]]; then
-            exec /bin/bash "$@"
-        else
-            start_shell
-        fi
-        ;;
-    *)
-        # Treat unknown command as a direct command to execute
-        log "Executing custom command: $COMMAND $*"
-        exec "$COMMAND" "$@"
-        ;;
+gateway)
+    start_gateway
+    ;;
+bootstrap)
+    run_bootstrap
+    log "Bootstrap complete. Starting gateway..."
+    start_gateway
+    ;;
+shell | bash | sh)
+    # If additional arguments provided (like -c "command"), pass them to bash
+    if [[ $# -gt 0 ]]; then
+        exec /bin/bash "$@"
+    else
+        start_shell
+    fi
+    ;;
+*)
+    # Treat unknown command as a direct command to execute
+    log "Executing custom command: $COMMAND $*"
+    exec "$COMMAND" "$@"
+    ;;
 esac

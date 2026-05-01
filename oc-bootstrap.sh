@@ -49,19 +49,19 @@ source "$SCRIPT_DIR/lib/helpers.sh"
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --non-interactive | -y)
-            NON_INTERACTIVE=true
-            shift
-            ;;
-        --config | -c)
-            CONFIG_FILE="$2"
-            shift 2
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Usage: $0 [--config FILE] [--non-interactive]"
-            exit 1
-            ;;
+    --non-interactive | -y)
+        NON_INTERACTIVE=true
+        shift
+        ;;
+    --config | -c)
+        CONFIG_FILE="$2"
+        shift 2
+        ;;
+    *)
+        echo "Unknown option: $1"
+        echo "Usage: $0 [--config FILE] [--non-interactive]"
+        exit 1
+        ;;
     esac
 done
 
@@ -327,18 +327,18 @@ if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_T
                 CURRENT_TOKEN=""
             else
                 case $current_token in
-                    0)
-                        ASSISTANT_TOKEN="$CURRENT_TOKEN"
-                        echo "  [OK] Assistant bot token accepted"
-                        ;;
-                    1)
-                        RESEARCH_TOKEN="$CURRENT_TOKEN"
-                        echo "  [OK] Research bot token accepted"
-                        ;;
-                    2)
-                        DEVELOPER_TOKEN="$CURRENT_TOKEN"
-                        echo "  [OK] Developer bot token accepted"
-                        ;;
+                0)
+                    ASSISTANT_TOKEN="$CURRENT_TOKEN"
+                    echo "  [OK] Assistant bot token accepted"
+                    ;;
+                1)
+                    RESEARCH_TOKEN="$CURRENT_TOKEN"
+                    echo "  [OK] Research bot token accepted"
+                    ;;
+                2)
+                    DEVELOPER_TOKEN="$CURRENT_TOKEN"
+                    echo "  [OK] Developer bot token accepted"
+                    ;;
                 esac
                 current_token=$((current_token + 1))
             fi
@@ -737,9 +737,9 @@ echo "=== Binding Telegram Channels ==="
 for agent in "${AGENTS[@]}"; do
     TOKEN=""
     case "$agent" in
-        "assistant") TOKEN="$ASSISTANT_TOKEN" ;;
-        "research") TOKEN="$RESEARCH_TOKEN" ;;
-        "developer") TOKEN="$DEVELOPER_TOKEN" ;;
+    "assistant") TOKEN="$ASSISTANT_TOKEN" ;;
+    "research") TOKEN="$RESEARCH_TOKEN" ;;
+    "developer") TOKEN="$DEVELOPER_TOKEN" ;;
     esac
 
     # FIX: Unbind any existing defaults BEFORE binding the new token.
@@ -896,71 +896,71 @@ else
         fi
 
         case "${SEED_CHOICE^^}" in
-            S)
-                echo ""
-                echo "Seeding prompt files into agent workspaces..."
+        S)
+            echo ""
+            echo "Seeding prompt files into agent workspaces..."
 
-                for agent in "${AGENTS_WITH_FILES[@]}"; do
-                    WORKSPACE="$HOME/.openclaw/workspace-${agent}"
-                    REPO_AGENT_DIR="$SCRIPT_DIR/$agent"
+            for agent in "${AGENTS_WITH_FILES[@]}"; do
+                WORKSPACE="$HOME/.openclaw/workspace-${agent}"
+                REPO_AGENT_DIR="$SCRIPT_DIR/$agent"
 
-                    while IFS= read -r file; do
-                        SRC="$REPO_AGENT_DIR/$file"
-                        DEST="$WORKSPACE/$file"
+                while IFS= read -r file; do
+                    SRC="$REPO_AGENT_DIR/$file"
+                    DEST="$WORKSPACE/$file"
 
-                        if [[ -f "$DEST" ]]; then
-                            if [[ "$NON_INTERACTIVE" == "true" ]]; then
-                                echo "  [INFO] ${agent^^}: $file already exists. Skipping overwrite (non-interactive)."
-                                continue
-                            fi
-                            echo ""
-                            echo "  [WARN] ${agent^^}: $file already exists in workspace."
-                            echo "  Diff (workspace → repository):"
-                            echo "  ------------------------------------------------------------"
-                            if [[ -f "$DEST" && -f "$SRC" ]]; then
-                                diff -u "$DEST" "$SRC" |
-                                    sed 's/^/  /' ||
-                                    true
-                            fi
-                            echo "  ------------------------------------------------------------"
-                            echo ""
-                            read -r -p "  Overwrite ~/.openclaw/workspace-${agent}/${file}? (y/N) " OVERWRITE_FILE </dev/tty
-                            if [[ "${OVERWRITE_FILE^^}" == "Y" ]]; then
-                                cp "$SRC" "$DEST" &&
-                                    echo "  [OK] ${agent^^}: $file overwritten." ||
-                                    echo "  [WARN] Failed to copy $file for $agent."
-                            else
-                                echo "  Skipped ${agent^^}: $file — existing file kept."
-                            fi
-                        else
-                            cp "$SRC" "$DEST" &&
-                                echo "  [OK] ${agent^^}: $file" ||
-                                echo "  [WARN] Failed to copy $file for $agent."
+                    if [[ -f "$DEST" ]]; then
+                        if [[ "$NON_INTERACTIVE" == "true" ]]; then
+                            echo "  [INFO] ${agent^^}: $file already exists. Skipping overwrite (non-interactive)."
+                            continue
                         fi
-                    done <<<"${AGENT_SEED_FILES[$agent]}"
-                done
+                        echo ""
+                        echo "  [WARN] ${agent^^}: $file already exists in workspace."
+                        echo "  Diff (workspace → repository):"
+                        echo "  ------------------------------------------------------------"
+                        if [[ -f "$DEST" && -f "$SRC" ]]; then
+                            diff -u "$DEST" "$SRC" |
+                                sed 's/^/  /' ||
+                                true
+                        fi
+                        echo "  ------------------------------------------------------------"
+                        echo ""
+                        read -r -p "  Overwrite ~/.openclaw/workspace-${agent}/${file}? (y/N) " OVERWRITE_FILE </dev/tty
+                        if [[ "${OVERWRITE_FILE^^}" == "Y" ]]; then
+                            cp "$SRC" "$DEST" &&
+                                echo "  [OK] ${agent^^}: $file overwritten." ||
+                                echo "  [WARN] Failed to copy $file for $agent."
+                        else
+                            echo "  Skipped ${agent^^}: $file — existing file kept."
+                        fi
+                    else
+                        cp "$SRC" "$DEST" &&
+                            echo "  [OK] ${agent^^}: $file" ||
+                            echo "  [WARN] Failed to copy $file for $agent."
+                    fi
+                done <<<"${AGENT_SEED_FILES[$agent]}"
+            done
 
-                echo ""
-                echo "[OK] Prompt file seeding complete."
-                print_section_summary "Prompt File Seeding" \
-                    "Prompt files seeded into agent workspaces"
-                ;;
-            D)
-                echo "Skipping seeding. OpenClaw will generate default prompt files on first start."
-                print_section_summary "Prompt File Seeding" \
-                    "Using default prompt files (seeding skipped)"
-                ;;
-            H)
-                echo ""
-                echo "Installation halted by user. No gateway has been started."
-                echo "Review the files listed above, then re-run this script when ready."
-                echo "Log file: $LOG_FILE"
-                exit 0
-                ;;
-            *)
-                echo "Invalid choice. Please enter S, D, or H."
-                SEED_CHOICE=""
-                ;;
+            echo ""
+            echo "[OK] Prompt file seeding complete."
+            print_section_summary "Prompt File Seeding" \
+                "Prompt files seeded into agent workspaces"
+            ;;
+        D)
+            echo "Skipping seeding. OpenClaw will generate default prompt files on first start."
+            print_section_summary "Prompt File Seeding" \
+                "Using default prompt files (seeding skipped)"
+            ;;
+        H)
+            echo ""
+            echo "Installation halted by user. No gateway has been started."
+            echo "Review the files listed above, then re-run this script when ready."
+            echo "Log file: $LOG_FILE"
+            exit 0
+            ;;
+        *)
+            echo "Invalid choice. Please enter S, D, or H."
+            SEED_CHOICE=""
+            ;;
         esac
     done
 fi

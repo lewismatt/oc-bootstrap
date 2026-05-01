@@ -95,7 +95,7 @@ run_test() {
             return 1
         fi
     else
-        if eval "$test_command" > /dev/null 2>&1; then
+        if eval "$test_command" >/dev/null 2>&1; then
             pass "$test_name"
             return 0
         else
@@ -145,11 +145,11 @@ cleanup() {
     log "Cleaning up test resources..."
 
     # Stop and remove test container
-    docker stop "$TEST_CONTAINER_NAME" &> /dev/null 2>&1 || true
-    docker rm "$TEST_CONTAINER_NAME" &> /dev/null 2>&1 || true
+    docker stop "$TEST_CONTAINER_NAME" &>/dev/null 2>&1 || true
+    docker rm "$TEST_CONTAINER_NAME" &>/dev/null 2>&1 || true
 
     # Remove generated config
-    rm -f "$GENERATED_CONFIG" 2> /dev/null || true
+    rm -f "$GENERATED_CONFIG" 2>/dev/null || true
 
     log "Cleanup complete"
 }
@@ -285,23 +285,23 @@ test_ip_validation() {
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --verbose)
-            VERBOSE=true
-            shift
-            ;;
-        --keep)
-            KEEP_CONTAINER=true
-            shift
-            ;;
-        --help | -h)
-            print_usage
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            print_usage
-            exit 1
-            ;;
+    --verbose)
+        VERBOSE=true
+        shift
+        ;;
+    --keep)
+        KEEP_CONTAINER=true
+        shift
+        ;;
+    --help | -h)
+        print_usage
+        exit 0
+        ;;
+    *)
+        echo "Unknown option: $1"
+        print_usage
+        exit 1
+        ;;
     esac
 done
 

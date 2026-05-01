@@ -1,14 +1,12 @@
-
-# .dockerignore is tracked in the repo
-# Docker
-*.log
 *.recommends.md
 .env
 .env.*
-.secrets
 docker-config.env
-node_modules/
-package-lock.json
-package.json
+.secrets
 secrets.env
+*.log
 venv/
+node_modules/
+
+# Docker
+# .dockerignore is tracked in the repo

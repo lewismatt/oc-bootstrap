@@ -123,7 +123,7 @@ run_test() {
             return 1
         fi
     else
-        if eval "$test_command" > /dev/null 2>&1; then
+        if eval "$test_command" >/dev/null 2>&1; then
             pass "$test_name"
             return 0
         else
@@ -138,7 +138,7 @@ docker_exec() {
     if [[ "$VERBOSE" == "true" ]]; then
         docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "$1"
     else
-        docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "$1" > /dev/null 2>&1
+        docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "$1" >/dev/null 2>&1
     fi
 }
 
@@ -228,11 +228,11 @@ cleanup() {
     log "Cleaning up test resources..."
 
     # Stop and remove test container
-    docker stop "$TEST_CONTAINER_NAME" &> /dev/null 2>&1 || true
-    docker rm "$TEST_CONTAINER_NAME" &> /dev/null 2>&1 || true
+    docker stop "$TEST_CONTAINER_NAME" &>/dev/null 2>&1 || true
+    docker rm "$TEST_CONTAINER_NAME" &>/dev/null 2>&1 || true
 
     # Remove generated config
-    rm -f "$GENERATED_CONFIG" 2> /dev/null || true
+    rm -f "$GENERATED_CONFIG" 2>/dev/null || true
 
     log "Cleanup complete"
 }
@@ -417,8 +417,8 @@ test_agent_list() {
     local output
     output=$(docker_exec_capture "openclaw agents list 2>/dev/null")
     echo "$output" | grep -q "assistant" &&
-    echo "$output" | grep -q "research" &&
-    echo "$output" | grep -q "developer"
+        echo "$output" | grep -q "research" &&
+        echo "$output" | grep -q "developer"
 }
 
 test_assistant_model_config() {
@@ -541,18 +541,18 @@ test_gateway_start() {
 
     log "Attempting to start OpenClaw gateway (may fail with dummy credentials)..."
 
-    if docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "openclaw gateway start" > /dev/null 2>&1; then
+    if docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "openclaw gateway start" >/dev/null 2>&1; then
         pass "Gateway started successfully"
 
         # Wait for gateway to stabilize
         sleep 5
 
         # Check gateway status
-        docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "openclaw gateway status" > /dev/null 2>&1 && \
+        docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "openclaw gateway status" >/dev/null 2>&1 &&
             pass "Gateway status check passed"
 
         # Stop gateway
-        docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "openclaw gateway stop" > /dev/null 2>&1 || true
+        docker exec --user "$CONTAINER_USER" "$TEST_CONTAINER_NAME" bash -c "openclaw gateway stop" >/dev/null 2>&1 || true
     else
         warn "Gateway failed to start (expected with dummy/test credentials)"
         return 0
@@ -566,27 +566,27 @@ test_gateway_start() {
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --verbose)
-            VERBOSE=true
-            shift
-            ;;
-        --keep)
-            KEEP_CONTAINER=true
-            shift
-            ;;
-        --quick)
-            QUICK_MODE=true
-            shift
-            ;;
-        --help | -h)
-            print_usage
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            print_usage
-            exit 1
-            ;;
+    --verbose)
+        VERBOSE=true
+        shift
+        ;;
+    --keep)
+        KEEP_CONTAINER=true
+        shift
+        ;;
+    --quick)
+        QUICK_MODE=true
+        shift
+        ;;
+    --help | -h)
+        print_usage
+        exit 0
+        ;;
+    *)
+        echo "Unknown option: $1"
+        print_usage
+        exit 1
+        ;;
     esac
 done
 
@@ -597,12 +597,12 @@ echo "=========================================="
 echo ""
 
 # Check if Docker is available
-if ! command -v docker &> /dev/null; then
+if ! command -v docker &>/dev/null; then
     error "Docker is not installed or not in PATH"
     exit 1
 fi
 
-if ! docker info &> /dev/null; then
+if ! docker info &>/dev/null; then
     error "Docker daemon is not running"
     exit 1
 fi
@@ -618,9 +618,7 @@ if ! generate_config "$GENERATED_CONFIG"; then
 fi
 
 # Determine if we have real credentials
-HAS_REAL_TOKENS=false
 if [[ -n "${TEST_ASSISTANT_TOKEN:-}" && -n "${TEST_RESEARCH_TOKEN:-}" && -n "${TEST_DEVELOPER_TOKEN:-}" ]]; then
-    HAS_REAL_TOKENS=true
     info "Real Telegram tokens detected - full test mode"
 else
     info "Using dummy tokens - config validation only"

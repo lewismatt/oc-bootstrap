@@ -286,4 +286,3 @@ docker rm oc-bootstrap-full-test-<PID>
 - Dummy credentials are NOT real - never use them in production
 - The test config template is in `tests/test-config.env.template`
 - With real credentials, the test validates **actual** OpenClaw functionality
-

@@ -33,4 +33,4 @@ Add any other context, screenshots, or examples about the feature request here.
 **Would you like to contribute this feature?**
 - [ ] Yes, I'd like to work on this (please indicate in comments)
 - [ ] I can provide testing/feedback
-- [ ] I can provide documentation updates
+- [ ] I can provide documentation updat
