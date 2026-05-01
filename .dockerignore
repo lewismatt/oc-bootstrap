@@ -1,0 +1,81 @@
+# =============================================================================
+# Docker Ignore File - OpenClaw Bootstrap
+# ==============================================================================
+# Optimizes Docker build by excluding unnecessary files from build context
+# ==============================================================================
+
+# Git repository data
+.git
+.gitignore
+.gitattributes
+
+# Node modules and JavaScript dependencies
+node_modules
+node_modules/**
+package-lock.json
+npm-debug.log
+yarn-error.log
+yarn.lock
+
+# Python dependencies (for Lemonade Server)
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Logs and temporary files
+*.log
+logs/
+*.tmp
+*.temp
+.cache/
+.history/
+
+# Environment and secrets (NEVER include in image)
+.env
+.env.*
+docker-config.env
+secrets.env
+*.secret
+*.key
+
+# OpenClaw runtime data (should be mounted as volume)
+.openclaw/
+workspace-*/
+memory/
+
+# Documentation (optional - can reduce image size)
+# *.md
+# !README.md
+# docs/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files (optional - can reduce image size)
+# tests/
+# __tests__/
+
+# CI/CD (not needed in container)
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+Dockerfile*
+docker-compose*
+
+# ShellCheck and linting
+.shellcheckrc
+.bashrc
+.profile
