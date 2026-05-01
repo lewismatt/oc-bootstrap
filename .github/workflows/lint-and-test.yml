@@ -1,5 +1,5 @@
 ---
-name: Lint and Test
+name: Lint and Test}
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
     branches:
       - main
       - development
-      - docker
+      - docker}
 
 jobs:
   lint:
@@ -20,59 +20,57 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4}
 
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@master
         with:
           scandir: '.'
-          additional_files: 'oc-bootstrap.sh scripts/install-lemonade.sh lib/helpers.sh'
+          additional_files: 'oc-bootstrap.sh scripts/install-lemonade.sh lib/helpers.sh'{}
 
       - name: shfmt
         uses: mfinelli/setup-shfmt@v3
-      - run: shfmt -d -i 4 -ci oc-bootstrap.sh lib/helpers.sh scripts/install-lemonade.sh
+      - run: shfmt -d -i 4 -ci oc-bootstrap.sh lib/helpers.sh scripts/install-lemonade.sh{}
 
       - name: Markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v14
         with:
           config: '.markdownlint.json'
           glob: '**/*.md'
-          ignore: 'node_modules/'
+          ignore: 'node_modules/'{}
 
       - name: Yamllint
         uses: ibiqlik/action-yamllint@v3
         with:
           file_or_dir: '.github/workflows/ .yamllint.yaml .gitlab-ci.yml'
           config_file: .yamllint.yaml
-        continue-on-error: true  # Create a default config if not present
+        continue-on-error: true  # Create a default config if not present{}
 
   secret-detection:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4}
+
       - name: Secret Detection
         uses: trufflesecurity/trufflehog@main
         with:
-          extra_args: --only-verified
+          extra_args: --only-verified{}
 
   integration-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4{}
 
       - name: Set up Docker
-        uses: docker/setup-docker-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-docker-action@v4{}
 
       - name: Run Docker Integration Tests
         run: |
           chmod +x tests/docker-integration-test.sh
           ./tests/docker-integration-test.sh --verbose
-        timeout-minutes: 30
+        timeout-minutes: 30{}
 
       - name: Upload test logs on failure
         if: failure()
@@ -81,4 +79,4 @@ jobs:
           name: test-logs
           path: |
             /tmp/oc-bootstrap-test-config-*.env
-          retention-days: 5
+          retention-days: 5}
