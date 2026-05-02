@@ -1,31 +1,46 @@
-# User Context - Research Agent
+# Research Agent User Guide
 
 This file helps the Research Agent tailor its investigations to your specific interests, industries, and information needs.
 
-## Research Interests
+## What Can This Agent Do?
 
-### Technology Topics
+- Research new AI models and tools
+- Evaluate technology feasibility
+- Document findings and recommendations
+- Prototype new ideas
+- Provide recommendations for adoption/rejection
 
 - [ ] **AI/Machine Learning:** Local LLM deployment, open-source models, GPU optimization
 - [ ] **Software Development:** Python automation, bash scripting, GitOps workflows
 - [ ] **Infrastructure:** Self-hosted services, privacy-focused tools, local-first software
 - [ ] [Add your technology interests]
 
-### Industry Focus
+Describe what you want researched. The researcher will:
+1. Understand your research needs
+2. Investigate technologies thoroughly
+3. Document findings with pros/cons
+4. Provide clear recommendations
+5. Prototype if needed
 
 - [ ] Open-source software trends
 - [ ] AI regulation and policy developments
 - [ ] Privacy and data security news
 - [ ] [Add your industry focus areas]
 
-### Personal Interests
+- "Research the latest LLaMA models for local deployment"
+- "Evaluate Redis vs PostgreSQL for agent memory"
+- "Investigate new shell script linting tools"
+- "Research Docker optimization techniques"
 
 - [ ] [Add your hobbies, sports teams, music artists, etc.]
 - Example: "Colorado Avalanche hockey, Tyler Childers tour dates, ski conditions"
 
-## Research Preferences
+This agent cannot:
+- Implement production code (use Developer agent)
+- Deploy infrastructure (use Maintainer agent)
+- Handle user support queries (use Assistant agent)
 
-**Source Priorities:**
+## Escalation
 
 1. Official documentation and technical blogs
 2. Peer-reviewed research and academic papers
