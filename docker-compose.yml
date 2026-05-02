@@ -1,55 +1,149 @@
-version: '3.8'
+# ==============================================================================
+# OpenClaw Multi-Agent Bootstrap - Docker Compose
+# ==============================================================================
+# Orchestrates OpenClaw services with optional Lemonade Server for local inference
+# 
+# Usage:
+#   docker compose up -d          # Start all services
+#   docker compose down            # Stop all services
+#   docker compose logs -f         # View logs
+# ==============================================================================
 
-services:
-  openclaw:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: openclaw
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    volumes:
-      - openclaw-data:/opt/openclaw
-      - openclaw-logs:/var/log/openclaw
-      - ./docker-config.env:/opt/openclaw/docker-config.env
-    env_file:
-      - docker-config.env
-    networks:
-      - openclaw-network
-    depends_on:
-      - lemonade-server
-
-  lemonade-server:
-    image: lemonade-server:latest
-    container_name: lemonade-server
-    restart: unless-stopped
-    ports:
-      - "8081:8080"
-    volumes:
-      - lemonade-data:/data
-    networks:
-      - openclaw-network
-    environment:
-      - LE MONADE_MODE=server
-      - LE MONADE_LOG_LEVEL=info
-
-  redis:
-    image: redis:7-alpine
-    container_name: openclaw-redis
-    restart: unless-stopped
-    volumes:
-      - redis-data:/data
-    networks:
-      - openclaw-network
-    command: redis-server --appendonly yes
-
-volumes:
-  openclaw-data:
-  openclaw-logs:
-  lemonade-data:
-  redis-data:
+# ==============================================================================
+# NETWORKS
+# ==============================================================================
 
 networks:
   openclaw-network:
     driver: bridge
+
+# ==============================================================================
+# VOLUMES (Named volumes for persistence)
+# ==============================================================================
+
+volumes:
+  openclaw-data:
+    driver: local
+
+# ==============================================================================
+# SERVICES
+# ==============================================================================
+
+services:
+
+  # --------------------------------------------------------------------------
+  # OpenClaw Main Service
+  # --------------------------------------------------------------------------
+  openclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: oc-bootstrap:latest
+    container_name: oc-bootstrap
+    hostname: openclaw
+    restart: unless-stopped
+    
+    # Environment variables (load from docker-config.env or set here)
+    env_file:
+      - docker-config.env
+    
+    # Additional environment variables
+    environment:
+      - NODE_ENV=production
+      - OPENCLAW_HOME=/home/openclaw/.openclaw
+      - NON_INTERACTIVE=true
+    
+    # Volume mounts for persistence
+    volumes:
+      # --------------------------------------------------------------------------
+      # STORAGE OPTIONS - Configure OPENCLAW_VOLUME in docker-config.env
+      # --------------------------------------------------------------------------
+      
+      # Option 1: Docker Named Volume (Recommended for production)
+      #   Set in docker-config.env: OPENCLAW_VOLUME=openclaw-data:/home/openclaw/.openclaw
+      #   - Portable across OS (Linux/Windows/macOS)
+      #   - Docker manages the storage location
+      #   - Harder to access files directly from host
+      
+      # Option 2: Bind Mount (Easier file access from host)
+      #   Set in docker-config.env: OPENCLAW_VOLUME=/home/youruser/.openclaw:/home/openclaw/.openclaw
+      #   - Example Linux: /home/youruser/.openclaw:/home/openclaw/.openclaw
+      #   - Example Windows: /c/Users/YourUsername/.openclaw:/home/openclaw/.openclaw
+      #   - Example macOS: /Users/youruser/.openclaw:/home/openclaw/.openclaw
+      #   - Note: Ensure host directory exists and has correct permissions
+      
+      - ${OPENCLAW_VOLUME:-openclaw-data:/home/openclaw/.openclaw}
+      
+      # Optional: Mount host oc-bootstrap scripts for development
+      # - ./:/home/openclaw/oc-bootstrap:ro
+    
+    # Network
+    networks:
+      - openclaw-network
+    
+    # Resource limits (adjust as needed)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '4'
+    #       memory: 8G
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "bash", "-c", "openclaw --version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # --------------------------------------------------------------------------
+  # Lemonade Server (Optional - for local inference)
+  # --------------------------------------------------------------------------
+  # Uncomment the section below to enable local LLM inference via Lemonade Server
+  # 
+  # lemonade:
+  #   image: python:3.11-slim
+  #   container_name: lemonade-server
+  #   restart: unless-stopped
+  #   
+  #   environment:
+  #     - LEMONADE_PORT=8000
+  #     - LEMONADE_HOST=0.0.0.0
+  #   
+  #   volumes:
+  #     - ./scripts/install-lemonade.sh:/tmp/install-lemonade.sh:ro
+  #     - lemonade-data:/home/lemonade
+  #   
+  #   ports:
+  #     - "8000:8000"
+  #   
+  #   networks:
+  #     - openclaw-network
+  #   
+  #   command: >
+  #     bash -c "
+  #       pip install lemonade-server &&
+  #       lemonade-server --host 0.0.0.0 --port 8000
+  #     "
+  #   
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 120s
+
+# ==============================================================================
+# VOLUMES (Additional named volumes)
+# ==============================================================================
+
+# Uncomment if using Lemonade Server:
+# volumes:
+#   lemonade-data:
+#     driver: local

@@ -1,19 +1,10 @@
 {
   "ignorePatterns": [
     {
-      "pattern": "^https://github.com/lewismatt/oc-bootstrap/(issues|merge_requests|blob)/"
+      "pattern": "^https://lemonade.ai"
     },
     {
-      "pattern": "^https://gitlab.com/mattlewis/oc-bootstrap/(issues|merge_requests|blob)/"
-    },
-    {
-      "pattern": "^http://localhost"
-    },
-    {
-      "pattern": "^https://ollama.com/library"
+      "pattern": "^https://discord.gg/openclaw"
     }
-  ],
-  "retryOn429": true,
-  "timeOut": "30s",
-  "deadline": "60s"
+  ]
 }

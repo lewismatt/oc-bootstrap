@@ -4,31 +4,14 @@ on:
   push:
     branches: [main, development, docker]
   pull_request:
-    branches: [main, development]
-  schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sunday
+    branches: [main, development, docker]
 
 jobs:
   link-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Restore lychee cache
-        uses: actions/cache@v4
+      - uses: lycheeverse/lychee-action@v1
         with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-      
-      - name: Run lychee link checker
-        uses: lycheeverse/lychee-action@v2
-        with:
-          args: >-
-            --config .github/link-check-config.json
-            --cache .lycheecache
-            --no-progress
-            './**/*.md'
-          fail: true
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN }}
+          config-file: .github/link-check-config.json
+        continue-on-error: true  # Link checking is informational

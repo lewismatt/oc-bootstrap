@@ -1,3 +1,10 @@
--i 4
--ci
--simplify
+basedir = .
+
+indent = 4
+binary_next_line = false
+case_indent = true
+else_elif = true
+func_next_line = false
+keep_column = false
+semicolon_newline = true
+space_after_redirect = true
