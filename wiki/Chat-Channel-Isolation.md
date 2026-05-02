@@ -149,9 +149,9 @@ RESEARCH_TOKEN=987654321:ZYXwvuTSRqponMLKjihGFEdcba
 DEVELOPER_TOKEN=111222333:AABBccDDeeFFggHHiiJJkkLLmm
 
 # Optional: Bot usernames (for display)
-TELEGRAM_ASSISTANT_BOT_USERNAME=openclaw_assistant_bot
-TELEGRAM_RESEARCH_BOT_USERNAME=openclaw_research_bot
-TELEGRAM_DEVELOPER_BOT_USERNAME=openclaw_developer_bot
+ASSISTANT_BOT_USERNAME=openclaw_assistant_bot
+RESEARCH_BOT_USERNAME=openclaw_research_bot
+DEVELOPER_BOT_USERNAME=openclaw_developer_bot
 ```text
 
 ### Bare Metal Configuration
@@ -198,9 +198,9 @@ By default, any user who knows the bot username can interact with it. To restric
 
 ```bash
 # In docker-config.env or .env
-TELEGRAM_ALLOWED_USERS_ASSISTANT="12345678,87654321,11223344"
-TELEGRAM_ALLOWED_USERS_RESEARCH="12345678"
-TELEGRAM_ALLOWED_USERS_DEVELOPER="12345678,11223344"
+ALLOWED_USERS_ASSISTANT="12345678,87654321,11223344"
+ALLOWED_USERS_RESEARCH="12345678"
+ALLOWED_USERS_DEVELOPER="12345678,11223344"
 ```text
 
 Get user IDs by having them send `/start` to the bot, then check logs:
@@ -221,9 +221,9 @@ Create a private Telegram channel for each agent:
 Configuration:
 
 ```bash
-TELEGRAM_ASSISTANT_CHANNEL_ID="-1001234567890"
-TELEGRAM_RESEARCH_CHANNEL_ID="-1009876543210"
-TELEGRAM_DEVELOPER_CHANNEL_ID="-1001122334455"
+ASSISTANT_CHANNEL_ID="-1001234567890"
+RESEARCH_CHANNEL_ID="-1009876543210"
+DEVELOPER_CHANNEL_ID="-1001122334455"
 ```text
 
 ### User Permissions Matrix
@@ -300,9 +300,9 @@ Add bot to the forum and configure:
 
 ```bash
 TELEGRAM_FORUM_MODE=true
-TELEGRAM_ASSISTANT_TOPIC_ID=1
-TELEGRAM_RESEARCH_TOPIC_ID=2
-TELEGRAM_DEVELOPER_TOPIC_ID=3
+ASSISTANT_TOPIC_ID=1
+RESEARCH_TOPIC_ID=2
+DEVELOPER_TOPIC_ID=3
 ```text
 
 ### 2. Separate Telegram Accounts

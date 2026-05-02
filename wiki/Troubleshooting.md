@@ -324,7 +324,7 @@ curl "https://api.telegram.org/bot<YOUR_TOKEN>/getMe"
 
 ```bash
 # Verify channel ID format (should start with -100 for channels)
-TELEGRAM_ASSISTANT_CHANNEL_ID=-1001234567890
+ASSISTANT_CHANNEL_ID=-1001234567890
 
 # Get correct channel ID:
 # 1. Add bot to channel as admin

@@ -281,7 +281,7 @@ OpenClaw Gateway loads environment
                   ▼
 ┌─────────────────────────────────────────┐
 │         User Whitelist (Optional)        │  ← Layer 3: User Authorization
-│  (TELEGRAM_ALLOWED_USERS_* variables)   │
+│  (ALLOWED_USERS_* variables)   │
 └─────────────────────────────────────────┘
                   │
                   ▼
