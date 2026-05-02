@@ -295,7 +295,7 @@ Error: 401 Unauthorized - Invalid bot token
 4. Copy the new token
 5. Update `docker-config.env`:
    ```bash
-   TELEGRAM_ASSISTANT_BOT_TOKEN=new_token_here
+   ASSISTANT_TOKEN=new_token_here
    ```
 6. Restart: `docker compose restart openclaw`
 

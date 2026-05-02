@@ -110,9 +110,9 @@ nano docker-config.env
 
 ```bash
 # Telegram bot tokens
-TELEGRAM_ASSISTANT_BOT_TOKEN=your_token_here
-TELEGRAM_RESEARCH_BOT_TOKEN=your_token_here
-TELEGRAM_DEVELOPER_BOT_TOKEN=your_token_here
+ASSISTANT_TOKEN=your_token_here
+RESEARCH_TOKEN=your_token_here
+DEVELOPER_TOKEN=your_token_here
 
 # Model selection
 ASSISTANT_MODEL=openai/gpt-4o

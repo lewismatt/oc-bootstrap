@@ -128,7 +128,7 @@ fi
 - **Include code examples** with proper syntax highlighting
 - **Keep README.md updated** with new features
 - **Document all new environment variables**
-- **Add entries to CHANGELOG** for user-facing changes
+- **Add entries to CHANGELOG.md** for user-facing changes
 
 ---
 
@@ -226,7 +226,7 @@ We use [Semantic Versioning](https://semver.org/):
 
 ### Changelog
 
-Update `CHANGELOG` with your changes:
+Update `CHANGELOG.md` with your changes:
 
 ```text
 ## [Unreleased]

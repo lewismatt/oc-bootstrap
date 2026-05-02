@@ -10,7 +10,7 @@ Automated setup for [OpenClaw](https://openclaw.ai) multi-agent AI system. Deplo
 > and the interactive setup is designed for users with basic
 > Linux/command-line skills. See [REFACTOR.md](REFACTOR.md) for details.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 [![Platform: Ubuntu 24.04](https://img.shields.io/badge/Platform-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/download/server)
 [![Node.js 22.x](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
 [![Docker Ready](https://img.shields.io/badge/Docker-Ready-blue.svg)](DOCKER.md)
@@ -53,7 +53,7 @@ chmod +x *.sh
 
 # 3. Run the interactive installer
 ./oc-bootstrap.sh
-```text
+```bash
 
 The script will guide you through:
 - Choosing between local (Lemonade) or cloud-based AI models
@@ -73,7 +73,7 @@ docker compose up -d
 
 # 3. View logs
 docker compose logs -f
-```text
+```bash
 
 ---
 
@@ -131,7 +131,7 @@ Cloud APIs (OpenAI, Anthropic) are also supported for convenience.
 
 ### System Overview
 
-```text
+```bash
 ┌─────────────────────────────────────────────────────────┐
 │         Your Linux Server (Ubuntu 24.04)               │
 ├─────────────────────────────────────────────────────────┤
@@ -161,7 +161,7 @@ Cloud APIs (OpenAI, Anthropic) are also supported for convenience.
          ↕                                    ↕
     Telegram Bots                      AI Model Providers
     (1 per agent)                 (Local: Lemonade / Cloud: OpenAI, etc.)
-```text
+```bash
 
 ### Agent Isolation via Telegram
 
@@ -179,7 +179,7 @@ This isolation ensures:
 
 ### Directory Structure
 
-```text
+```bash
 ~/.openclaw/
 ├── logs/                          # Installation and runtime logs
 │   └── openclaw-setup.log
@@ -193,7 +193,7 @@ This isolation ensures:
     ├── USER.md                    # User preferences & context
     ├── AGENTS.md                  # Multi-agent collaboration rules
     └── config/
-```text
+```bash
 
 ---
 
@@ -256,7 +256,7 @@ chmod +x oc-bootstrap.sh
 
 # 3. Run the installer
 ./oc-bootstrap.sh
-```text
+```bash
 
 The script will interactively prompt you for:
 - Whether to use local or remote inference
@@ -284,7 +284,7 @@ nano ~/.openclaw/secrets.env
 
 # 2. Run non-interactively
 ./oc-bootstrap.sh --config ~/.openclaw/secrets.env --non-interactive
-```text
+```bash
 
 > **Note**: The script also supports reading from a custom config file location:
 > ```bash
@@ -326,7 +326,7 @@ docker compose up -d
 
 # 3. View logs
 docker compose logs -f
-```text
+```bash
 
 **Data location**: Docker manages this volume. To inspect:
 ```bash
@@ -335,7 +335,7 @@ docker volume ls | grep openclaw
 
 # Inspect volume location (Linux)
 docker volume inspect oc-bootstrap_openclaw-data
-```text
+```bash
 
 #### Option 2: Bind Mount (Easier File Access)
 
@@ -346,43 +346,43 @@ Mount a directory from your host machine directly into the container. Great for 
 Linux/macOS:
 ```bash
 mkdir -p ~/.openclaw
-```text
+```bash
 
 Windows (Docker Desktop) - PowerShell:
 ```powershell
 New-Item -Path "$env:USERPROFILE\.openclaw" -ItemType Directory -Force
-```text
+```bash
 
 **Step 2: Configure `docker-config.env`**
 
 Edit `docker-config.env` and set `OPENCLAW_VOLUME` to your host path:
 
 Linux example:
-```text
+```bash
 OPENCLAW_VOLUME=/home/youruser/.openclaw:/home/openclaw/.openclaw
-```text
+```bash
 
 macOS example:
-```text
+```bash
 OPENCLAW_VOLUME=/Users/youruser/.openclaw:/home/openclaw/.openclaw
-```text
+```bash
 
 Windows example:
-```text
+```bash
 OPENCLAW_VOLUME=/c/Users/YourUsername/.openclaw:/home/openclaw/.openclaw
-```text
+```bash
 
 **Step 3: Fix permissions (Linux only)**
 
 The container runs as `openclaw` user (UID 1000). Ensure the host directory is writable:
 ```bash
 sudo chown -R 1000:1000 ~/.openclaw
-```text
+```bash
 
 **Step 4: Start with bind mount**
 ```bash
 docker compose up -d
-```text
+```bash
 
 > **⚠️ Permissions**: On Linux, the container user (`openclaw`, UID 1000) must be able to write to the host directory.
 > Windows (Docker Desktop) handles permissions automatically.
@@ -410,7 +410,7 @@ docker compose exec openclaw bash
 
 # Restart services
 docker compose restart
-```text
+```bash
 
 ### Docker Management Quick Reference
 
@@ -435,7 +435,7 @@ docker compose build
 
 # Or build with Docker CLI
 docker build -t oc-bootstrap:latest .
-```text
+```bash
 
 ### Running with Docker CLI
 
@@ -452,7 +452,7 @@ docker run -it --rm \
   --env-file docker-config.env \
   oc-bootstrap:latest \
   shell
-```text
+```bash
 
 ### Configuration
 
@@ -480,7 +480,7 @@ docker volume ls | grep openclaw
 
 # Data location in container: /home/openclaw/.openclaw
 # Contains: config, memory (SQLite), agent workspaces
-```text
+```bash
 
 ### Local Inference with Lemonade Server
 
@@ -531,7 +531,7 @@ GITHUB_PAT="ghp_YOUR_GITHUB_TOKEN_HERE"
 GITLAB_PAT="glpat-YOUR_GITLAB_TOKEN_HERE"
 BRAVE_API_KEY="YOUR_BRAVE_API_KEY_HERE"
 X_API_KEY="YOUR_X_BEARER_TOKEN_HERE"
-```text
+```bash
 
 ### Environment Variables
 
@@ -542,7 +542,7 @@ export ASSISTANT_TOKEN="..."
 export RESEARCH_TOKEN="..."
 export DEVELOPER_TOKEN="..."
 ./oc-bootstrap.sh
-```text
+```bash
 
 ---
 
@@ -556,19 +556,19 @@ If the installer didn't start the gateway for you:
 
 ```bash
 openclaw gateway start
-```text
+```bash
 
 Check the status:
 
 ```bash
 openclaw gateway status
-```text
+```bash
 
 #### Configuring API Keys (if not done during setup)
 
 ```bash
 openclaw onboarding
-```text
+```bash
 
 This interactive wizard will walk you through entering:
 - OpenAI API key
@@ -581,7 +581,7 @@ Once the gateway is running, message your agents on Telegram:
 
 **Example conversation with Assistant:**
 
-```text
+```bash
 You:        "What's the capital of France?"
 Assistant:  "The capital of France is Paris..."
 
@@ -591,19 +591,19 @@ Research:   "Here are the latest developments in AI..."
 
 You:        "@developer_bot write a Python function to sort a list"
 Developer:  "Here's a Python function..."
-```text
+```bash
 
 #### Checking Agent Status
 
 ```bash
 openclaw agents list --bindings
-```text
+```bash
 
 #### Viewing Memory & Search
 
 ```bash
 openclaw memory status
-```text
+```bash
 
 Shows:
 - Number of indexed memories per agent
@@ -625,7 +625,7 @@ docker compose down
 
 # Stop services and remove volumes (DESTRUCTIVE - deletes data)
 docker compose down -v
-```text
+```bash
 
 #### Viewing Logs
 
@@ -638,7 +638,7 @@ docker compose logs --tail=50 openclaw
 
 # View specific service logs
 docker compose logs -f openclaw
-```text
+```bash
 
 #### Checking Status
 
@@ -651,7 +651,7 @@ docker exec oc-bootstrap openclaw doctor
 
 # Inspect container details
 docker inspect oc-bootstrap
-```text
+```bash
 
 #### Restarting Services
 
@@ -661,7 +661,7 @@ docker compose restart
 
 # Restart specific service
 docker compose restart openclaw
-```text
+```bash
 
 #### Accessing the Container Shell
 
@@ -671,7 +671,7 @@ docker compose exec openclaw bash
 
 # Run new temporary container with shell
 docker run -it --rm --env-file docker-config.env oc-bootstrap:latest shell
-```text
+```bash
 
 #### Advanced Docker Operations
 
@@ -694,7 +694,7 @@ For more advanced Docker operations, see [DOCKER.md](DOCKER.md):
 sudo apt update
 sudo apt install -y curl git build-essential
 ./oc-bootstrap.sh
-```text
+```bash
 
 ---
 
@@ -737,7 +737,7 @@ cat ~/.openclaw/logs/openclaw-setup.log
 
 # Try starting with verbose output
 openclaw gateway start --verbose
-```text
+```bash
 
 ---
 
@@ -761,7 +761,7 @@ openclaw agents bind --agent assistant --bind "telegram:YOUR_TOKEN_HERE"
 
 # Check agent logs
 openclaw agents logs assistant
-```text
+```bash
 
 ---
 
@@ -789,7 +789,7 @@ docker compose logs openclaw
 
 # Inspect container for errors
 docker inspect oc-bootstrap
-```text
+```bash
 
 #### Telegram Bots Not Connecting (Docker)
 
@@ -810,7 +810,7 @@ docker exec oc-bootstrap curl -I https://api.telegram.org
 
 # Check OpenClaw doctor inside container
 docker exec oc-bootstrap openclaw doctor
-```text
+```bash
 
 #### Volume Permission Issues
 
@@ -825,7 +825,7 @@ docker exec oc-bootstrap sudo chown -R openclaw:openclaw /home/openclaw/.opencla
 docker-compose down -v
 docker-compose build --no-cache
 docker-compose up -d
-```text
+```bash
 
 > 📌 For more Docker troubleshooting, see [DOCKER.md - Troubleshooting section](DOCKER.md#troubleshooting).
 
@@ -850,7 +850,7 @@ For complete privacy, run OpenClaw with a local Lemonade Server instead of cloud
 # Once server is running, bootstrap agents:
 ./oc-bootstrap.sh --config .env
 # When prompted, set LOCAL_INFERENCE=true
-```text
+```bash
 
 See [Lemonade Server Documentation](https://lemonade.ai/docs) for details.
 
@@ -872,7 +872,7 @@ nano ~/.openclaw/workspace-assistant/SOUL.md
 
 # Reload configuration
 openclaw agents reload assistant
-```text
+```bash
 
 ---
 
@@ -889,7 +889,7 @@ openclaw memory search --agent assistant --query "previous conversations about P
 
 # Export memory for backup
 openclaw memory export --agent assistant > assistant-memory.json
-```text
+```bash
 
 ---
 
@@ -917,12 +917,12 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable openclaw
 sudo systemctl start openclaw
-```text
+```bash
 
 Check status:
 ```bash
 sudo systemctl status openclaw
-```text
+```bash
 
 ---
 
@@ -936,7 +936,7 @@ tar -czf openclaw-backup.tar.gz ~/.openclaw/
 
 # Restore from backup
 tar -xzf openclaw-backup.tar.gz -C ~/
-```text
+```bash
 
 > ⚠️ **Important**: The `secrets.env` file contains credentials. Keep it secure and never commit it to version control.
 
@@ -954,13 +954,13 @@ tail -f ~/.openclaw/logs/openclaw-setup.log
 openclaw agents logs assistant --follow
 openclaw agents logs research --follow
 openclaw agents logs developer --follow
-```text
+```bash
 
 ---
 
 ## 📁 Project Structure
 
-```text
+```bash
 oc-bootstrap/
 ├── README.md                    # This file
 ├── oc-bootstrap.sh              # Main installation script
@@ -983,8 +983,8 @@ oc-bootstrap/
 ├── docker-compose.yml           # Docker Compose configuration
 ├── Dockerfile                   # Docker image definition
 ├── .gitignore                   # Don't commit .env or logs
-├── LICENSE                      # MIT License
-├── CHANGELOG                    # Version history
+├── LICENSE.md                   # MIT License
+├── CHANGELOG.md                 # Version history
 ├── CONTRIBUTING.md              # Contribution guidelines
 ├── CODE_OF_CONDUCT.md           # Code of conduct
 ├── DOCKER.md                    # Docker documentation
@@ -999,7 +999,7 @@ oc-bootstrap/
     ├── Home.md
     ├── Quick-Start.md
     └── ... (additional guides)
-```text
+```bash
 
 ---
 
@@ -1013,7 +1013,7 @@ This project builds upon these excellent open source projects:
 |---------|---------|---------|---------|
 | [OpenClaw](https://github.com/openclaw/openclaw) | Self-hosted multi-agent AI platform | [MIT](https://github.com/openclaw/openclaw/blob/main/LICENSE) | Latest |
 | [Node.js](https://nodejs.org/) | JavaScript runtime for OpenClaw CLI | [MIT](https://github.com/nodejs/node/blob/main/LICENSE) | 22.x |
-| [Ubuntu](https://ubuntu.com/) | Base operating system | [Various](https://ubuntu.com/licensing) | 24.04 LTS |
+| [Ubuntu](https://ubuntu.com/) | Base operating system | [Various](https://ubuntu.com/licensing) | 24.04 |
 | [Docker](https://www.docker.com/) | Container platform for isolated deployment | [Apache 2.0](https://github.com/docker/docker/blob/master/LICENSE) | Latest |
 
 ### AI Model Providers
@@ -1055,7 +1055,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## 📄 License
 
-MIT License — See [LICENSE](LICENSE) file for details.
+MIT License — See [LICENSE.md](LICENSE.md) file for details.
 
 ---
 
@@ -1093,7 +1093,7 @@ If you want to remove OpenClaw and all its data, use the provided uninstall scri
 
 # Keep agent workspaces (SOUL.md, AGENTS.md, etc.)
 ./scripts/uninstall-oc-bootstrap.sh --preserve-workspaces
-```text
+```bash
 
 **What the uninstall script removes:**
 

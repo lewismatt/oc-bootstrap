@@ -144,9 +144,9 @@ Edit `docker-config.env`:
 
 ```bash
 # Telegram Bot Tokens (one per agent)
-TELEGRAM_ASSISTANT_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
-TELEGRAM_RESEARCH_BOT_TOKEN=987654321:ZYXwvuTSRqponMLKjihGFEdcba
-TELEGRAM_DEVELOPER_BOT_TOKEN=111222333:AABBccDDeeFFggHHiiJJkkLLmm
+ASSISTANT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+RESEARCH_TOKEN=987654321:ZYXwvuTSRqponMLKjihGFEdcba
+DEVELOPER_TOKEN=111222333:AABBccDDeeFFggHHiiJJkkLLmm
 
 # Optional: Bot usernames (for display)
 TELEGRAM_ASSISTANT_BOT_USERNAME=openclaw_assistant_bot
@@ -159,12 +159,12 @@ TELEGRAM_DEVELOPER_BOT_USERNAME=openclaw_developer_bot
 Set environment variables:
 
 ```bash
-export TELEGRAM_ASSISTANT_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
-export TELEGRAM_RESEARCH_BOT_TOKEN="987654321:ZYXwvuTSRqponMLKjihGFEdcba"
-export TELEGRAM_DEVELOPER_BOT_TOKEN="111222333:AABBccDDeeFFggHHiiJJkkLLmm"
+export ASSISTANT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+export RESEARCH_TOKEN="987654321:ZYXwvuTSRqponMLKjihGFEdcba"
+export DEVELOPER_TOKEN="111222333:AABBccDDeeFFggHHiiJJkkLLmm"
 
 # Add to ~/.bashrc for persistence
-echo 'export TELEGRAM_ASSISTANT_BOT_TOKEN="..."' >> ~/.bashrc
+echo 'export ASSISTANT_TOKEN="..."' >> ~/.bashrc
 ```text
 
 ### Verify Configuration
