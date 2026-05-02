@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Documentation Specialist Agent**: Created `.github/agents/documentation-specialist.agent.md` for improving repository documentation
+- **Documentation Specialist Agent**: Created `wiki/Documentation-Specialist.md` for improving repository documentation
 - **CONTRIBUTING.md**: Comprehensive contributing guidelines with coding standards and testing instructions
 - **CODE_OF_CONDUCT.md**: Contributor Covenant Code of Conduct for community standards
 - **Dependencies & Attributions Section**: Added to README.md with proper citation of open source projects

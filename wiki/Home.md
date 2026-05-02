@@ -31,10 +31,10 @@ Welcome to the OpenClaw Multi-Agent Bootstrap documentation wiki! This wiki prov
 
 | Resource | Link |
 |----------|------|
-| Main Repository | [github.com/openclaw/oc-bootstrap](https://github.com/openclaw/oc-bootstrap) |
-| Issue Tracker | [Report a Bug](https://github.com/openclaw/oc-bootstrap/issues) |
-| Discussions | [Community Discussions](https://github.com/openclaw/oc-bootstrap/discussions) |
-| Releases | [Download Latest](https://github.com/openclaw/oc-bootstrap/releases) |
+| Main Repository | [github.com/lewismatt/oc-bootstrap](https://github.com/lewismatt/oc-bootstrap) |
+| Issue Tracker | [Report a Bug](https://github.com/lewismatt/oc-bootstrap/issues) |
+| Discussions | [Community Discussions](https://github.com/lewismatt/oc-bootstrap/discussions) |
+| Releases | [Download Latest](https://github.com/lewismatt/oc-bootstrap/releases) |
 
 ---
 
@@ -75,7 +75,7 @@ This wiki is maintained alongside the main repository. To contribute:
 
 1. Clone the wiki repository:
    ```bash
-   git clone https://github.com/openclaw/oc-bootstrap.wiki.git
+   git clone https://github.com/lewismatt/oc-bootstrap.wiki.git
    ```
 
 2. Make your changes and commit:
@@ -94,8 +94,8 @@ This wiki is maintained alongside the main repository. To contribute:
 ## 🆘 Need Help?
 
 - Check **[Troubleshooting](Troubleshooting)** page first
-- Search existing [Issues](https://github.com/openclaw/oc-bootstrap/issues)
-- Ask in [Discussions](https://github.com/openclaw/oc-bootstrap/discussions)
+- Search existing [Issues](https://github.com/lewismatt/oc-bootstrap/issues)
+- Ask in [Discussions](https://github.com/lewismatt/oc-bootstrap/discussions)
 - Review [README.md](../README.md) for basic information
 
 ---

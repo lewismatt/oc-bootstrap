@@ -34,7 +34,7 @@ git --version
 
 # Check internet connectivity
 ping -c 3 github.com
-```text
+```
 
 ---
 
@@ -45,7 +45,7 @@ ping -c 3 github.com
 ```bash
 git clone https://github.com/openclaw/oc-bootstrap.git
 cd oc-bootstrap
-```text
+```
 
 ### Step 2: Configure Environment
 
@@ -55,7 +55,7 @@ cp docker-config.env.template docker-config.env
 
 # Edit with your values
 nano docker-config.env
-```text
+```
 
 **Minimum configuration needed:**
 
@@ -79,7 +79,7 @@ docker compose up -d
 
 # View logs
 docker compose logs -f
-```text
+```
 
 ### Step 4: Test the Bots
 
