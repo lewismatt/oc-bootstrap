@@ -569,27 +569,27 @@ test_gateway_start() {
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --verbose)
-            VERBOSE=true
-            shift
-            ;;
-        --keep)
-            KEEP_CONTAINER=true
-            shift
-            ;;
-        --quick)
-            QUICK_MODE=true
-            shift
-            ;;
-        --help | -h)
-            print_usage
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            print_usage
-            exit 1
-            ;;
+    --verbose)
+        VERBOSE=true
+        shift
+        ;;
+    --keep)
+        KEEP_CONTAINER=true
+        shift
+        ;;
+    --quick)
+        QUICK_MODE=true
+        shift
+        ;;
+    --help | -h)
+        print_usage
+        exit 0
+        ;;
+    *)
+        echo "Unknown option: $1"
+        print_usage
+        exit 1
+        ;;
     esac
 done
 
@@ -660,7 +660,7 @@ fi
 if [[ "$goto_summary" == "false" ]]; then
     echo ""
     log "Phase 3: Directory Structure Validation"
-    echo ""
+echo ""
 
     run_test "OpenClaw directory exists" test_openclaw_directory_exists
     run_test "OpenClaw directory permissions" test_openclaw_directory_permissions
@@ -674,14 +674,14 @@ if [[ "$goto_summary" == "false" ]]; then
 
     echo ""
     log "Phase 4: Secrets File Validation"
-    echo ""
+echo ""
 
     run_test "Secrets file has all required variables" test_secrets_file_content
     run_test "Secrets file model values match config" test_secrets_model_values
 
     echo ""
     log "Phase 5: OpenClaw Configuration Validation"
-    echo ""
+echo ""
 
     run_test "OpenClaw binary installed" test_openclaw_installed
     run_test "OpenClaw version check" test_openclaw_version
@@ -693,7 +693,7 @@ if [[ "$goto_summary" == "false" ]]; then
 
     echo ""
     log "Phase 6: Memory Backend Configuration"
-    echo ""
+echo ""
 
     run_test "Memory search provider configured" test_memory_search_provider
     run_test "Memory search store path configured" test_memory_search_store_path
@@ -702,7 +702,7 @@ if [[ "$goto_summary" == "false" ]]; then
 
     echo ""
     log "Phase 7: Skills & Hooks Configuration"
-    echo ""
+echo ""
 
     run_test "Research agent skills enabled" test_research_skills_enabled
     run_test "Assistant autoMemory hook enabled" test_assistant_hooks
@@ -711,7 +711,7 @@ if [[ "$goto_summary" == "false" ]]; then
 
     echo ""
     log "Phase 8: Agent Prompt Files"
-    echo ""
+echo ""
 
     # Only test if prompt files exist in the repo
     if [[ -d "$PROJECT_ROOT/assistant" && -d "$PROJECT_ROOT/research" && -d "$PROJECT_ROOT/developer" ]]; then
@@ -724,7 +724,7 @@ if [[ "$goto_summary" == "false" ]]; then
 
     echo ""
     log "Phase 9: Gateway Startup Test"
-    echo ""
+echo ""
 
     run_test "Gateway startup test" test_gateway_start
 fi
