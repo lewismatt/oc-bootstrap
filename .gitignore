@@ -1,2 +1,12 @@
 *.recommends.md
-.github/*
+.env
+.env.*
+docker-config.env
+.secrets
+secrets.env
+*.log
+venv/
+node_modules/
+
+# Docker
+# .dockerignore is tracked in the repo
