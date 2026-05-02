@@ -308,7 +308,7 @@ Error: 401 Unauthorized - Invalid bot token
 docker compose logs openclaw | grep "bot initialized"
 
 # Test bot token manually
-curl "https://api.telegram.org/bot<YOUR_TOKEN>/getMe"
+curl "https://api.Telegram.org/bot<YOUR_TOKEN>/getMe"
 ```text
 
 **Solution:**

@@ -121,7 +121,7 @@ Store the tokens securely:
 
 ```bash
 # Create a file to store tokens (don't commit this!)
-nano ~/telegram-bot-tokens.txt
+nano ~/Telegram-bot-tokens.txt
 ```text
 
 Content:
@@ -336,7 +336,7 @@ Implement custom message filters in agent configuration:
 
 ```bash
 # Check if bot token is valid
-curl "https://api.telegram.org/bot<YOUR_TOKEN>/getMe"
+curl "https://api.Telegram.org/bot<YOUR_TOKEN>/getMe"
 
 # Should return:
 # {"ok":true,"result":{"id":123456789,"is_bot":true,"first_name":"...","username":"..."}}
@@ -463,8 +463,8 @@ After setting up channel isolation:
 
 ## Additional Resources
 
-- [Telegram Bot API Documentation](https://core.telegram.org/bots/api)
-- [BotFather Commands](https://core.telegram.org/bots#6-botfather)
+- [Telegram Bot API Documentation](https://core.Telegram.org/bots/api)
+- [BotFather Commands](https://core.Telegram.org/bots#6-botfather)
 - [OpenClaw Configuration](../README.md#configuration)
 - [Docker Deployment](Docker-Deployment)
 
