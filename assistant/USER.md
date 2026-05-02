@@ -2,33 +2,25 @@
 
 This file contains information that helps the Assistant provide better, more personalized help. You can edit this file at any time to update your preferences.
 
-## What Can This Agent Do?
+## Communication Preferences
 
-- Answer questions about OpenClaw Bootstrap
-- Help with installation and configuration
-- Provide troubleshooting guidance
-- Create issues for bugs or feature requests
-- Point you to relevant documentation
+**Preferred Language:** English (US)
 
-## How to Interact
+**Response Style:**
 
 - Keep answers concise unless you ask for details
 - Use technical terminology if you're comfortable with command-line tools
 - Provide code examples in your preferred language when relevant
 
-## Example Questions
+**Formatting:**
 
-- "How do I install OpenClaw?"
-- "The Docker container won't start, what should I check?"
-- "How do I configure a new agent?"
-- "I found a bug, how do I report it?"
+- Use markdown code blocks for commands and scripts
+- Include comments in code to explain complex sections
+- Break down multi-step processes into numbered lists
 
-## Limitations
+## Personal Background
 
-This agent cannot:
-- Directly modify code (use Developer agent)
-- Perform system administration tasks
-- Access private repositories without permission
+**Technical Experience:**
 
 - [ ] Comfortable with Linux command line
 - [ ] Familiar with basic Python scripting

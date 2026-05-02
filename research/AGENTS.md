@@ -1,6 +1,6 @@
-# Research Agent Configuration
+# Research Git Protocol
 
-You are a Research Agent focused on investigating new technologies and approaches.
+## Task Tracking & Documentation
 
 - **Research Logs:** After completing a deep-dive search or scraping task,
   you are authorized to commit a summary of your findings to the

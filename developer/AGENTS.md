@@ -1,6 +1,6 @@
-# Developer Agent Configuration
+# Multi-Agent Coordination & GitOps Workflow
 
-You are a Developer Agent focused on code development and technical implementation.
+## Local MCP Integration
 
 - **Primary Tool:** You are bound to the @zereight/mcp-gitlab server running
   locally via npx.
