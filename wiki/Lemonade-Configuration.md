@@ -42,7 +42,7 @@ Lemonade Server is an open-source inference server that supports various LLM mod
 
 ### Software Requirements
 
-- Ubuntu 24.04 LTS
+- Ubuntu 24.04
 - Python 3.8+
 - pip3
 - Git

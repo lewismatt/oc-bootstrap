@@ -1,6 +1,6 @@
 # Linux Server Configuration
 
-This guide covers the complete configuration of your Ubuntu 24.04 LTS server for running OpenClaw Multi-Agent system. Follow these steps to prepare your server environment.
+This guide covers the complete configuration of your Ubuntu 24.04 server for running OpenClaw Multi-Agent system. Follow these steps to prepare your server environment.
 
 ---
 
@@ -23,7 +23,7 @@ This guide covers the complete configuration of your Ubuntu 24.04 LTS server for
 
 | Component | Specification |
 |-----------|---------------|
-| OS | Ubuntu 24.04 LTS (Noble Numbat) |
+| OS | Ubuntu 24.04 (Noble Numbat) |
 | CPU | 4 cores (x86_64) |
 | RAM | 8GB |
 | Storage | 20GB free space (SSD recommended) |

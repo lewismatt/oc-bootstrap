@@ -40,7 +40,7 @@ Complete installation guide for OpenClaw Multi-Agent system. Choose the method t
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
-| **OS** | Ubuntu 22.04+ | Ubuntu 24.04 LTS |
+| **OS** | Ubuntu 22.04+ | Ubuntu 24.04 |
 | **CPU** | 4 cores | 8+ cores |
 | **RAM** | 8GB | 32GB |
 | **Storage** | 20GB free | 100GB+ SSD |

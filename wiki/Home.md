@@ -61,7 +61,7 @@ Welcome to the OpenClaw Multi-Agent Bootstrap documentation wiki! This wiki prov
 
 ## 🛠️ System Requirements
 
-- **OS**: Ubuntu 24.04 LTS (recommended)
+- **OS**: Ubuntu 24.04 (recommended)
 - **RAM**: 8GB minimum (16GB+ recommended)
 - **Storage**: 20GB free space minimum
 - **Network**: Internet access for initial setup

@@ -1,6 +1,6 @@
 # Bare Metal Installation
 
-Complete guide to installing OpenClaw Multi-Agent system directly on Ubuntu 24.04 LTS (without Docker). Bare metal installation provides maximum performance and full system access.
+Complete guide to installing OpenClaw Multi-Agent system directly on Ubuntu 24.04 (without Docker). Bare metal installation provides maximum performance and full system access.
 
 ---
 
@@ -42,7 +42,7 @@ Complete guide to installing OpenClaw Multi-Agent system directly on Ubuntu 24.0
 
 | Component | Minimum | Recommended |
 |-----------|----------|-------------|
-| OS | Ubuntu 22.04+ | Ubuntu 24.04 LTS |
+| OS | Ubuntu 22.04+ | Ubuntu 24.04 |
 | CPU | 4 cores | 8+ cores |
 | RAM | 8GB | 32GB |
 | Storage | 20GB free | 100GB+ SSD |

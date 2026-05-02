@@ -18,7 +18,7 @@ Get OpenClaw Multi-Agent system up and running in under 5 minutes. This guide co
 
 Before starting, ensure you have:
 
-- **Ubuntu 24.04 LTS** server (or compatible Linux distribution)
+- **Ubuntu 24.04** server (or compatible Linux distribution)
 - **Telegram account** for bot communication
 - **Git** installed (`sudo apt install git`)
 - **Internet access** for initial setup
