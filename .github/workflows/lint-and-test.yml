@@ -36,7 +36,7 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v14
         with:
           config: '.markdownlint.json'
-          globs: '**/*.md'
+          glob: '**/*.md'
           ignore: 'node_modules/**'
 
       - name: Yamllint
