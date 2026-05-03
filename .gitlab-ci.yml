@@ -26,7 +26,7 @@ shfmt:
   stage: lint
   image:
     name: mvdan/shfmt:latest
-    entrypoint: ["/bin/sh", "-c"]
+    entrypoint: [""]
   script:
     # The -d flag prints a diff and fails the job if formatting is incorrect
     # The -i 4 flag enforces 4-space indentation
