@@ -215,7 +215,9 @@ run_secret_detection() {
 
     if docker_exists; then
         # Use trufflehog Docker image like GitHub Actions
-        if run_in_docker "trufflesecurity/trufflehog:latest" "trufflehog git file:///app --only-verified" "/app" "$(pwd):/app:ro"; then
+        # Must run trufflehog directly without sh -c wrapper
+        print_header "Running trufflehog secret scan..."
+        if docker run --rm -v "$(pwd):/app:ro" "trufflesecurity/trufflehog:latest" git file:///app --only-verified 2>&1; then
             print_success "trufflehog: no secrets detected"
         else
             print_failure "trufflehog: potential secrets found"
