@@ -33,12 +33,10 @@ jobs:
       - run: shfmt -d -i 4 -ci oc-bootstrap.sh lib/helpers.sh scripts/install-lemonade.sh
 
       - name: Markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v14
-        with:
-          config: '.markdownlint.json'
-          glob: |
-            **/*.md
-            !node_modules/**/*.md
+        run: |
+          npm install -g markdownlint-cli
+          markdownlint -c .markdownlint.json .
+        shell: bash
 
       - name: Yamllint
         uses: ibiqlik/action-yamllint@v3
