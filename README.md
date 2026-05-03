@@ -54,22 +54,22 @@ docker compose logs -f
 ```
 ---
 ## 📖 Table of Contents
-1. [Overview](#-overview)
-2. [Architecture](#️-architecture)
-3. [Prerequisites Checklist](#-prerequisites-checklist)
-4. [Installation](#-installation)
-5. [Docker Setup](#-docker-setup)
-6. [Configuration](#-configuration)
-7. [After Installation](#-after-installation)
-8. [Troubleshooting](#-troubleshooting)
-9. [Advanced Topics](#-advanced-topics)
-10. [Project Structure](#-project-structure)
-11. [Dependencies & Attributions](#-dependencies--attributions)
-12. [Contributing](#-contributing)
-13. [License](#-license)
-14. [Support](#-support)
-15. [Additional Resources](#-additional-resources)
-16. [Uninstalling OpenClaw](#uninstalling-openclaw)
+ 1. [Overview](#overview)
+ 2. [Architecture](#architecture)
+ 3. [Prerequisites Checklist](#prerequisites-checklist)
+ 4. [Installation](#installation)
+ 5. [Docker Setup](#docker-setup)
+ 6. [Configuration](#configuration)
+ 7. [After Installation](#after-installation)
+ 8. [Troubleshooting](#troubleshooting)
+ 9. [Advanced Topics](#advanced-topics)
+ 10. [Project Structure](#project-structure)
+ 11. [Dependencies & Attributions](#dependencies--attributions)
+ 12. [Contributing](#contributing)
+ 13. [License](#license)
+ 14. [Support](#support)
+ 15. [Additional Resources](#additional-resources)
+ 16. [Uninstalling OpenClaw](#uninstalling-openclaw)
 ---
 ## 🎯 Overview
 **OpenClaw** is a self-hosted multi-agent AI platform. This bootstrap project automates the complex setup process so you can get started in minutes.

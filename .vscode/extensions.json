@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "saoudrizwan.claude-dev"
+        "saoudrizwan.claude-dev",
+        "ms-azuretools.vscode-containers"
     ]
 }

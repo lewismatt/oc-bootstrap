@@ -48,8 +48,8 @@ fi
 source "$SCRIPT_DIR/lib/helpers.sh"
 
 # Parse command-line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
         --non-interactive | -y)
             NON_INTERACTIVE=true
             shift
@@ -206,14 +206,14 @@ else
 fi
 
 echo ""
-echo "=== Step 3: Model Selection ==="
+echo "=== Step 2: Model Selection ==="
 echo ""
 echo "AI Models determine how smart and capable each agent is."
 echo ""
 echo "Model format: provider/model-name"
 echo ""
 echo "Available options:"
-echo "  • Local (Lemonade):  lemonade/user.Qwen3.5-4B-GGUF"
+echo "  • Local (lemonade):  lemonade/user.Qwen3.5-4B-GGUF"
 echo "    - Free after setup, runs privately on your hardware"
 echo "    - Requires 6GB+ VRAM, slower response times"
 echo ""
@@ -268,7 +268,7 @@ if [[ -z "${DEVELOPER_MODEL:-}" ]]; then
 fi
 
 echo ""
-echo "=== Step 2: Telegram Bot Setup ==="
+echo "=== Step 3: Telegram Bot Setup ==="
 echo ""
 echo "Each agent needs its own Telegram bot for isolated conversations."
 echo ""
@@ -326,7 +326,7 @@ if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_T
                 echo "  Please try again."
                 CURRENT_TOKEN=""
             else
-                case $current_token in
+                case "$current_token" in
                     0)
                         ASSISTANT_TOKEN="$CURRENT_TOKEN"
                         echo "  [OK] Assistant bot token accepted"
@@ -563,7 +563,7 @@ echo "" # Newline after final progress bar
 
 print_section_summary "System Preparation" \
     "Sudo configured" \
-    "Node.js 20.x installed" \
+    "Node.js 22.x installed" \
     "System packages updated" \
     "curl, git, and Node.js installed" \
     "OpenClaw installed and configured" \

@@ -11,7 +11,145 @@ The tests use Docker to spin up a container, run the bootstrap script, and verif
 |------|-------------|
 | `docker-integration-test.sh` | Basic integration test that runs in a Docker container (config validation only) |
 | `full-integration-test.sh` | **Full integration test** that validates ALL configuration, directory structure, and OpenClaw setup |
+| `telegram-e2e-test.sh` | **Telegram E2E test** - fully automated end-to-end test with real Telegram bots and OpenRouter |
+| `e2e-config.env.template` | Template with Telegram bot tokens and OpenRouter API key for E2E testing |
 | `test-config.env.template` | Template with dummy API keys for testing |
+
+## Telegram E2E Test (New)
+
+The `telegram-e2e-test.sh` script performs a **fully automated end-to-end test** that validates the entire OpenClaw setup with real Telegram bots.
+
+### What It Tests
+
+1. **Validation Phase:**
+   - Validates all 3 Telegram bot tokens (via Telegram API)
+   - Validates OpenRouter API key
+   - Checks Docker availability
+
+2. **Full Setup Phase:**
+   - Starts OpenClaw with Docker Compose
+   - Configures all 3 agents with `openrouter/free` models
+   - Binds Telegram channels to each agent
+   - Waits for gateway to be ready
+
+3. **Bot Response Phase:**
+   - Automatically gets chat IDs from Telegram
+   - Sends test messages to each bot
+   - Polls for bot responses
+   - Reports pass/fail for each agent
+
+### Prerequisites
+
+- 3 Telegram bots created via [@BotFather](https://t.me/BotFather)
+- OpenRouter API key (free tier available at [openrouter.ai](https://openrouter.ai))
+- Docker and Docker Compose installed and running
+
+### Setup
+
+1. **Copy the template:**
+   ```bash
+   cp tests/e2e-config.env.template tests/e2e-config.env
+   ```
+
+2. **Fill in your credentials:**
+    ```bash
+    nano tests/e2e-config.env
+    ```
+
+    Add your:
+   - 3 Telegram bot tokens (from @BotFather)
+   - OpenRouter API key
+   - Optional: GitLab PAT, Brave API key, etc.
+
+3. **Start a chat with each bot:**
+   - Open Telegram
+   - Search for each of your 3 bots
+   - Send any message to each bot (this allows the test to get the chat_id)
+
+### Running the E2E Test
+
+```bash
+# Run full E2E test
+./tests/telegram-e2e-test.sh
+
+# Run with verbose output
+./tests/telegram-e2e-test.sh --verbose
+
+# Keep containers after test (for debugging)
+./tests/telegram-e2e-test.sh --keep
+
+# Skip full setup, test existing deployment
+./tests/telegram-e2e-test.sh --quick
+```
+
+### Expected Output
+
+```text
+  OpenClaw Telegram E2E Test
+
+[TEST] Loading configuration...
+[INFO] Configuration loaded from tests/e2e-config.env
+
+[TEST] Phase 1: Validation Tests
+
+[TEST] Running: Assistant bot token valid
+[PASS] Assistant bot token valid
+[INFO] Assistant bot username: @your_assistant_bot
+
+[TEST] Running: Research bot token valid
+[PASS] Research bot token valid
+[INFO] Research bot username: @your_research_bot
+
+[TEST] Running: Developer bot token valid
+[PASS] Developer bot token valid
+[INFO] Developer bot username: @your_developer_bot
+
+[TEST] Running: OpenRouter API key valid
+[PASS] OpenRouter API key valid
+
+...
+
+[TEST] Phase 4: Bot Response Tests
+
+[TEST] Running: Assistant bot responds to message
+[PASS] Assistant bot responds to message
+
+[TEST] Running: Research bot responds to message
+[PASS] Research bot responds to message
+
+[TEST] Running: Developer bot responds to message
+[PASS] Developer bot responds to message
+
+  Test Summary
+Passed: 12
+Failed: 0
+
+All tests passed!
+```
+
+### Troubleshooting
+
+**Bot chat_id not found:**
+- Make sure you've started a chat with each bot on Telegram
+- Send any message to each bot before running the test
+
+**Bots not responding:**
+- Check that OpenRouter API key is valid
+- Verify bots are running: `docker logs oc-bootstrap`
+- Check test output with `--verbose` flag
+
+**Cleanup:**
+```bash
+# Stop and remove test containers
+docker stop oc-bootstrap
+docker rm oc-bootstrap
+
+# Remove test volumes
+docker volume prune
+
+# Remove docker-compose override
+rm -f docker-compose.e2e-test.yml
+```
 
 ## Prerequisites
 

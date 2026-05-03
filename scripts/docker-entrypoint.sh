@@ -26,7 +26,7 @@ BOOTSTRAP_SCRIPT="/home/openclaw/oc-bootstrap/oc-bootstrap.sh"
 # ==============================================================================
 
 log() {
-    echo "[$(date +'%Y-%m-%d %H:%M:%S')] [ENTRYPOINT] $*" >&2
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ENTRYPOINT] $*" >&2
 }
 
 handle_error() {
