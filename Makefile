@@ -23,7 +23,7 @@ CONTAINER_NAME := oc-bootstrap
 # DOCKER COMPOSE COMMANDS (using modern 'docker compose' V2 syntax)
 # ==============================================================================
 
-.PHONY: build up down restart logs shell test test-full test-full-real test-quick clean clean-all help
+.PHONY: build up down restart logs shell test test-full test-full-real test-quick ci clean clean-all help
 
 ## Build Docker image
 build:
@@ -101,6 +101,14 @@ test-full-real:
 	./tests/full-integration-test.sh --verbose
 
 # ==============================================================================
+# CI/CD
+# ==============================================================================
+
+## Run local CI checks (mirrors GitLab/GitHub pipelines)
+ci:
+	./scripts/local-ci.sh $(STAGE)
+
+# ==============================================================================
 # CLEANUP
 # ==============================================================================
 
@@ -133,6 +141,7 @@ help:
 	@echo "  make test-full     - Run full integration test"
 	@echo "  make test-full-real - Run full test with real credentials"
 	@echo "  make test-quick    - Run quick tests"
+	@echo "  make ci            - Run local CI checks (lint, test, secret-detection)"
 	@echo "  make clean         - Stop and remove containers"
 	@echo "  make clean-all     - Stop, remove containers AND volumes"
 	@echo "  make help          - Show this help message"
