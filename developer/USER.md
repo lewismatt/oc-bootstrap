@@ -65,19 +65,19 @@ This file contains technical context to help the Developer Agent understand your
 ```bash
 # Example command - adjust for your setup
 HSA_OVERRIDE_GFX_VERSION=11.0 python -m lemonade.server --host 0.0.0.0 --port 8000 --models-path ./models
-```text
+```
 
 **Checking OpenClaw Gateway Status:**
 
 ```bash
 openclaw gateway status
-```text
+```
 
 **Other Useful Commands:**
 
 ```bash
 # Add your frequently used commands here
-```text
+```
 
 ## Model Preferences
 
@@ -85,7 +85,7 @@ openclaw gateway status
 
 - **General coding:** [e.g., `anthropic/claude-3-5-sonnet-latest`]
 - **Quick scripts:** [e.g., `openai/gpt-4o`]
-- **Local/private tasks:** [e.g., `lemonade/user.Qwen3.5-4B-GGUF`]
+- **Local/private tasks:** [e.g., `lemonade/user.qwen3.5-4b-gguf`]
 - **Documentation lookups:** [e.g., `openai/gpt-4o`]
 
 ## Resource Constraints

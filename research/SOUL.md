@@ -61,11 +61,11 @@ When given a research task:
 
 ## Sources
 - [URL 1] - Brief description
-- [URL 2] - Brief description
+- [URL 2] - Brief description]
 
 ## Research Notes
 [Any caveats, conflicting information, or areas needing follow-up]
-```text
+```
 
 ### 3. Documentation
 
@@ -79,7 +79,7 @@ With `sessionSummarize` hook enabled, you automatically:
 
 **Breaking News:**
 
-```text
+```
 User: "What's the latest on the AI regulation bill?"
 
 You: [Use newsSearch + webSearch]
@@ -96,11 +96,11 @@ Sources:
 - https://techcrunch.com/...
 
 Would you like me to monitor this topic and provide daily updates?"
-```text
+```
 
 **Deep Dive Research:**
 
-```text
+```
 User: "Research the best practices for local LLM deployment."
 
 You: [Use webSearch + webScrape + summarize]
@@ -119,11 +119,11 @@ You: [Use webSearch + webScrape + summarize]
 [Detailed analysis continues...]
 
 Sources: [15 URLs listed]"
-```text
+```
 
 **Social Sentiment Analysis:**
 
-```text
+```
 User: "What's the general sentiment about the new iPhone release?"
 
 You: [Use xScraper + trendsFinder + webSearch]
@@ -143,7 +143,7 @@ Negative themes:
 Trending hashtags: #iPhone16Pro, #AppleEvent, #CameraPhone
 
 [Detailed breakdown with example tweets and tech review summaries...]"
-```text
+```
 
 ## Git Integration for Research Logs (Optional)
 
@@ -151,13 +151,13 @@ If Git MCP server is configured, you can commit findings:
 
 **File naming convention:**
 
-```text
+```
 research/logs/YYYY-MM-DD-topic-slug.md
-```text
+```
 
 **Commit message format:**
 
-```text
+```
 Research: [Brief Topic] - [Date]
 
 Key findings:
@@ -165,7 +165,7 @@ Key findings:
 - Finding 2
 
 Sources: [count]
-```text
+```
 
 This creates a searchable research archive that other agents can reference.
 

@@ -87,7 +87,7 @@ server, VM, or Docker container.
 **Files Checked**:
 - ✅ `CONTRIBUTING.md` - Already had correct `openclaw/oc-bootstrap` URLs
 - ✅ `wiki/*.md` - All reference correct repository links
-- ✅ `DOCKER.md` - Uses proper URLs
+- ✅ `DOCKER.md` - Uses proper URLs (needs fixing - see DOCKER.md fixes)
 
 ---
 
@@ -159,7 +159,7 @@ Each agent has:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/openclaw/oc-bootstrap.git
+git clone https://github.com/lewismatt/oc-bootstrap.git
 cd oc-bootstrap
 
 # 2. Make scripts executable
@@ -167,7 +167,7 @@ chmod +x *.sh
 
 # 3. Run the interactive installer
 ./oc-bootstrap.sh
-```text
+```bash
 
 The script will guide you through:
 1. Choosing local (Lemonade) or cloud AI models

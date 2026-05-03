@@ -83,7 +83,7 @@ chmod +x lib/*.sh
 
 ```bash
 # Run the test suite
-./tests/docker-test.sh --verbose/
+./tests/docker-test.sh --verbose
 
 # Or use make
 make test
@@ -147,7 +147,7 @@ fi
 ./tests/docker-test.sh --verbose/
 
 # Run quick tests (skip Docker build)
-./tests/docker-test.sh --quick --verbose/
+./tests/docker-test.sh --quick --verbose
 
 # Test specific functionality
 bash -x oc-bootstrap.sh --help

@@ -24,7 +24,7 @@ Complete guide to running OpenClaw Multi-Agent system in Docker containers.
 
 ```bash
 # Clone the repository
-git clone https://github.com/openclaw/oc-bootstrap.git
+git clone https://github.com/lewismatt/oc-bootstrap.git
 cd oc-bootstrap
 
 # Create and configure environment file
@@ -39,7 +39,7 @@ docker compose logs -f
 
 # Stop the container
 docker compose down
-```text
+```
 
 ---
 
@@ -63,7 +63,7 @@ newgrp docker
 
 # Install Docker Compose V2 (usually included with modern Docker installations)
 # If needed: sudo apt install -y docker-compose-plugin
-```text
+```
 
 ---
 
@@ -73,13 +73,13 @@ newgrp docker
 
 ```bash
 docker compose build
-```text
+```
 
 ### Build with Docker CLI
 
 ```bash
 docker build -t oc-bootstrap:latest .
-```text
+```
 
 ### Build Arguments (Optional)
 
@@ -89,7 +89,7 @@ Currently, the Dockerfile uses Node.js 22.x by default. To customize:
 docker build \
   --build-arg NODE_VERSION=22 \
   -t oc-bootstrap:custom .
-```text
+```
 
 ---
 
@@ -99,7 +99,7 @@ docker build \
 
 ```bash
 cp docker-config.env.template docker-config.env
-```text
+```
 
 ### 2. Edit `docker-config.env`
 
@@ -116,7 +116,7 @@ ASSISTANT_MODEL=openai/gpt-4o
 RESEARCH_MODEL=openai/gpt-4o
 DEVELOPER_MODEL=anthropic/claude-3-5-sonnet-latest
 EMBEDDING_MODEL=openai/text-embedding-3-small
-```text
+```
 
 **Optional Settings:**
 
@@ -131,7 +131,7 @@ GITHUB_PAT=ghp_...
 LOCAL_INFERENCE=false
 LEMONADE_KEY=local-dummy-key
 # LEMONADE_IP=192.168.12.50
-```text
+```
 
 ---
 
@@ -148,7 +148,7 @@ docker compose up -d --build
 
 # Start with local inference (uncomment lemonade service first)
 docker compose up -d --profile lemonade
-```text
+```
 
 ### View Logs
 
@@ -161,7 +161,7 @@ docker compose logs -f openclaw
 
 # Last 50 lines
 docker compose logs --tail=50 openclaw
-```text
+```
 
 ### Stop Services
 
@@ -174,13 +174,13 @@ docker compose down -v
 
 # Stop and remove everything (containers, volumes, images)
 docker compose down -v --rmi all
-```text
+```
 
 ### Check Status
 
 ```bash
 docker compose ps
-```text
+```
 
 ---
 
@@ -196,7 +196,7 @@ docker run -d \
   -e RESEARCH_TOKEN=your_token \
   -e DEVELOPER_TOKEN=your_token \
   oc-bootstrap:latest
-```text
+```
 
 ### Run with Environment File
 
@@ -206,7 +206,7 @@ docker run -d \
   --env-file docker-config.env \
   -v openclaw-data:/home/openclaw/.openclaw \
   oc-bootstrap:latest
-```text
+```
 
 ### Interactive Shell (Debugging)
 
@@ -215,7 +215,7 @@ docker run -it --rm \
   --env-file docker-config.env \
   oc-bootstrap:latest \
   shell
-```text
+```
 
 ### Run Bootstrap Script
 
@@ -225,7 +225,7 @@ docker run -it --rm \
   -v $(pwd):/home/openclaw/oc-bootstrap:ro \
   oc-bootstrap:latest \
   bootstrap
-```text
+```
 
 ---
 
@@ -241,13 +241,13 @@ OpenClaw data persists in Docker volumes:
 
 ```bash
 docker volume ls | grep openclaw
-```text
+```
 
 ### Inspect Volume
 
 ```bash
 docker volume inspect oc-bootstrap_openclaw-data
-```text
+```
 
 ### Backup Volume
 
@@ -256,7 +256,7 @@ docker run --rm \
   -v openclaw-data:/data:ro \
   -v $(pwd):/backup \
   alpine tar czf /backup/openclaw-backup.tar.gz -C /data .
-```text
+```
 
 ### Restore Volume
 
@@ -265,7 +265,7 @@ docker run --rm \
   -v openclaw-data:/data \
   -v $(pwd):/backup \
   alpine tar xzf /backup/openclaw-backup.tar.gz -C /data
-```text
+```
 
 ---
 
@@ -285,7 +285,7 @@ Lemonade Server provides local LLM inference (no cloud APIs needed).
 
 ```bash
 docker-compose up -d
-```text
+```
 
 ### Lemonade Configuration
 
@@ -293,7 +293,7 @@ docker-compose up -d
 LOCAL_INFERENCE=true
 LEMONADE_KEY=local-dummy-key
 LEMONADE_IP=lemonade  # Service name in docker-compose.yml
-```text
+```
 
 ---
 
@@ -308,7 +308,7 @@ docker run -it --rm \
   -v openclaw-data:/home/openclaw/.openclaw \
   oc-bootstrap:latest \
   shell
-```text
+```
 
 ### Hot-Reload Development
 
@@ -323,7 +323,7 @@ docker run -it --rm \
 
 # Terminal 2: Edit files on host, test in container
 vim oc-bootstrap.sh
-```text
+```
 
 ---
 
@@ -340,7 +340,7 @@ docker inspect oc-bootstrap
 
 # Check OpenClaw health
 docker exec oc-bootstrap openclaw doctor
-```text
+```
 
 ### Telegram Bots Not Connecting
 
@@ -356,7 +356,7 @@ docker exec oc-bootstrap openclaw doctor
 ```bash
 # Fix permissions
 docker exec oc-bootstrap sudo chown -R openclaw:openclaw /home/openclaw/.openclaw
-```text
+```
 
 ### OpenClaw CLI Not Found
 
@@ -366,7 +366,7 @@ docker compose build --no-cache
 
 # Check installation
 docker exec oc-bootstrap which openclaw
-```text
+```
 
 ### Memory/Performance Issues
 
@@ -381,7 +381,7 @@ deploy:
     reservations:
       cpus: '2'
       memory: 4G
-```text
+```
 
 ---
 
@@ -396,7 +396,7 @@ networks:
     ipam:
       config:
         - subnet: 172.20.0.0/16
-```text
+```
 
 ### Using External Secrets Management
 
@@ -408,7 +408,7 @@ docker run -d \
   --name oc-bootstrap \
   -e ASSISTANT_TOKEN=$(pass show telegram/assistant) \
   oc-bootstrap:latest
-```text
+```
 
 ### Multi-Architecture Builds
 
@@ -417,7 +417,7 @@ docker buildx build \
   --platform linux/amd64,linux/arm64 \
   -t oc-bootstrap:multi-arch \
   --push .
-```text
+```
 
 ### Health Checks
 
@@ -429,7 +429,7 @@ docker inspect --format='{{json .State.Health}}' oc-bootstrap | jq
 
 # Wait for healthy
 docker wait-for-it oc-bootstrap:3000 -t 60
-```text
+```
 
 ---
 
@@ -446,13 +446,13 @@ Use the provided cleanup script:
 
 # Full cleanup (containers, volumes, images)
 ./scripts/docker-cleanup.sh --all
-```text
+```
 
 Or use Docker Compose:
 
 ```bash
 docker-compose down -v --rmi all
-```text
+```
 
 ---
 
