@@ -13,18 +13,18 @@
 # ==============================================================================
 
 set -euo pipefail
-set +o histexpand # Disable history expansion to prevent issues with '!' characters
+set +o histexpand                   # Disable history expansion to prevent issues with '!' characters
 
 # ==============================================================================
 # CONSTANTS & EXIT CODES
 # ==============================================================================
 
 # Exit code constants (for error classification)
-E_SUDO=10       # Script run as root or sudo unavailable
-E_DEPENDENCY=11 # System package installation failure
-E_OPENCLAW=12   # OpenClaw installation or runtime error
-E_CONFIG=13     # Configuration operation failed
-E_GATEWAY=14    # Gateway start/bind error
+E_SUDO=10                           # Script run as root or sudo unavailable
+E_DEPENDENCY=11                     # System package installation failure
+E_OPENCLAW=12                       # OpenClaw installation or runtime error
+E_CONFIG=13                         # Configuration operation failed
+E_GATEWAY=14                        # Gateway start/bind error
 
 # Execution settings
 STABILITY_DELAY=5                   # Wait time for gateway to stabilize (seconds)
@@ -294,8 +294,7 @@ if [[ -z "${ASSISTANT_TOKEN:-}" || -z "${RESEARCH_TOKEN:-}" || -z "${DEVELOPER_T
         CURRENT_TOKEN=""
         ATTEMPT=0
 
-        while [[ -z "$CURRENT_TOKEN" || "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" ||
-            "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" || "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; do
+        while [[ -z "$CURRENT_TOKEN" || "$CURRENT_TOKEN" == "$ASSISTANT_TOKEN" || "$CURRENT_TOKEN" == "$RESEARCH_TOKEN" || "$CURRENT_TOKEN" == "$DEVELOPER_TOKEN" ]]; do
             ATTEMPT=$((ATTEMPT + 1))
             if [[ $ATTEMPT -gt 3 ]]; then
                 echo "  [WARN] Failed to collect $AGENT_PREFIX token after 3 attempts."
