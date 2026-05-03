@@ -43,7 +43,7 @@ Enhancement suggestions are welcome! Please include:
 - **Explain why this enhancement would be useful**
 - **List any alternatives you've considered**
 
-### Pull Requests #
+### Pull Requests
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -55,7 +55,7 @@ Enhancement suggestions are welcome! Please include:
 
 ---
 
-## 🛠️ Development Setup #
+## 🛠️ Development Setup
 
 ### Prerequisites
 
@@ -64,7 +64,7 @@ Enhancement suggestions are welcome! Please include:
 - Docker (for testing Docker-related changes)
 - Git
 
-### Local Development Environment #
+### Local Development Environment
 
 ```bash
 # Clone your fork
@@ -79,7 +79,7 @@ chmod +x *.sh
 chmod +x lib/*.sh
 ```
 
-### Testing Your Changes #
+### Testing Your Changes
 
 ```bash
 # Run the test suite
@@ -94,9 +94,9 @@ make test
 
 ---
 
-## 📏 Coding Standards #
+## 📏 Coding Standards
 
-### Bash Script Standards #
+### Bash Script Standards
 
 - **Use `set -euo pipefail`** at the top of scripts for safety
 - **Quote all variable expansions** (`"$variable"` not `$variable`)
@@ -105,7 +105,7 @@ make test
 - **Use the helper functions** from `lib/helpers.sh` when possible
 - **Follow the existing code style** (indentation, spacing)
 
-### Example #
+### Example
 
 ```bash
 #!/bin/bash
@@ -122,7 +122,7 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
 fi
 ```
 
-### Documentation Standards #
+### Documentation Standards
 
 - **Use Markdown** for all documentation files
 - **Include code examples** with proper syntax highlighting
@@ -132,15 +132,15 @@ fi
 
 ---
 
-## 🧪 Testing #
+## 🧪 Testing
 
-### Test Types #
+### Test Types
 
 1. **Unit Tests** - Test individual functions in `lib/helpers.sh`
 2. **Integration Tests** - Test the full installation process
 3. **Docker Tests** - Test Docker build and functionality
 
-### Running Tests #
+### Running Tests
 
 ```bash
 # Run all tests
@@ -153,7 +153,7 @@ fi
 bash -x oc-bootstrap.sh --help
 ```
 
-### Writing Tests #
+### Writing Tests
 
 When adding new features, please add corresponding tests:
 
@@ -178,9 +178,9 @@ test_new_feature() {
 
 ---
 
-## 📝 Documentation #
+## 📝 Documentation
 
-### README Updates #
+### README Updates
 
 When making changes that affect users, update `README.md`:
 
@@ -188,7 +188,7 @@ When making changes that affect users, update `README.md`:
 - **Configuration changes** → Update "Configuration" section
 - **New dependencies** → Update "Dependencies & Attributions" section
 
-### Inline Documentation #
+### Inline Documentation
 
 - **Comment complex bash logic**
 - **Use function headers** to describe purpose and parameters
@@ -214,9 +214,9 @@ install_packages() {
 
 ---
 
-## 🏷️ Release Process #
+## 🏷️ Release Process
 
-### Versioning #
+### Versioning
 
 We use [Semantic Versioning](https://semver.org/):
 
@@ -224,7 +224,7 @@ We use [Semantic Versioning](https://semver.org/):
 - **MINOR** version for new functionality (backwards-compatible)
 - **PATCH** version for bug fixes (backwards-compatible)
 
-### Changelog #
+### Changelog
 
 Update `CHANGELOG.md` with your changes:
 
@@ -242,7 +242,7 @@ Update `CHANGELOG.md` with your changes:
 
 ---
 
-## ❓ Questions? #
+## ❓ Questions?
 
 Feel free to:
 
@@ -252,6 +252,6 @@ Feel free to:
 
 ---
 
-## 🙏 Thank You #
+## 🙏 Thank You
 
 Your contributions help make OpenClaw Bootstrap better for everyone. We appreciate your time and effort!
