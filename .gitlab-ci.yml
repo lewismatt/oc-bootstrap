@@ -24,13 +24,9 @@ shellcheck:
 # 3. shfmt: Enforces strict styling and indentation
 shfmt:
   stage: lint
-  image:
-    name: mvdan/shfmt:latest
-    entrypoint: [""]
+  image: golang:alpine
   script:
-    # The -d flag prints a diff and fails the job if formatting is incorrect
-    # The -i 4 flag enforces 4-space indentation
-    # The -ci flag indents switch cases
+    - go install mvdan.cc/sh/cmd/shfmt@latest
     - shfmt -d -i 4 -ci oc-bootstrap.sh lib/helpers.sh scripts/install-lemonade.sh
 
 # 4. MarkdownLint: Ensures prompt files are LLM-ready
